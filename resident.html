@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+  <title>Fiche résident — FTR</title>
+  <link rel="stylesheet" href="css/style.css"/>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet"/>
+</head>
+<body>
+<div class="app-layout">
+  <aside class="sidebar">
+    <a href="dashboard.html" class="sidebar-logo"><img class="sidebar-logo-img" src="" style="display:none" alt="Logo"/><div class="logo-icon">FTR</div><div class="logo-text"><span id="sidebarEtab">Foyer Trois Rivières</span><strong>Administration</strong></div></a>
+    <div class="sidebar-section">
+      <div class="sidebar-label">Principal</div>
+      <a href="dashboard.html" class="nav-item" data-page="dashboard.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>Tableau de bord</a>
+      <a href="residents.html" class="nav-item active" data-page="residents.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>Résidents</a>
+      <a href="journal.html" class="nav-item" data-page="journal.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/>      </svg>Journal de bord</a>
+      <a href="ppe.html" class="nav-item" data-page="ppe.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>Avenants</a>
+      <a href="planning.html" class="nav-item" data-page="planning.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>Planning</a>
+      <a href="presences.html" class="nav-item" data-page="presences.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>Présences</a>
+      <a href="vehicules.html" class="nav-item" data-page="vehicules.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 16H9m10 0h3v-3.15a1 1 0 0 0-.84-.99L16 11l-2.7-3.6a1 1 0 0 0-.8-.4H5.5a1 1 0 0 0-.8.4L2 11v5h2m10 1.5a1.5 1.5 0 0 1-3 0m3 0a1.5 1.5 0 0 0-3 0m3 0h3m-3 0H9m6-6V7a1 1 0 0 0-1-1h-3a1 1 0 0 0-1 1v3M6 17.5a1.5 1.5 0 0 1-3 0m3 0a1.5 1.5 0 0 0-3 0"/>      </svg>Véhicules</a>
+      <a href="incidents.html" class="nav-item" data-page="incidents.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>Incidents</a>
+      <a href="messages.html" class="nav-item" data-page="messages.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>Messages</a>
+      <a href="repertoire.html" class="nav-item" data-page="repertoire.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>Répertoire</a>
+    </div>
+    <div class="sidebar-section"><div class="sidebar-label">Paramètres</div><a href="admin.html" class="nav-item admin-only" data-page="admin.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.07 4.93l-1.41 1.41M4.93 4.93l1.41 1.41M12 2v2M12 20v2M2 12h2M20 12h2M19.07 19.07l-1.41-1.41M4.93 19.07l1.41-1.41"/></svg>Administration</a></div>
+    <div class="sidebar-footer">
+      <div class="user-card"><div class="avatar" id="sidebarAvatar">A</div><div><div class="user-name" id="sidebarUserName">Administrateur</div><div class="user-role" id="sidebarUserRole">Admin</div></div></div>
+      <a href="#" onclick="Auth.logout()" class="nav-item" style="margin-top:.25rem;color:rgba(255,255,255,.4)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>Déconnexion</a>
+    </div>
+  </aside>
+
+  <div class="main">
+    <header class="header">
+      <div><div class="header-title" id="pageTitle">Fiche résident</div><div class="header-sub" id="pageSub">Chargement…</div></div>
+      <div class="header-right">
+        <button class="btn btn-outline btn-sm" onclick="history.back()">← Retour</button>
+        <button class="btn btn-accent btn-sm" id="btnEdit" onclick="togglePageEdit()">✎ Modifier</button>
+      </div>
+    </header>
+    <main class="content" id="residentContent"></main>
+  </div>
+</div>
+
+<div id="toast-container" class="toast-container"></div>
+<script src="js/app.js"></script>
+<script>Auth.requireAuth();</script>
+<script src="js/residents.js"></script>
+<script>
+let currentResidentId = null;
+let pageEditMode = false;
+
+function getResident(id) {
+  const residents = DB.get(DB.keys.residents) || [];
+  return residents.find(x => x.id === (id || currentResidentId));
+}
+
+function canEditResident() {
+  const session = Auth.getSession();
+  return session && (session.role === 'admin' || session.role === 'moderator');
+}
+
+function loadResident() {
+  const params = new URLSearchParams(window.location.search);
+  const id = params.get('id');
+  if (!id) { document.getElementById('residentContent').innerHTML = '<div class="empty"><h3>Résident non trouvé</h3><p>Aucun ID fourni.</p><a href="residents.html" class="btn btn-accent">← Retour aux résidents</a></div>'; return; }
+
+  currentResidentId = id;
+
+  const r = getResident();
+  if (!r) { document.getElementById('residentContent').innerHTML = '<div class="empty"><h3>Résident introuvable</h3><p>Ce résident n\'existe pas ou a été supprimé.</p><a href="residents.html" class="btn btn-accent">← Retour aux résidents</a></div>'; return; }
+  document.getElementById('pageTitle').textContent = `${r.prenom||''} ${r.nom||''}`;
+  document.getElementById('pageSub').textContent = 'Fiche résident';
+
+  const editBtn = document.getElementById('btnEdit');
+  if (editBtn) {
+    if (!canEditResident()) { editBtn.style.display = 'none'; }
+    else { editBtn.style.display = ''; editBtn.textContent = pageEditMode ? '✕ Annuler' : '✎ Modifier'; }
+  }
+
+  if (pageEditMode) { renderEditMode(r); return; }
+  renderViewMode(r);
+}
+
+function renderViewMode(r) {
+  const objs = DB.get(DB.keys.objectives) || [];
+  const resObjs = (r.objectifs || []).map(id => objs.find(o => String(o.id) === String(id))).filter(Boolean);
+  const type = getStructureType();
+  const docs = (DB.get(DB.keys.documents)||{})[currentResidentId]||[];
+  const genderLabel = r.genre==='M'?'Masculin':r.genre==='F'?'Féminin':'Autre';
+
+  const photoEl = r.photo
+    ? `<img src="${r.photo}" style="width:96px;height:96px;border-radius:50%;object-fit:cover;border:3px solid #fff;box-shadow:var(--shadow-md)" alt=""/>`
+    : `<div style="width:96px;height:96px;border-radius:50%;background:${r.color||'var(--blue)'};display:flex;align-items:center;justify-content:center;font-weight:800;font-size:1.8rem;color:#fff;box-shadow:var(--shadow-md)">${initials(r.prenom,r.nom)}</div>`;
+
+  const infoRow = (label, value) => value ? `<div><div style="font-size:.68rem;font-weight:700;color:var(--muted);margin-bottom:2px">${label}</div><div style="font-weight:600;font-size:.85rem">${escHtml(value)}</div></div>` : '';
+
+  const infoCard = (color, title, rows) => {
+    const content = rows.filter(Boolean).join('');
+    if (!content) return '';
+    return `<div class="card" style="border-left:3px solid #${color}"><div class="card-body" style="display:flex;flex-direction:column;gap:.75rem"><div style="font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:#${color}">${title}</div><div class="grid grid-2" style="gap:.75rem">${content}</div></div></div>`;
+  };
+
+  const isEnfant = type === 'enfants' || type === 'mixte';
+  const isAdulte = type === 'adultes' || type === 'mixte';
+
+  document.getElementById('residentContent').innerHTML = `
+    <div style="background:linear-gradient(135deg,${r.color||'var(--primary)'},${r.color||'var(--primary-dark)'}22);border-radius:var(--r);padding:2rem 2rem 1.5rem;margin-bottom:1.5rem;display:flex;gap:1.5rem;align-items:center">
+      ${photoEl}
+      <div style="flex:1">
+        <h1 style="font-size:1.8rem;font-weight:800;color:#fff;margin:0;text-shadow:0 1px 3px rgba(0,0,0,.15)">${escHtml(r.prenom||'')} ${escHtml(r.nom||'')}</h1>
+        <div style="display:flex;gap:.5rem;margin-top:.6rem;flex-wrap:wrap">
+          ${statusBadge(r.statut)}
+          ${r.genre ? `<span class="badge" style="background:rgba(255,255,255,.2);color:#fff">${genderLabel}</span>` : ''}
+          ${r.dob ? `<span class="badge" style="background:rgba(255,255,255,.2);color:#fff">${age(r.dob)} ans</span>` : ''}
+        </div>
+        ${r.referent ? `<div style="color:rgba(255,255,255,.8);font-size:.85rem;margin-top:.5rem">Référent : <strong style="color:#fff">${escHtml(r.referent)}</strong></div>` : ''}
+      </div>
+    </div>
+    <div class="grid grid-4" style="margin-bottom:1.5rem">
+      <div class="stat-card"><div class="stat-card-top"><span class="stat-label">Naissance</span><div class="stat-icon blue"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/></svg></div></div><div class="stat-num" style="font-size:1rem">${r.dob ? formatDate(r.dob) : '—'}</div><div class="stat-change" style="font-size:.72rem">${r.dob ? age(r.dob)+' ans' : ''}</div></div>
+      <div class="stat-card"><div class="stat-card-top"><span class="stat-label">Entrée</span><div class="stat-icon green"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg></div></div><div class="stat-num" style="font-size:1rem">${r.entree ? formatDate(r.entree) : '—'}</div><div class="stat-change" style="font-size:.72rem">Date d'admission</div></div>
+      <div class="stat-card"><div class="stat-card-top"><span class="stat-label">Chambre</span><div class="stat-icon orange"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg></div></div><div class="stat-num" style="font-size:1rem">${r.chambre||'—'}</div><div class="stat-change" style="font-size:.72rem">Espace de vie</div></div>
+      <div class="stat-card"><div class="stat-card-top"><span class="stat-label">Genre</span><div class="stat-icon purple"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/></svg></div></div><div class="stat-num" style="font-size:1rem">${genderLabel}</div><div class="stat-change" style="font-size:.72rem">${r.dob ? 'Né(e) le '+formatDate(r.dob) : ''}</div></div>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:1rem;margin-bottom:1.5rem">
+      ${infoCard('0f2b4a', '👤 Identité', [
+        infoRow('Nom', r.nom), infoRow('Prénom', r.prenom),
+        infoRow('Genre', genderLabel), infoRow('Date de naissance', r.dob ? formatDate(r.dob)+' ('+age(r.dob)+' ans)' : ''),
+        infoRow('N° Sécurité sociale', r.nss)
+      ])}
+      ${infoCard('d97706', '🏠 Séjour', [
+        infoRow('Date d\'entrée', r.entree ? formatDate(r.entree) : ''),
+        infoRow('Statut', r.statut), infoRow('Chambre / Unité', r.chambre),
+        infoRow('Référent principal', r.referent)
+      ])}
+      ${infoCard('16a34a', '🏥 Médical', [
+        infoRow('Médecin traitant', r.medecin), infoRow('Tél. médecin', r.medecinTel),
+        infoRow('Allergies / Contre-indications', r.allergies)
+      ])}
+      ${isEnfant ? infoCard('8b5cf6', '🧒 Enfant', [
+        infoRow('Tuteur légal', r.tuteur), infoRow('Tél. tuteur', r.tuteurTel),
+        infoRow('Établissement scolaire', r.ecole), infoRow('Classe', r.classe),
+        infoRow('Organisme', r.organisme), infoRow('N° dossier', r.dossier)
+      ]) : ''}
+      ${isAdulte ? infoCard('3b82f6', '👤 Adulte', [
+        infoRow('Situation professionnelle', r.situationPro),
+        infoRow('Ressources', r.ressources),
+        infoRow('Organisme prescripteur', r.organismeA),
+        infoRow('Situation administrative', r.situationAdmin)
+      ]) : ''}
+      ${resObjs.length ? infoCard('f59e0b', '🎯 Objectifs assignés ('+resObjs.length+')', resObjs.map(o => `<div style="grid-column:1/-1"><div style="padding:.6rem .85rem;background:var(--g50);border-radius:var(--r-sm);border:1px solid var(--border)"><div style="font-weight:600;font-size:.85rem">${escHtml(o.name)}</div>${o.description ? `<div style="font-size:.75rem;color:var(--muted);margin-top:2px">${escHtml(o.description)}</div>` : ''}</div></div>`)) : ''}
+      ${r.notes ? infoCard('6366f1', '📝 Notes', [`<div style="grid-column:1/-1"><p style="white-space:pre-wrap;line-height:1.8;font-size:.875rem;margin:0">${escHtml(r.notes)}</p></div>`]) : ''}
+      ${r.contacts ? infoCard('6366f1', '📞 Contacts d\'urgence', [`<div style="grid-column:1/-1"><p style="white-space:pre-wrap;line-height:1.8;font-size:.875rem;margin:0">${escHtml(r.contacts)}</p></div>`]) : ''}
+    </div>
+    <div class="tabs" style="margin-bottom:1rem">
+      <button class="tab active" data-tab="documents">📎 Documents ${docs.length ? `<span class="badge badge-gray" style="margin-left:.3rem">${docs.length}</span>` : ''}</button>
+    </div>
+    <div id="tab-documents">${docsHtml(docs)}</div>`;
+
+  initPageDocUpload(currentResidentId);
+}
+
+function docsHtml(docs) {
+  return `<div class="card"><div class="card-header"><span class="card-title">Fichiers joints</span></div><div class="card-body" style="padding:0">${docs.length ? docs.map(d => `<div style="display:flex;align-items:center;gap:.75rem;padding:.75rem 1.25rem;border-bottom:1px solid var(--border)"><span style="font-size:1.3rem">${docTypeIcon(d.mimeType)}</span><div style="flex:1;min-width:0"><div style="font-weight:600;font-size:.85rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${escHtml(d.name)}</div><div style="font-size:.72rem;color:var(--muted)">${DOC_CAT_LABELS[d.category]||d.category} · ${fmtSize(d.size)}</div></div><button class="btn btn-ghost btn-sm" onclick="downloadDoc('${d.id}','${currentResidentId}')">↓ Télécharger</button><button class="btn btn-ghost btn-sm admin-only" style="color:var(--red)" onclick="deleteDocFromPage('${d.id}','${currentResidentId}')">✕</button></div>`).join('') : `<div class="empty" style="padding:2rem"><p>Aucun document joint.</p></div>`}</div></div><div class="card" style="margin-top:1rem"><div class="card-header"><span class="card-title">Ajouter un document</span></div><div class="card-body"><div class="doc-upload-zone" onclick="document.getElementById('pageDocFileInput').click()" style="cursor:pointer;padding:1.5rem;text-align:center;border:2px dashed var(--border);border-radius:var(--r);background:var(--g50)"><div style="font-size:2rem;margin-bottom:.5rem">📎</div><div style="font-weight:600;font-size:.875rem">Cliquez pour sélectionner un fichier</div><div style="font-size:.78rem;color:var(--muted)">PDF, Word, image — max 3 Mo</div></div><input type="file" id="pageDocFileInput" style="display:none" accept=".pdf,.doc,.docx,.png,.jpg,.jpeg,.gif,.webp"/><div id="pageDocPending" style="display:none;margin-top:.75rem;padding:.75rem 1rem;border:1px solid var(--border);border-radius:var(--r-sm);display:flex;align-items:center;gap:.75rem"><span style="font-size:1.2rem">📎</span><div style="flex:1;min-width:0"><div style="font-weight:600;font-size:.85rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis" id="pageDocPendingName"></div><div style="font-size:.75rem;color:var(--muted)" id="pageDocPendingSize"></div></div><select id="pageDocCategory" style="width:auto;font-size:.82rem"><option value="mdph">MDPH</option><option value="cmu">CMU / CSS</option><option value="contrat">Contrat de séjour</option><option value="avenant">Avenant</option><option value="jugement">Jugement / Tutelle</option><option value="ordonnance">Ordonnance</option><option value="attestation">Attestation</option><option value="rapport">Rapport social</option><option value="ase">Document ASE</option><option value="pjj">Document PJJ</option><option value="identite">Pièce d'identité</option><option value="autre">Autre</option></select><button class="btn btn-primary btn-sm" onclick="uploadDocFromPage()">Ajouter</button><button class="btn btn-ghost btn-sm" onclick="cancelPageDoc()">✕</button></div></div></div>`;
+}
+
+function inputField(id, label, value, type) {
+  return `<div class="form-group"><label>${label}</label><input type="${type||'text'}" id="${id}" value="${escHtml(value||'')}" class="form-input"/></div>`;
+}
+
+function selectField(id, label, value, options) {
+  const opts = options.map(o => `<option value="${o[0]}"${value===o[0]?' selected':''}>${o[1]}</option>`).join('');
+  return `<div class="form-group"><label>${label}</label><select id="${id}" class="form-input">${opts}</select></div>`;
+}
+
+function renderEditMode(r) {
+  const type = getStructureType();
+  const objs = DB.get(DB.keys.objectives) || [];
+  const resObjIds = r.objectifs || [];
+
+  document.getElementById('residentContent').innerHTML = `
+    <div class="card" style="margin-bottom:1.5rem">
+      <div class="card-header"><span class="card-title">✎ Modification — ${escHtml(r.prenom||'')} ${escHtml(r.nom||'')}</span></div>
+      <div class="card-body" style="display:flex;flex-direction:column;gap:1rem">
+        <div class="grid grid-3" style="gap:.75rem">
+          ${inputField('ePrenom','Prénom',r.prenom)}
+          ${inputField('eNom','Nom',r.nom)}
+          ${selectField('eGenre','Genre',r.genre, [['','—'],['M','Masculin'],['F','Féminin'],['A','Autre']])}
+        </div>
+        <div class="grid grid-3" style="gap:.75rem">
+          ${inputField('eDob','Date de naissance',r.dob,'date')}
+          ${inputField('eEntree','Date d\'entrée',r.entree,'date')}
+          ${inputField('eChambre','Chambre / Unité',r.chambre)}
+        </div>
+        <div class="grid grid-3" style="gap:.75rem">
+          ${selectField('eStatut','Statut',r.statut, [['present','Présent'],['absent','Absent'],['sortie','Sortie temp.'],['sorti','Sorti']])}
+          ${inputField('eReferent','Référent',r.referent)}
+          ${inputField('eColor','Couleur',r.color||'#3b82f6','color')}
+        </div>
+        <hr style="border:none;border-top:1px solid var(--border);margin:.25rem 0"/>
+        <div style="font-size:.8rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);margin-bottom:.25rem">👤 Informations personnelles</div>
+        <div class="grid grid-2" style="gap:.75rem">
+          ${inputField('eMedecin','Médecin traitant',r.medecin)}
+          ${inputField('eMedecinTel','Tél. médecin',r.medecinTel)}
+          ${inputField('eAllergies','Allergies / CI',r.allergies)}
+          ${inputField('eNss','N° Sécurité sociale',r.nss)}
+        </div>
+        ${(type==='enfants'||type==='mixte')?`
+        <hr style="border:none;border-top:1px solid var(--border);margin:.25rem 0"/>
+        <div style="font-size:.8rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:#8b5cf6;margin-bottom:.25rem">🧒 Enfant</div>
+        <div class="grid grid-2" style="gap:.75rem">
+          ${inputField('eTuteur','Tuteur légal',r.tuteur)}
+          ${inputField('eTuteurTel','Tél. tuteur',r.tuteurTel)}
+          ${inputField('eEcole','Établissement scolaire',r.ecole)}
+          ${inputField('eClasse','Classe',r.classe)}
+          ${inputField('eOrganisme','Organisme',r.organisme)}
+          ${inputField('eDossier','N° dossier',r.dossier)}
+        </div>`:''}
+        ${(type==='adultes'||type==='mixte')?`
+        <hr style="border:none;border-top:1px solid var(--border);margin:.25rem 0"/>
+        <div style="font-size:.8rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:#3b82f6;margin-bottom:.25rem">👤 Adulte</div>
+        <div class="grid grid-2" style="gap:.75rem">
+          ${selectField('eSituationPro','Situation pro.',r.situationPro, [['','—'],['emploi','Emploi'],['chantier','Chantier éducatif'],['formation','Formation'],['stage','Stage'],['inactif','Inactif'],['retraite','Retraite'],['autre','Autre']])}
+          ${selectField('eRessources','Ressources',r.ressources, [['','—'],['aaH','AAH'],['rsa','RSA'],['sans','Sans'],['autre','Autre']])}
+          ${inputField('eOrganismeA','Organisme',r.organismeA)}
+          ${inputField('eSituationAdmin','Situation admin.',r.situationAdmin)}
+        </div>`:''}
+        <hr style="border:none;border-top:1px solid var(--border);margin:.25rem 0"/>
+        <div style="font-size:.8rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:#f59e0b;margin-bottom:.25rem">🎯 Objectifs</div>
+        <div id="eObjectifsList" style="display:flex;flex-wrap:wrap;gap:.4rem">${objs.map(o => `<label class="checkbox-wrap" style="padding:.4rem .65rem;border:1px solid var(--border);border-radius:var(--r-sm);cursor:pointer;transition:background var(--t);user-select:none"><input type="checkbox" name="pageObj" value="${o.id}"${resObjIds.includes(o.id)?' checked':''}> ${escHtml(o.name)}</label>`).join('')}</div>
+        <hr style="border:none;border-top:1px solid var(--border);margin:.25rem 0"/>
+        <div style="font-size:.8rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:#6366f1;margin-bottom:.25rem">📝 Notes</div>
+        <textarea id="eNotes" class="form-input" rows="4" style="resize:vertical">${escHtml(r.notes||'')}</textarea>
+        <div style="font-size:.8rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:#6366f1;margin-bottom:.25rem">📞 Contacts d'urgence</div>
+        <textarea id="eContacts" class="form-input" rows="3" style="resize:vertical">${escHtml(r.contacts||'')}</textarea>
+      </div>
+      <div class="card-footer" style="display:flex;gap:.75rem;justify-content:flex-end;padding:.75rem 1rem">
+        <button class="btn btn-ghost" onclick="cancelPageEdit()">Annuler</button>
+        <button class="btn btn-primary" onclick="savePageEdit()">💾 Enregistrer</button>
+      </div>
+    </div>`;
+}
+
+function savePageEdit() {
+  const r = getResident();
+  if (!r) return;
+  const g = id => { const el = document.getElementById(id); return el ? el.value.trim() : ''; };
+  const checked = [...document.querySelectorAll('input[name="pageObj"]:checked')].map(el => el.value);
+  const data = {
+    ...r,
+    prenom: g('ePrenom'), nom: g('eNom'), genre: g('eGenre'),
+    dob: g('eDob'), entree: g('eEntree'), chambre: g('eChambre'),
+    statut: g('eStatut'), referent: g('eReferent'), color: g('eColor') || '#3b82f6',
+    medecin: g('eMedecin'), medecinTel: g('eMedecinTel'),
+    allergies: g('eAllergies'), nss: g('eNss'),
+    tuteur: g('eTuteur'), tuteurTel: g('eTuteurTel'), ecole: g('eEcole'),
+    classe: g('eClasse'), organisme: g('eOrganisme'), dossier: g('eDossier'),
+    situationPro: g('eSituationPro'), ressources: g('eRessources'),
+    organismeA: g('eOrganismeA'), situationAdmin: g('eSituationAdmin'),
+    objectifs: checked,
+    notes: g('eNotes'), contacts: g('eContacts'),
+    updatedAt: new Date().toISOString()
+  };
+  const residents = DB.get(DB.keys.residents) || [];
+  DB.set(DB.keys.residents, residents.map(x => x.id === currentResidentId ? data : x));
+  toast('Résident mis à jour', 'success');
+  pageEditMode = false;
+  loadResident();
+}
+
+function cancelPageEdit() {
+  pageEditMode = false;
+  loadResident();
+}
+
+function togglePageEdit() {
+  pageEditMode = !pageEditMode;
+  loadResident();
+}
+
+function initPageTabs() {
+  document.querySelectorAll('#residentContent .tab').forEach(t => {
+    t.addEventListener('click', () => {
+      document.querySelectorAll('#residentContent .tab').forEach(x => x.classList.remove('active'));
+      t.classList.add('active');
+      document.querySelectorAll('#residentContent > [id^="tab-"]').forEach(x => x.style.display = 'none');
+      const tab = document.getElementById('tab-' + t.dataset.tab);
+      if (tab) tab.style.display = '';
+    });
+  });
+}
+
+let pageDocFile = null;
+
+function initPageDocUpload(residentId) {
+  const input = document.getElementById('pageDocFileInput');
+  if (!input) return;
+  input.addEventListener('change', async e => {
+    const file = e.target.files[0];
+    if (!file) return;
+    if (file.size > 3 * 1024 * 1024) { toast('Fichier trop lourd (max 3 Mo)', 'error'); return; }
+    pageDocFile = file;
+    document.getElementById('pageDocPendingName').textContent = file.name;
+    document.getElementById('pageDocPendingSize').textContent = fmtSize(file.size);
+    document.getElementById('pageDocPending').style.display = 'flex';
+  });
+}
+
+async function uploadDocFromPage() {
+  if (!pageDocFile || !currentResidentId) return;
+  const category = document.getElementById('pageDocCategory').value;
+  try {
+    const base64 = await fileToBase64(pageDocFile);
+    const doc = {
+      id: Date.now().toString(36) + Math.random().toString(36).slice(2,6),
+      name: pageDocFile.name,
+      size: pageDocFile.size,
+      mimeType: pageDocFile.type,
+      category,
+      date: new Date().toISOString()
+    };
+    const allDocs = DB.get(DB.keys.documents) || {};
+    if (!allDocs[currentResidentId]) allDocs[currentResidentId] = [];
+    allDocs[currentResidentId].push(doc);
+    DB.set(DB.keys.documents, allDocs);
+    toast('Document ajouté', 'success');
+    pageDocFile = null;
+    document.getElementById('pageDocFileInput').value = '';
+    document.getElementById('pageDocPending').style.display = 'none';
+    loadResident();
+  } catch { toast('Erreur lors de l\'ajout', 'error'); }
+}
+
+function cancelPageDoc() {
+  pageDocFile = null;
+  document.getElementById('pageDocFileInput').value = '';
+  document.getElementById('pageDocPending').style.display = 'none';
+}
+
+function deleteDocFromPage(docId, resId) {
+  if (!confirm('Supprimer ce document ?')) return;
+  const allDocs = DB.get(DB.keys.documents) || {};
+  if (!allDocs[resId]) return;
+  allDocs[resId] = allDocs[resId].filter(d => d.id !== docId);
+  if (!allDocs[resId].length) delete allDocs[resId];
+  DB.set(DB.keys.documents, allDocs);
+  toast('Document supprimé', 'success');
+  loadResident();
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  loadResident();
+});
+</script>
+</body>
+</html>

@@ -8,7 +8,8 @@ const DB = {
     journal:'ftr_journal', presences:'ftr_presences', planning:'ftr_planning',
     settings:'ftr_settings', user:'ftr_user', branding:'ftr_branding',
     users:'ftr_users', session:'ftr_session', vehicules:'ftr_vehicules',
-    documents:'ftr_documents', onboarded:'ftr_onboarded'
+    documents:'ftr_documents', onboarded:'ftr_onboarded', messages:'ftr_messages',
+    repertoire:'ftr_repertoire', incidents:'ftr_incidents', ppe:'ftr_ppe'
   }
 };
 
@@ -49,6 +50,8 @@ function initDefaults() {
   if (!DB.get(DB.keys.users)) DB.set(DB.keys.users, DEFAULTS.users);
   if (!DB.get(DB.keys.vehicules)) DB.set(DB.keys.vehicules, DEFAULTS.vehicules);
   if (!DB.get(DB.keys.documents)) DB.set(DB.keys.documents, {});
+  if (!DB.get(DB.keys.incidents)) DB.set(DB.keys.incidents, []);
+  if (!DB.get(DB.keys.ppe)) DB.set(DB.keys.ppe, []);
 }
 
 // ── AUTH ──
@@ -182,7 +185,7 @@ function initials(prenom='', nom='') {
 function today() { return new Date().toISOString().slice(0,10); }
 function formatDate(d) {
   if (!d) return '—';
-  return new Date(d).toLocaleDateString('fr-FR', { day:'2-digit', month:'long', year:'numeric' });
+  return new Date(d).toLocaleDateString('fr-FR', { weekday:'long', day:'2-digit', month:'long', year:'numeric' });
 }
 function formatDateTime(d) {
   if (!d) return '—';
@@ -265,6 +268,15 @@ function getStats() {
     vehiculeResa
   };
 }
+
+function escHtml(s) {
+  if (!s) return '';
+  const d = document.createElement('div');
+  d.textContent = s;
+  return d.innerHTML;
+}
+
+const STATUT_PPE_LABEL = { brouillon:'Brouillon', actif:'Actif', termine:'Terminé' };
 
 // ── INIT ──
 document.addEventListener('DOMContentLoaded', () => {

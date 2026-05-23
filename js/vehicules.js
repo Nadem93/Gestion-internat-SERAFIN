@@ -1,0 +1,145 @@
+function initVehicules() {
+  const now = new Date();
+  const fmt = d => d.toISOString().slice(0,16);
+  document.getElementById('vDateAller').value = fmt(now);
+  document.getElementById('vDuree').value = '60';
+  document.getElementById('vVehicule').value = '';
+  document.getElementById('vDestination').value = '';
+  document.getElementById('vMotif').value = '';
+  const vehicules = DB.get(DB.keys.vehicules) || [];
+  document.getElementById('vehiculesList').innerHTML = vehicules.map(v => `<option value="${escapeAttr(v)}"/>`).join('');
+  const session = Auth.getSession();
+  const name = session ? [session.prenom, session.nom].filter(Boolean).join(' ') || session.username : '';
+  document.getElementById('vReservataire').textContent = `Réservation au nom de : ${name}`;
+  renderReservations();
+}
+
+function getVehiculeConflit(vehicule, dateAller, dateRetour, excludeId) {
+  const planning = DB.get(DB.keys.planning) || [];
+  const newStart = new Date(dateAller).getTime();
+  const newEnd = new Date(dateRetour).getTime();
+  return planning.find(e => {
+    if (e.type !== 'vehicule' || e.vehicule !== vehicule) return false;
+    if (excludeId && e.id === excludeId) return false;
+    const existStart = new Date(e.date + 'T' + (e.time || '00:00')).getTime();
+    const existEnd = new Date(e.dateEnd + 'T' + (e.timeEnd || '23:59')).getTime();
+    if (isNaN(existStart) || isNaN(existEnd)) return false;
+    return newStart < existEnd && newEnd > existStart;
+  });
+}
+
+function reserverVehicule() {
+  const dateAller  = document.getElementById('vDateAller').value;
+  const dureeVal   = document.getElementById('vDuree').value;
+  const vehicule   = document.getElementById('vVehicule').value.trim();
+  const destination = document.getElementById('vDestination').value.trim();
+  const motif      = document.getElementById('vMotif').value.trim();
+  if (!dateAller || !vehicule || !destination) {
+    toast('Veuillez remplir tous les champs obligatoires', 'error'); return;
+  }
+  let dateRetour;
+  if (dureeVal === 'journee') {
+    const d = new Date(dateAller);
+    dateRetour = d.toISOString().slice(0,10) + 'T23:59';
+  } else {
+    const d = new Date(new Date(dateAller).getTime() + parseInt(dureeVal) * 60000);
+    dateRetour = d.toISOString().slice(0,16);
+  }
+  const conflit = getVehiculeConflit(vehicule, dateAller, dateRetour);
+  if (conflit) {
+    toast(`❌ ${vehicule} déjà réservé du ${formatDateTime(conflit.date+'T'+conflit.time)} au ${formatDateTime(conflit.dateEnd+'T'+conflit.timeEnd)} par ${conflit.reservedBy}`, 'error');
+    return;
+  }
+  const session = Auth.getSession();
+  const prenom = session?.prenom || '';
+  const nom = session?.nom || '';
+  const userName = [prenom, nom].filter(Boolean).join(' ') || session?.username || 'Inconnu';
+  const planning = DB.get(DB.keys.planning) || [];
+  planning.push({
+    id: genId(),
+    titre: `Véhicule — ${vehicule}`,
+    date: dateAller.slice(0,10),
+    dateEnd: dateRetour.slice(0,10),
+    time: dateAller.slice(11,16),
+    timeEnd: dateRetour.slice(11,16),
+    desc: `Réservé par : ${userName}${motif ? '\nMotif : '+motif : ''}\nVéhicule : ${vehicule}\nDestination : ${destination}`,
+    color: '#6366f1',
+    type: 'vehicule',
+    vehicule, destination, reservedBy: userName, reservedPrenom: prenom
+  });
+  DB.set(DB.keys.planning, planning);
+  toast(`🚗 ${vehicule} réservé par ${prenom || userName} vers ${destination}`);
+  initVehicules();
+}
+
+function annulerReservation(id) {
+  if (!confirm('Annuler cette réservation ?')) return;
+  let planning = DB.get(DB.keys.planning) || [];
+  planning = planning.filter(e => e.id !== id);
+  DB.set(DB.keys.planning, planning);
+  toast('Réservation annulée', 'success');
+  renderReservations();
+}
+
+function renderReservations() {
+  const planning = DB.get(DB.keys.planning) || [];
+  const today = new Date().toISOString().slice(0,10);
+  const now = new Date();
+
+  const upcoming = planning
+    .filter(e => e.type === 'vehicule' && (e.date > today || (e.date === today && e.time >= now.toTimeString().slice(0,5))))
+    .sort((a, b) => a.date.localeCompare(b.date) || (a.time||'').localeCompare(b.time||''));
+
+  const past = planning
+    .filter(e => e.type === 'vehicule' && (e.date < today || (e.date === today && e.time < now.toTimeString().slice(0,5))))
+    .sort((a, b) => b.date.localeCompare(a.date) || (b.time||'').localeCompare(a.time||''));
+
+  const users = DB.get(DB.keys.users) || [];
+
+  function renderRow(e) {
+    const u = users.find(x => x.id === e.reservedPrenom && x.prenom === e.reservedPrenom);
+    return `<div style="display:flex;align-items:center;gap:.75rem;padding:.75rem 1.25rem;border-bottom:1px solid var(--border)">
+      <div style="width:36px;height:36px;border-radius:50%;background:#eef2ff;display:flex;align-items:center;justify-content:center;flex-shrink:0">
+        <svg viewBox="0 0 24 24" fill="none" stroke="#6366f1" stroke-width="2" style="width:18px;height:18px"><rect x="2" y="7" width="20" height="12" rx="2"/><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/><circle cx="7.5" cy="16.5" r="1.5"/><circle cx="16.5" cy="16.5" r="1.5"/></svg>
+      </div>
+      <div style="flex:1;min-width:0">
+        <div style="font-weight:600;font-size:.85rem">${escapeHtml(e.vehicule||'')}</div>
+        <div style="font-size:.78rem;color:var(--muted)">
+          ${e.date ? formatDate(e.date) : '?'} ${e.time ? '· '+e.time.slice(0,5) : ''}
+          ${e.destination ? '→ '+escapeHtml(e.destination) : ''}
+          ${e.reservedBy ? '· '+escapeHtml(e.reservedBy) : ''}
+        </div>
+      </div>
+      <button class="btn btn-ghost btn-sm" style="color:var(--red)" onclick="annulerReservation('${e.id}')">✕</button>
+    </div>`;
+  }
+
+  const upcomingEl = document.getElementById('vReservationsList');
+  if (upcoming.length) {
+    upcomingEl.innerHTML = upcoming.map(renderRow).join('');
+  } else {
+    upcomingEl.innerHTML = '<div class="empty" style="padding:2rem"><p>Aucune réservation à venir.</p></div>';
+  }
+
+  const pastEl = document.getElementById('vPastReservationsList');
+  if (past.length) {
+    document.getElementById('pastReservationsCard').style.display = '';
+    pastEl.innerHTML = past.map(renderRow).join('');
+  } else {
+    document.getElementById('pastReservationsCard').style.display = 'none';
+  }
+}
+
+function escapeHtml(s) {
+  if (!s) return '';
+  const d = document.createElement('div');
+  d.textContent = s;
+  return d.innerHTML;
+}
+
+function escapeAttr(s) {
+  if (!s) return '';
+  return s.replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/'/g,'&#39;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+document.addEventListener('DOMContentLoaded', initVehicules);

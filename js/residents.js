@@ -206,7 +206,7 @@ function renderResidents() {
   }
 
   if (currentView === 'grid') {
-    container.innerHTML = `<div class="grid grid-auto" style="gap:1rem">${list.map(residentCard).join('')}</div>`;
+    container.innerHTML = `<div class="grid grid-4" style="gap:1rem">${list.map(residentCard).join('')}</div>`;
   } else {
     container.innerHTML = `<div class="table-wrap"><table><thead><tr><th>Résident</th><th>Âge / Naissance</th><th>Entrée</th><th>Chambre</th><th>Statut</th><th>Objectifs</th><th>Actions</th></tr></thead><tbody>${list.map(residentRow).join('')}</tbody></table></div>`;
   }
@@ -219,30 +219,30 @@ function statusBadge(s) {
 }
 
 function residentCard(r) {
-  const objs = DB.get(DB.keys.objectives) || [];
-  const resObjs = (r.objectifs || []).map(id => objs.find(o => String(o.id) === String(id))?.name).filter(Boolean);
   const coverColor = r.color || 'var(--primary)';
   const photoEl = r.photo
     ? `<img src="${r.photo}" class="res-card-photo" alt="${r.prenom||''} ${r.nom||''}"/>`
     : `<div class="res-card-photo" style="background:${coverColor};display:flex;align-items:center;justify-content:center;font-weight:800;font-size:1.2rem;color:#fff">${initials(r.prenom,r.nom)}</div>`;
 
   const docCount = ((DB.get(DB.keys.documents)||{})[r.id]||[]).length;
-  return `<div class="res-card" onclick="showDetail('${r.id}')">
-    <div class="res-card-cover" style="background:${coverColor};height:8px"></div>
+  const session = Auth.getSession();
+  const canEdit = session && (session.role === 'admin' || session.role === 'moderator');
+  const todayPresences = (DB.get(DB.keys.presences)||{})[today()] || {};
+  const presenceStatus = todayPresences[r.id] || (r.statut === 'sorti' ? 'sorti' : r.statut);
+  return `<div class="res-card" onclick="window.location.href='resident.html?id=${r.id}'">
+    <div class="res-card-cover" style="background:${coverColor}"></div>
     <div class="res-card-body">
       ${photoEl}
       <div class="res-card-name">${r.prenom||''} ${r.nom||''}</div>
       <div class="res-card-meta">${r.dob ? age(r.dob) : ''}${r.chambre ? ' · Ch. '+r.chambre : ''}</div>
       <div style="display:flex;gap:.35rem;flex-wrap:wrap;justify-content:center;margin-top:.25rem">
-        ${statusBadge(r.statut)}
-        ${resObjs.slice(0,2).map(o=>`<span class="badge badge-gray">${o}</span>`).join('')}
-        ${resObjs.length>2?`<span class="badge badge-gray">+${resObjs.length-2}</span>`:''}
+        ${statusBadge(presenceStatus)}
         ${docCount?`<span class="badge" style="background:#f0fdf4;color:#16a34a;border:1px solid #bbf7d0">📎 ${docCount}</span>`:''}
       </div>
     </div>
     <div class="res-card-footer">
       <span style="font-size:.72rem;color:var(--muted)">${r.entree ? 'Entré le '+formatDate(r.entree) : ''}</span>
-      <button class="btn btn-ghost btn-sm admin-only" onclick="event.stopPropagation();editResident('${r.id}')">Modifier</button>
+      ${canEdit ? `<button class="btn btn-ghost btn-sm" style="font-size:.7rem;padding:.15rem .45rem" onclick="event.stopPropagation();quickEditResident('${r.id}')">✎ Modifier</button>` : ''}
     </div>
   </div>`;
 }
@@ -253,6 +253,8 @@ function residentRow(r) {
   const photoEl = r.photo
     ? `<img src="${r.photo}" style="width:32px;height:32px;border-radius:50%;object-fit:cover;border:2px solid var(--border)" alt=""/>`
     : `<div style="width:32px;height:32px;border-radius:50%;background:${r.color||'var(--blue)'};display:flex;align-items:center;justify-content:center;font-weight:700;font-size:.65rem;color:#fff;flex-shrink:0">${initials(r.prenom,r.nom)}</div>`;
+  const session = Auth.getSession();
+  const canEdit = session && (session.role === 'admin' || session.role === 'moderator');
   return `<tr>
     <td><div style="display:flex;align-items:center;gap:.6rem">${photoEl}<span style="font-weight:600">${r.prenom||''} ${r.nom||''}</span></div></td>
     <td>${r.dob ? age(r.dob)+' ('+formatDate(r.dob)+')' : '—'}</td>
@@ -261,8 +263,8 @@ function residentRow(r) {
     <td>${statusBadge(r.statut)}</td>
     <td><div style="display:flex;gap:.3rem;flex-wrap:wrap">${resObjs.map(o=>`<span class="badge badge-gray">${o}</span>`).join('')||'—'}</div></td>
     <td><div class="table-actions">
-      <button class="btn btn-ghost btn-sm" onclick="showDetail('${r.id}')">Voir</button>
-      <button class="btn btn-ghost btn-sm" onclick="editResident('${r.id}')">Modifier</button>
+      <button class="btn btn-ghost btn-sm" onclick="window.location.href='resident.html?id=${r.id}'">Voir</button>
+      ${canEdit ? `<button class="btn btn-ghost btn-sm" onclick="quickEditResident('${r.id}')">Modifier</button>` : ''}
     </div></td>
   </tr>`;
 }
@@ -480,4 +482,92 @@ document.addEventListener('DOMContentLoaded', () => {
   document.getElementById('modalResident').addEventListener('click', e => {
     if (e.target.id === 'modalResident') { closeAllModals(); resetForm(); }
   });
+
+  // Ouvrir directement l'édition si ?edit=xxx
+  const params = new URLSearchParams(window.location.search);
+  const editId = params.get('edit');
+  if (editId) {
+    setTimeout(() => editResident(editId), 100);
+  } else if (params.get('new') === 'true') {
+    setTimeout(() => openModal('modalResident'), 100);
+  }
 });
+
+// ── ÉDITION RAPIDE (CARTE) ──
+let qePendingPhoto = null;
+
+function qeUpdatePhotoPreview(src) {
+  const el = document.getElementById('qePhotoPreview');
+  if (!el) return;
+  if (src) {
+    el.innerHTML = `<img src="${src}" style="width:100%;height:100%;object-fit:cover;border-radius:50%"/>`;
+    document.getElementById('qePhotoRemove').style.display = '';
+  } else {
+    el.innerHTML = '—';
+    document.getElementById('qePhotoRemove').style.display = 'none';
+  }
+}
+
+function removeQePhoto() {
+  qePendingPhoto = null;
+  qeUpdatePhotoPreview(null);
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  const input = document.getElementById('qePhotoInput');
+  if (input) {
+    input.addEventListener('change', async e => {
+      const file = e.target.files[0];
+      if (!file) return;
+      if (file.size > 2 * 1024 * 1024) { toast('Photo trop lourde (max 2 Mo)', 'error'); return; }
+      try {
+        qePendingPhoto = await fileToBase64(file);
+        qeUpdatePhotoPreview(qePendingPhoto);
+      } catch { toast('Erreur lors du chargement', 'error'); }
+    });
+  }
+});
+
+function quickEditResident(id) {
+  qePendingPhoto = null;
+  const list = DB.get(DB.keys.residents);
+  const r = list.find(x => String(x.id) === String(id));
+  if (!r) return toast('Résident introuvable', 'error');
+  document.getElementById('qeId').value = r.id;
+  document.getElementById('qeNom').value = r.nom || '';
+  document.getElementById('qePrenom').value = r.prenom || '';
+  document.getElementById('qeDob').value = r.dob || '';
+  document.getElementById('qeStatut').value = r.statut || 'present';
+  document.getElementById('qeEntree').value = r.entree || '';
+  document.getElementById('qeChambre').value = r.chambre || '';
+  document.getElementById('qeColor').value = r.color || '#3b82f6';
+  qeUpdatePhotoPreview(r.photo || null);
+  document.getElementById('qePhotoInput').value = '';
+  openModal('modalQuickEdit');
+}
+
+function saveQuickEdit() {
+  const id = document.getElementById('qeId').value;
+  if (!id) return;
+  const list = DB.get(DB.keys.residents);
+  const idx = list.findIndex(x => String(x.id) === String(id));
+  if (idx === -1) return toast('Résident introuvable', 'error');
+  const nom = document.getElementById('qeNom').value.trim();
+  const prenom = document.getElementById('qePrenom').value.trim();
+  if (!nom || !prenom) return toast('Nom et prénom sont requis', 'error');
+  list[idx].nom = nom;
+  list[idx].prenom = prenom;
+  list[idx].dob = document.getElementById('qeDob').value;
+  list[idx].statut = document.getElementById('qeStatut').value;
+  list[idx].entree = document.getElementById('qeEntree').value;
+  list[idx].chambre = document.getElementById('qeChambre').value;
+  list[idx].color = document.getElementById('qeColor').value;
+  if (qePendingPhoto !== null) {
+    list[idx].photo = qePendingPhoto;
+    qePendingPhoto = null;
+  }
+  DB.set(DB.keys.residents, list);
+  closeModal('modalQuickEdit');
+  renderResidents();
+  toast('Carte mise à jour');
+}

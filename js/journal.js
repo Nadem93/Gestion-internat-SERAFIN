@@ -60,8 +60,28 @@ function renderEntries() {
         </div>
       </div>
       <div class="entry-preview">${e.contenu||''}</div>
+      ${(e.replies||[]).length ? `<div style="font-size:.7rem;color:var(--blue);margin-top:.4rem;font-weight:600">💬 ${e.replies.length} réponse${e.replies.length>1?'s':''}</div>` : ''}
     </div>`;
   }).join('');
+}
+
+function renderReplies(e) {
+  const replies = e.replies || [];
+  if (!replies.length) return '';
+  return `<div style="margin-top:1.25rem;border-top:1px solid var(--border);padding-top:1rem">
+    <div style="font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);margin-bottom:.75rem">Réponses (${replies.length})</div>
+    ${replies.map(r => `
+      <div style="display:flex;gap:.6rem;padding:.6rem .75rem;background:var(--g50);border-radius:var(--r-sm);margin-bottom:.5rem;border:1px solid var(--border)">
+        <div class="avatar sm" style="background:var(--accent);flex-shrink:0;width:24px;height:24px;font-size:.55rem">${(r.author||'?')[0].toUpperCase()}</div>
+        <div style="flex:1;min-width:0">
+          <div style="display:flex;justify-content:space-between;align-items:center;gap:.5rem">
+            <span style="font-weight:700;font-size:.78rem">${r.author}</span>
+            <span style="font-size:.65rem;color:var(--muted)">${formatDateTime(r.createdAt)}</span>
+          </div>
+          <p style="font-size:.82rem;line-height:1.6;margin-top:3px;white-space:pre-wrap">${r.content}</p>
+        </div>
+      </div>`).join('')}
+  </div>`;
 }
 
 function selectEntry(id) {
@@ -74,6 +94,8 @@ function selectEntry(id) {
   const cat = cats.find(c => String(c.id) === String(e.categorie));
   const obj = objs.find(o => String(o.id) === String(e.objectif));
   const vis = { equipe: 'Équipe uniquement', tous: 'Tous', confidentiel: 'Confidentiel' };
+  const session = Auth.getSession();
+  const userName = session ? [session.prenom, session.nom].filter(Boolean).join(' ') || session.username : 'Utilisateur';
 
   document.getElementById('entryDetail').innerHTML = `
     <div class="entry-detail fade-in">
@@ -93,8 +115,41 @@ function selectEntry(id) {
       </div>
       <div class="divider"></div>
       <p style="font-size:.9rem;line-height:1.8;white-space:pre-wrap;color:var(--text)">${e.contenu||''}</p>
+      ${renderReplies(e)}
+      <div style="margin-top:1rem;padding-top:1rem;border-top:1px solid var(--border)">
+        <div style="display:flex;gap:.6rem">
+          <div class="avatar sm" style="background:var(--accent);flex-shrink:0;width:28px;height:28px;font-size:.65rem">${(userName||'?')[0].toUpperCase()}</div>
+          <div style="flex:1;display:flex;gap:.5rem">
+            <textarea id="replyContent" rows="2" style="flex:1;font-size:.82rem;padding:.5rem .75rem" placeholder="Écrire une réponse…"></textarea>
+            <button class="btn btn-primary btn-sm" style="align-self:flex-end" onclick="addReply('${e.id}')">Répondre</button>
+          </div>
+        </div>
+      </div>
     </div>`;
   renderEntries();
+}
+
+function addReply(entryId) {
+  const content = document.getElementById('replyContent')?.value?.trim();
+  if (!content) { toast('Écrivez une réponse', 'error'); return; }
+  const session = Auth.getSession();
+  const userName = session ? [session.prenom, session.nom].filter(Boolean).join(' ') || session.username : 'Utilisateur';
+  let entries = DB.get(DB.keys.journal) || [];
+  entries = entries.map(e => {
+    if (e.id !== entryId) return e;
+    const replies = e.replies || [];
+    replies.push({
+      id: genId(),
+      content,
+      author: userName,
+      authorId: session?.userId,
+      createdAt: new Date().toISOString()
+    });
+    return { ...e, replies };
+  });
+  DB.set(DB.keys.journal, entries);
+  toast('Réponse ajoutée');
+  selectEntry(entryId);
 }
 
 function editEntry(id) {
@@ -143,6 +198,7 @@ function saveEntry() {
     toast('Entrée mise à jour');
   } else {
     data.id = genId();
+    data.replies = [];
     data.createdAt = new Date().toISOString();
     entries.push(data);
     toast('Entrée ajoutée');

@@ -517,3 +517,27 @@ tbody tr:hover{background:var(--g50)}
 /* ── SECTION MÉDICALE ── */
 .medical-section{background:linear-gradient(135deg,#f0fdf4,#ecfdf5);border:1px solid #bbf7d0;border-radius:var(--r);padding:1rem;margin-top:.5rem}
 .medical-section-title{font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:#16a34a;margin-bottom:.75rem;display:flex;align-items:center;gap:.4rem}
+
+/* ── PP / AVENANT ── */
+.badge-ppe{display:inline-flex;align-items:center;font-size:.68rem;font-weight:600;padding:2px 10px;border-radius:var(--r-full);text-transform:uppercase;letter-spacing:.04em}
+.badge-ppe.brouillon{background:#f1f5f9;color:#64748b}
+.badge-ppe.actif{background:#f0fdf4;color:#16a34a}
+.badge-ppe.termine{background:#fef3f2;color:#ef4444}
+.ppe-card{background:var(--card-bg,#fff);border:1px solid var(--border);border-radius:var(--r);padding:.85rem 1.1rem;margin-bottom:.6rem;transition:box-shadow var(--t)}
+.ppe-card:hover{box-shadow:var(--shadow)}
+.ppe-card .top{display:flex;justify-content:space-between;align-items:flex-start;gap:.5rem}
+.ppe-card .info h3{font-size:.875rem;font-weight:600;margin:0}
+.ppe-card .meta{display:flex;gap:.75rem;font-size:.72rem;color:var(--muted);margin-top:2px}
+
+/* ── CHAT ── */
+.chat-msgs{display:flex;flex-direction:column;padding:20px;gap:10px;overflow-y:auto}
+.chat-row{display:flex;width:100%}
+.chat-row.own{justify-content:flex-end}
+.chat-row.other{justify-content:flex-start}
+.chat-bubble{width:auto;max-width:65%;padding:10px 14px;border-radius:18px;position:relative;display:inline-block;word-wrap:break-word;height:auto;min-height:auto;font-size:.82rem;line-height:1.45}
+.chat-bubble-author{font-size:.78rem;font-weight:700;margin-bottom:3px}
+.chat-row.other .chat-bubble-author{color:#3b82f6}
+.chat-row.own .chat-bubble{background:#007aff;color:white}
+.chat-row.other .chat-bubble{background:#e5e5ea;color:#111}
+.chat-bubble-time{font-size:11px;opacity:.65;white-space:nowrap;flex-shrink:0}
+.chat-date-sep{text-align:center;color:#64748b;font-size:13px;margin:15px 0}

@@ -283,14 +283,14 @@ function resetObjForm() {
   document.getElementById('btnDeleteObj').style.display = 'none';
 }
 
-// ── ÉDUCATEURS ──
+// ── UTILISATEURS ──
 function renderEducateurs() {
   const users = DB.get(DB.keys.users) || [];
   const educateurs = users.filter(u => u.role === 'educateur');
   const el = document.getElementById('eduList');
   if (!el) return;
   if (!educateurs.length) {
-    el.innerHTML = `<div class="empty" style="padding:2rem"><p>Aucun éducateur enregistré</p></div>`;
+    el.innerHTML = `<div class="empty" style="padding:2rem"><p>Aucun utilisateur enregistré</p></div>`;
     return;
   }
   el.innerHTML = educateurs.map(u => `
@@ -298,9 +298,9 @@ function renderEducateurs() {
       <div class="avatar sm" style="background:var(--blue)">${initials(u.prenom||'', u.nom||'') || u.username[0].toUpperCase()}</div>
       <div style="flex:1">
         <div style="font-weight:600;font-size:.875rem">${[u.prenom, u.nom].filter(Boolean).join(' ') || u.username}</div>
-        <div style="font-size:.75rem;color:var(--muted)">@${u.username}</div>
+        <div style="font-size:.75rem;color:var(--muted)">${u.fonction ? u.fonction+' · ' : ''}@${u.username}</div>
       </div>
-      <span class="badge" style="background:#eff6ff;color:var(--blue)">Éducateur</span>
+      <span class="badge" style="background:#eff6ff;color:var(--blue)">Utilisateur</span>
       <button class="btn btn-ghost btn-sm" onclick="editEducateur(${u.id})">Modifier</button>
     </div>`).join('');
 }
@@ -309,10 +309,11 @@ function editEducateur(id) {
   const users = DB.get(DB.keys.users) || [];
   const u = users.find(x => x.id === id);
   if (!u) return;
-  document.getElementById('modalEduTitle').textContent = "Modifier l'éducateur";
+  document.getElementById('modalEduTitle').textContent = "Modifier l'utilisateur";
   document.getElementById('eduId').value = id;
   document.getElementById('eduPrenom').value = u.prenom || '';
   document.getElementById('eduNom').value = u.nom || '';
+  document.getElementById('eduFonction').value = u.fonction || '';
   document.getElementById('eduUsername').value = u.username;
   document.getElementById('eduPassword').value = '';
   document.getElementById('eduPasswordLabel').textContent = 'Nouveau mot de passe (vide = inchangé)';
@@ -325,6 +326,7 @@ function saveEducateur() {
   const password = document.getElementById('eduPassword').value;
   const prenom = document.getElementById('eduPrenom').value.trim();
   const nom = document.getElementById('eduNom').value.trim();
+  const fonction = document.getElementById('eduFonction').value.trim();
   const id = document.getElementById('eduId').value;
   if (!username) { toast("L'identifiant est requis", 'error'); return; }
   let users = DB.get(DB.keys.users) || [];
@@ -336,13 +338,13 @@ function saveEducateur() {
       toast('Le mot de passe est requis', 'error'); return;
     }
     users = users.map(u => String(u.id) === String(id)
-      ? { ...u, prenom, nom, username, ...(password ? { password } : {}) } : u);
-    toast('Éducateur mis à jour');
+      ? { ...u, prenom, nom, fonction, username, ...(password ? { password } : {}) } : u);
+    toast('Utilisateur mis à jour');
   } else {
     if (!password) { toast('Le mot de passe est requis', 'error'); return; }
     const newId = Math.max(0, ...users.map(u => u.id)) + 1;
-    users.push({ id: newId, prenom, nom, username, password, role: 'educateur' });
-    toast('Éducateur ajouté');
+    users.push({ id: newId, prenom, nom, fonction, username, password, role: 'educateur' });
+    toast('Utilisateur ajouté');
   }
   DB.set(DB.keys.users, users);
   closeAllModals();
@@ -367,9 +369,10 @@ function resetEducateurForm() {
   document.getElementById('eduId').value = '';
   document.getElementById('eduPrenom').value = '';
   document.getElementById('eduNom').value = '';
+  document.getElementById('eduFonction').value = '';
   document.getElementById('eduUsername').value = '';
   document.getElementById('eduPassword').value = '';
-  document.getElementById('modalEduTitle').textContent = 'Nouvel éducateur';
+  document.getElementById('modalEduTitle').textContent = 'Nouvel utilisateur';
   document.getElementById('eduPasswordLabel').textContent = 'Mot de passe';
   document.getElementById('btnDeleteEdu').style.display = 'none';
 }

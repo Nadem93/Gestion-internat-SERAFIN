@@ -2,7 +2,7 @@
 <html lang="fr">
 <head>
   <meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1.0"/>
-  <title>Présences — FTR</title>
+  <title>Véhicules — FTR</title>
   <link rel="stylesheet" href="css/style.css"/>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet"/>
 </head>
@@ -32,37 +32,67 @@
 
   <div class="main">
     <header class="header">
-      <div><div class="header-title">Présences</div><div class="header-sub">Suivi des présences et absences</div></div>
+      <div><div class="header-title">🚗 Véhicules</div><div class="header-sub">Réservation et gestion des véhicules</div></div>
       <div class="header-right">
-        <button class="btn btn-outline btn-sm" id="prevDay">&#8592;</button>
-        <input type="date" id="presenceDate" style="width:auto;font-weight:600"/>
-        <button class="btn btn-outline btn-sm" id="nextDay">&#8594;</button>
-        <button class="btn btn-ghost btn-sm" id="todayBtn">Aujourd'hui</button>
-        <button class="btn btn-accent btn-sm" onclick="markAllPresent()">Tous présents</button>
+        <a href="dashboard.html" class="btn btn-ghost btn-sm">← Tableau de bord</a>
       </div>
     </header>
 
     <main class="content">
-      <!-- Stats du jour -->
-      <div class="grid grid-4" style="margin-bottom:1.5rem">
-        <div class="stat-card"><div class="stat-card-top"><span class="stat-label">Présents</span><div class="stat-icon green"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg></div></div><div class="stat-num" id="countPresent">0</div></div>
-        <div class="stat-card"><div class="stat-card-top"><span class="stat-label">Absents</span><div class="stat-icon red"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg></div></div><div class="stat-num" id="countAbsent">0</div></div>
-        <div class="stat-card"><div class="stat-card-top"><span class="stat-label">Sortie temp.</span><div class="stat-icon orange"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg></div></div><div class="stat-num" id="countSortie">0</div></div>
-        <div class="stat-card"><div class="stat-card-top"><span class="stat-label">Non renseigné</span><div class="stat-icon teal"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg></div></div><div class="stat-num" id="countUnknown">0</div></div>
-      </div>
-
-      <div class="card">
-        <div class="card-header">
-          <span class="card-title">Feuille de présence</span>
-          <span id="presenceDateLabel" style="font-size:.8rem;color:var(--muted);margin-left:.5rem"></span>
-          <div style="margin-left:auto;display:flex;gap:.5rem;font-size:.75rem;color:var(--muted);align-items:center">
-            <span style="display:inline-flex;align-items:center;gap:.3rem"><span style="width:12px;height:12px;border-radius:2px;background:#ecfdf5;border:1px solid #a7f3d0"></span>Présent</span>
-            <span style="display:inline-flex;align-items:center;gap:.3rem"><span style="width:12px;height:12px;border-radius:2px;background:#fef2f2;border:1px solid #fecaca"></span>Absent</span>
-            <span style="display:inline-flex;align-items:center;gap:.3rem"><span style="width:12px;height:12px;border-radius:2px;background:#fffbeb;border:1px solid #fde68a"></span>Sortie</span>
+      <div class="grid grid-2" style="gap:1.5rem">
+        <!-- RÉSERVER -->
+        <div class="card">
+          <div class="card-header"><span class="card-title">Nouvelle réservation</span></div>
+          <div class="card-body" style="display:flex;flex-direction:column;gap:1rem">
+            <div class="form-row">
+              <div class="form-group"><label class="required">Date &amp; heure de départ</label><input type="datetime-local" id="vDateAller"/></div>
+              <div class="form-group"><label class="required">Durée</label>
+                <select id="vDuree">
+                  <option value="30">30 min</option>
+                  <option value="60" selected>1 h</option>
+                  <option value="90">1 h 30</option>
+                  <option value="120">2 h</option>
+                  <option value="180">3 h</option>
+                  <option value="240">4 h</option>
+                  <option value="360">6 h</option>
+                  <option value="480">8 h</option>
+                  <option value="journee">Journée</option>
+                </select>
+              </div>
+            </div>
+            <div class="form-group">
+              <label class="required">Véhicule</label>
+              <input type="text" id="vVehicule" list="vehiculesList" placeholder="Sélectionner ou saisir un véhicule"/>
+              <datalist id="vehiculesList"></datalist>
+            </div>
+            <div class="form-group"><label class="required">Destination</label><input type="text" id="vDestination" placeholder="Lieu de destination"/></div>
+            <div class="form-group"><label>Motif</label><input type="text" id="vMotif" placeholder="Objet du déplacement (optionnel)"/></div>
+            <div id="vReservataire" style="font-size:.8rem;color:var(--muted);padding:.5rem .75rem;background:var(--g50);border-radius:var(--r)"></div>
+            <button class="btn btn-primary" onclick="reserverVehicule()">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:15px;height:15px"><polyline points="20 6 9 17 4 12"/></svg>
+              Confirmer la réservation
+            </button>
           </div>
         </div>
+
+        <!-- LISTE DES RÉSERVATIONS -->
+        <div class="card">
+          <div class="card-header"><span class="card-title">Réservations à venir</span></div>
+          <div class="card-body" style="padding:0">
+            <div id="vReservationsList">
+              <div class="empty" style="padding:2rem"><p>Aucune réservation à venir.</p></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- RÉSERVATIONS PASSÉES -->
+      <div class="card" style="margin-top:1.5rem" id="pastReservationsCard">
+        <div class="card-header"><span class="card-title">Historique</span></div>
         <div class="card-body" style="padding:0">
-          <div id="presenceTable"></div>
+          <div id="vPastReservationsList">
+            <div class="empty" style="padding:2rem"><p>Aucune réservation passée.</p></div>
+          </div>
         </div>
       </div>
     </main>
@@ -72,6 +102,6 @@
 <div id="toast-container" class="toast-container"></div>
 <script src="js/app.js"></script>
 <script>Auth.requireAuth();</script>
-<script src="js/presences.js"></script>
+<script src="js/vehicules.js"></script>
 </body>
 </html>

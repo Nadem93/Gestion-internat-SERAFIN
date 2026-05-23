@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+  <title>Messages — FTR</title>
+  <link rel="stylesheet" href="css/style.css"/>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet"/>
+  <style>
+    .chat-wrap{display:grid;grid-template-columns:300px 1fr;gap:0;height:calc(100vh - 140px);min-height:450px;border:1px solid var(--border);border-radius:var(--r);overflow:hidden;background:#fff}
+    .chat-list{border-right:1px solid var(--border);display:flex;flex-direction:column;background:var(--bg)}
+    .chat-list-header{display:flex;align-items:center;padding:.75rem 1rem;border-bottom:1px solid var(--border);gap:.5rem;background:#fff}
+    .chat-list-header h3{margin:0;font-size:.85rem;font-weight:700;flex:1}
+    .chat-list-search{padding:.5rem .75rem;border-bottom:1px solid var(--border)}
+    .chat-list-search input{width:100%;padding:.35rem .65rem;border:1px solid var(--border);border-radius:var(--r-sm);font-size:.78rem;outline:none;box-sizing:border-box}
+    .chat-list-search input:focus{border-color:var(--blue)}
+    .chat-convs{flex:1;overflow-y:auto}
+    .chat-conv{display:flex;align-items:center;gap:.6rem;padding:.55rem .75rem;cursor:pointer;transition:background .1s;border-bottom:1px solid var(--border)}
+    .chat-conv:hover{background:var(--b50)}
+    .chat-conv.active{background:#e8f0fe}
+    .chat-conv-avatar{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:.75rem;color:#fff;flex-shrink:0}
+    .chat-conv-info{flex:1;min-width:0}
+    .chat-conv-name{font-weight:600;font-size:.82rem;display:flex;align-items:center;gap:.3rem}
+    .chat-conv-preview{font-size:.72rem;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:1px}
+    .chat-conv-right{text-align:right;flex-shrink:0}
+    .chat-conv-time{font-size:.65rem;color:var(--muted);white-space:nowrap}
+    .chat-conv-badge{background:var(--blue);color:#fff;font-size:.6rem;font-weight:700;min-width:16px;height:16px;border-radius:8px;display:flex;align-items:center;justify-content:center;margin-top:2px;margin-left:auto;padding:0 4px;box-sizing:border-box}
+    .chat-main{display:flex;flex-direction:column;background:#fff;min-height:0}
+    .chat-main-header{display:flex;align-items:center;gap:.6rem;padding:.5rem .85rem;border-bottom:1px solid var(--border);background:#fff;min-height:48px}
+    .chat-main-header .avatar{width:30px;height:30px;font-size:.7rem}
+    .chat-main-header-info{flex:1;min-width:0}
+    .chat-main-header-name{font-weight:600;font-size:.82rem}
+    .chat-main-header-status{font-size:.68rem;color:var(--muted)}
+
+    .chat-input{display:flex;gap:.5rem;align-items:center;padding:.5rem .75rem;border-top:1px solid var(--border);background:#fff}
+    .chat-input input{flex:1;border:1px solid var(--border);border-radius:var(--r);padding:.45rem .75rem;font-size:.82rem;outline:none}
+    .chat-input input:focus{border-color:var(--blue)}
+    .chat-empty{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;color:var(--muted);text-align:center;padding:2rem}
+    .chat-empty svg{width:40px;height:40px;opacity:.25;margin-bottom:.5rem}
+    .chat-empty p{font-size:.85rem;margin:0}
+    .chat-overlay{position:absolute;top:0;left:0;right:0;bottom:0;background:#fff;z-index:10;display:flex;flex-direction:column}
+    .chat-overlay-header{display:flex;align-items:center;gap:.5rem;padding:.6rem .85rem;border-bottom:1px solid var(--border)}
+    .chat-overlay-header h3{margin:0;font-size:.85rem;font-weight:700;flex:1}
+    .chat-overlay-search{padding:.4rem .75rem;border-bottom:1px solid var(--border)}
+    .chat-overlay-search input{width:100%;padding:.35rem .65rem;border:1px solid var(--border);border-radius:var(--r-sm);font-size:.78rem;outline:none;box-sizing:border-box}
+    .chat-overlay-search input:focus{border-color:var(--blue)}
+    .chat-overlay-list{flex:1;overflow-y:auto}
+    .chat-overlay-user{display:flex;align-items:center;gap:.55rem;padding:.45rem .75rem;cursor:pointer;transition:background .08s}
+    .chat-overlay-user:hover{background:var(--b50)}
+    .chat-overlay-user .ck{width:20px;height:20px;border-radius:50%;border:2px solid #c7c7cc;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all .1s}
+    .chat-overlay-user .ck.checked{background:var(--blue);border-color:var(--blue)}
+    .chat-overlay-user .ck.checked::after{content:'✓';color:#fff;font-size:11px;font-weight:700}
+    .chat-overlay-user .avatar{width:34px;height:34px;font-size:.72rem}
+    .chat-overlay-user-info{flex:1;min-width:0}
+    .chat-overlay-user-name{font-weight:600;font-size:.8rem}
+    .chat-overlay-user-role{font-size:.68rem;color:var(--muted)}
+    .chat-overlay-btn{padding:.5rem .75rem;border-top:1px solid var(--border)}
+    .chat-overlay-btn button{width:100%}
+    .btn-circle{width:30px;height:30px;border-radius:50%;border:none;background:var(--blue);color:#fff;display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0}
+    .btn-circle svg{width:14px;height:14px;stroke:currentColor;stroke-width:2.5;fill:none}
+    .chat-conv-del{opacity:0;transition:opacity .12s;width:20px;height:20px;border-radius:50%;border:none;background:#ff3b30;color:#fff;display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;padding:0;margin-left:2px}
+    .chat-conv-del svg{width:10px;height:10px;stroke:currentColor;stroke-width:3;fill:none}
+    .chat-conv:hover .chat-conv-del{opacity:1}
+  </style>
+</head>
+<body>
+<div class="app-layout">
+  <aside class="sidebar"><a href="dashboard.html" class="sidebar-logo"><img class="sidebar-logo-img" src="" style="display:none" alt="Logo"/><div class="logo-icon">FTR</div><div class="logo-text"><span id="sidebarEtab">Foyer Trois Rivières</span><strong>Administration</strong></div></a>
+    <div class="sidebar-section"><div class="sidebar-label">Principal</div>
+      <a href="dashboard.html" class="nav-item" data-page="dashboard.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>Tableau de bord</a>
+      <a href="residents.html" class="nav-item" data-page="residents.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>Résidents</a>
+      <a href="journal.html" class="nav-item" data-page="journal.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/>      </svg>Journal de bord</a>
+      <a href="ppe.html" class="nav-item" data-page="ppe.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>Avenants</a>
+      <a href="planning.html" class="nav-item" data-page="planning.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>Planning</a>
+      <a href="presences.html" class="nav-item" data-page="presences.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>Présences</a>
+      <a href="vehicules.html" class="nav-item" data-page="vehicules.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 16H9m10 0h3v-3.15a1 1 0 0 0-.84-.99L16 11l-2.7-3.6a1 1 0 0 0-.8-.4H5.5a1 1 0 0 0-.8.4L2 11v5h2m10 1.5a1.5 1.5 0 0 1-3 0m3 0a1.5 1.5 0 0 0-3 0m3 0h3m-3 0H9m6-6V7a1 1 0 0 0-1-1h-3a1 1 0 0 0-1 1v3M6 17.5a1.5 1.5 0 0 1-3 0m3 0a1.5 1.5 0 0 0-3 0"/></svg>Véhicules</a>
+      <a href="incidents.html" class="nav-item" data-page="incidents.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>Incidents</a>
+      <a href="messages.html" class="nav-item" data-page="messages.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>Messages</a>
+      <a href="repertoire.html" class="nav-item" data-page="repertoire.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>Répertoire</a>
+    </div>
+    <div class="sidebar-section"><div class="sidebar-label">Paramètres</div><a href="admin.html" class="nav-item admin-only" data-page="admin.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.07 4.93l-1.41 1.41M4.93 4.93l1.41 1.41M12 2v2M12 20v2M2 12h2M20 12h2M19.07 19.07l-1.41-1.41M4.93 19.07l1.41-1.41"/></svg>Administration</a></div>
+    <div class="sidebar-footer"><div class="user-card"><div class="avatar" id="sidebarAvatar">A</div><div><div class="user-name" id="sidebarUserName">Administrateur</div><div class="user-role" id="sidebarUserRole">Admin</div></div></div>
+      <a href="#" onclick="Auth.logout()" class="nav-item" style="margin-top:.25rem;color:rgba(255,255,255,.4)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>Déconnexion</a></div>
+  </aside>
+  <div class="main">
+    <header class="header">
+      <div><div class="header-title">Messages</div><div class="header-sub">Communication interne</div></div>
+      <div class="header-right"><span id="convCount" style="font-size:.8rem;color:var(--muted)"></span></div>
+    </header>
+    <main class="content" style="padding-bottom:0">
+      <div class="chat-wrap" style="position:relative">
+        <div class="chat-list">
+          <div class="chat-list-header">
+            <h3>Conversations</h3>
+            <button class="btn-circle" onclick="openCompose()" title="Nouveau message"><svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></button>
+          </div>
+          <div class="chat-list-search"><input type="text" id="convSearch" placeholder="Rechercher" oninput="renderConvs()"/></div>
+          <div class="chat-convs" id="chatConvs"></div>
+        </div>
+        <div class="chat-main" id="chatMain">
+          <div class="chat-main-header" id="chatMainHeader" style="display:none">
+            <div class="avatar" id="chatMainAvatar" style="background:var(--blue)">?</div>
+            <div class="chat-main-header-info">
+              <div class="chat-main-header-name" id="chatMainName">—</div>
+              <div class="chat-main-header-status" id="chatMainStatus">Conversation</div>
+            </div>
+          </div>
+          <div class="chat-msgs" id="chatMsgs">
+            <div class="chat-empty">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+              <p>Messages</p>
+            </div>
+          </div>
+          <div class="chat-input" id="chatInputBar">
+            <input type="text" id="chatInput" placeholder="Message" onkeydown="if(event.key==='Enter') sendChatMsg()" disabled/>
+            <button class="btn btn-primary btn-sm" onclick="sendChatMsg()" id="sendBtn" disabled>Envoyer</button>
+          </div>
+          <div class="chat-overlay" id="composeOverlay" style="display:none">
+            <div class="chat-overlay-header">
+              <button class="btn btn-ghost btn-sm" onclick="closeCompose()" style="font-size:.8rem">Annuler</button>
+              <h3>Nouveau message</h3>
+              <div style="width:50px"></div>
+            </div>
+            <div class="chat-overlay-search"><input type="text" id="composeSearch" placeholder="Rechercher" oninput="renderComposeUsers()"/></div>
+            <div class="chat-overlay-list" id="composeList"></div>
+            <div class="chat-overlay-btn"><button class="btn btn-primary" id="composeStartBtn" disabled onclick="startComposeConv()">Démarrer</button></div>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+</div>
+<div id="toast-container" class="toast-container"></div>
+<script src="js/app.js"></script>
+<script>Auth.requireAuth();</script>
+<script src="js/messages.js"></script>
+</body>
+</html>

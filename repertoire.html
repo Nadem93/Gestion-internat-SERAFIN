@@ -2,7 +2,7 @@
 <html lang="fr">
 <head>
   <meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1.0"/>
-  <title>Présences — FTR</title>
+  <title>Répertoire — FTR</title>
   <link rel="stylesheet" href="css/style.css"/>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet"/>
 </head>
@@ -21,7 +21,7 @@
       <a href="vehicules.html" class="nav-item" data-page="vehicules.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 16H9m10 0h3v-3.15a1 1 0 0 0-.84-.99L16 11l-2.7-3.6a1 1 0 0 0-.8-.4H5.5a1 1 0 0 0-.8.4L2 11v5h2m10 1.5a1.5 1.5 0 0 1-3 0m3 0a1.5 1.5 0 0 0-3 0m3 0h3m-3 0H9m6-6V7a1 1 0 0 0-1-1h-3a1 1 0 0 0-1 1v3M6 17.5a1.5 1.5 0 0 1-3 0m3 0a1.5 1.5 0 0 0-3 0"/>      </svg>Véhicules</a>
       <a href="incidents.html" class="nav-item" data-page="incidents.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>Incidents</a>
       <a href="messages.html" class="nav-item" data-page="messages.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>Messages</a>
-      <a href="repertoire.html" class="nav-item" data-page="repertoire.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>Répertoire</a>
+      <a href="repertoire.html" class="nav-item active" data-page="repertoire.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>Répertoire</a>
     </div>
     <div class="sidebar-section"><div class="sidebar-label">Paramètres</div><a href="admin.html" class="nav-item admin-only" data-page="admin.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.07 4.93l-1.41 1.41M4.93 4.93l1.41 1.41M12 2v2M12 20v2M2 12h2M20 12h2M19.07 19.07l-1.41-1.41M4.93 19.07l1.41-1.41"/></svg>Administration</a></div>
     <div class="sidebar-footer">
@@ -32,46 +32,57 @@
 
   <div class="main">
     <header class="header">
-      <div><div class="header-title">Présences</div><div class="header-sub">Suivi des présences et absences</div></div>
+      <div><div class="header-title">📇 Répertoire</div><div class="header-sub">Contacts des partenaires et organismes</div></div>
       <div class="header-right">
-        <button class="btn btn-outline btn-sm" id="prevDay">&#8592;</button>
-        <input type="date" id="presenceDate" style="width:auto;font-weight:600"/>
-        <button class="btn btn-outline btn-sm" id="nextDay">&#8594;</button>
-        <button class="btn btn-ghost btn-sm" id="todayBtn">Aujourd'hui</button>
-        <button class="btn btn-accent btn-sm" onclick="markAllPresent()">Tous présents</button>
+        <button class="btn btn-accent btn-sm" onclick="openAddContact()">+ Nouveau contact</button>
       </div>
     </header>
 
     <main class="content">
-      <!-- Stats du jour -->
-      <div class="grid grid-4" style="margin-bottom:1.5rem">
-        <div class="stat-card"><div class="stat-card-top"><span class="stat-label">Présents</span><div class="stat-icon green"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg></div></div><div class="stat-num" id="countPresent">0</div></div>
-        <div class="stat-card"><div class="stat-card-top"><span class="stat-label">Absents</span><div class="stat-icon red"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg></div></div><div class="stat-num" id="countAbsent">0</div></div>
-        <div class="stat-card"><div class="stat-card-top"><span class="stat-label">Sortie temp.</span><div class="stat-icon orange"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg></div></div><div class="stat-num" id="countSortie">0</div></div>
-        <div class="stat-card"><div class="stat-card-top"><span class="stat-label">Non renseigné</span><div class="stat-icon teal"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg></div></div><div class="stat-num" id="countUnknown">0</div></div>
-      </div>
-
-      <div class="card">
-        <div class="card-header">
-          <span class="card-title">Feuille de présence</span>
-          <span id="presenceDateLabel" style="font-size:.8rem;color:var(--muted);margin-left:.5rem"></span>
-          <div style="margin-left:auto;display:flex;gap:.5rem;font-size:.75rem;color:var(--muted);align-items:center">
-            <span style="display:inline-flex;align-items:center;gap:.3rem"><span style="width:12px;height:12px;border-radius:2px;background:#ecfdf5;border:1px solid #a7f3d0"></span>Présent</span>
-            <span style="display:inline-flex;align-items:center;gap:.3rem"><span style="width:12px;height:12px;border-radius:2px;background:#fef2f2;border:1px solid #fecaca"></span>Absent</span>
-            <span style="display:inline-flex;align-items:center;gap:.3rem"><span style="width:12px;height:12px;border-radius:2px;background:#fffbeb;border:1px solid #fde68a"></span>Sortie</span>
-          </div>
+      <div style="display:flex;align-items:center;gap:.75rem;margin-bottom:1rem">
+        <div style="flex:1;position:relative">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="position:absolute;left:12px;top:50%;transform:translateY(-50%);width:16px;height:16px;color:var(--muted)"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+          <input type="text" id="searchRepertoire" placeholder="Rechercher un organisme, un nom, une fonction…" oninput="renderContacts()" style="width:100%;padding:.7rem .7rem .7rem 2.3rem;border:1px solid #000;border-radius:8px;font-size:.85rem;outline:none;background:#eef4ff">
         </div>
-        <div class="card-body" style="padding:0">
-          <div id="presenceTable"></div>
-        </div>
+        <span id="contactCount" style="font-size:.8rem;color:var(--muted);white-space:nowrap"></span>
       </div>
+      <div id="contactList"></div>
     </main>
+  </div>
+</div>
+
+<!-- MODAL CONTACT -->
+<div class="modal-overlay" id="modalContact">
+  <div class="modal">
+    <div class="modal-header">
+      <span class="modal-title" id="modalContactTitle">Nouveau contact</span>
+      <button class="modal-close"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+    </div>
+    <div class="modal-body" style="display:flex;flex-direction:column;gap:.85rem">
+      <input type="hidden" id="contactId"/>
+      <div class="form-row">
+        <div class="form-group"><label class="required">Organisme / Partenaire</label><input type="text" id="cOrganisme" placeholder="Nom de l'organisme"/></div>
+        <div class="form-group"><label class="required">Nom du contact</label><input type="text" id="cNom" placeholder="Prénom et nom"/></div>
+      </div>
+      <div class="form-row">
+        <div class="form-group"><label>Téléphone</label><input type="tel" id="cTel" placeholder="06 00 00 00 00"/></div>
+        <div class="form-group"><label>Email</label><input type="email" id="cEmail" placeholder="contact@exemple.fr"/></div>
+      </div>
+      <div class="form-group"><label>Fonction / Service</label><input type="text" id="cFonction" placeholder="Ex : Assistante sociale, Médecin…"/></div>
+      <div class="form-group"><label>Adresse</label><textarea id="cAdresse" rows="2" placeholder="Adresse complète"></textarea></div>
+      <div class="form-group"><label>Notes</label><textarea id="cNotes" rows="2" placeholder="Informations complémentaires"></textarea></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" onclick="closeAllModals()">Annuler</button>
+      <button class="btn btn-danger btn-sm" id="btnDeleteContact" style="margin-right:auto;display:none" onclick="deleteContact()">Supprimer</button>
+      <button class="btn btn-primary" onclick="saveContact()">Enregistrer</button>
+    </div>
   </div>
 </div>
 
 <div id="toast-container" class="toast-container"></div>
 <script src="js/app.js"></script>
 <script>Auth.requireAuth();</script>
-<script src="js/presences.js"></script>
+<script src="js/repertoire.js"></script>
 </body>
 </html>

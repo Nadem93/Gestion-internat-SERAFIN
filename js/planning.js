@@ -3,8 +3,15 @@ let currentDate = new Date();
 
 const DAYS = ['Lundi','Mardi','Mercredi','Jeudi','Vendredi','Samedi','Dimanche'];
 const MONTHS = ['Janvier','Février','Mars','Avril','Mai','Juin','Juillet','Août','Septembre','Octobre','Novembre','Décembre'];
-const TYPE_COLORS = { activite:'#3b82f6', rdv:'#ef4444', sortie:'#10b981', reunion:'#8b5cf6', autre:'#f59e0b' };
-const TYPE_LABELS = { activite:'Activité', rdv:'Rendez-vous', sortie:'Sortie', reunion:'Réunion', autre:'Autre' };
+const TYPE_COLORS = { activite:'#3b82f6', rdv:'#ef4444', sortie:'#10b981', reunion:'#8b5cf6', avenant:'#f59e0b', projet:'#06b6d4', evaluation:'#9333ea', autre:'#f59e0b', vehicule:'#6366f1' };
+const TYPE_LABELS = { activite:'Activité', rdv:'Rendez-vous', sortie:'Sortie', reunion:'Réunion', avenant:'Avenant', projet:'Projet personnalisé', evaluation:'Évaluation', autre:'Autre', vehicule:'Véhicule' };
+
+function eventOnDay(event, dayStr) {
+  if (!event.date) return false;
+  if (event.date === dayStr) return true;
+  if (event.dateEnd && event.dateEnd >= dayStr && event.date < dayStr) return true;
+  return false;
+}
 
 function getMondayOf(d) {
   const date = new Date(d);
@@ -49,9 +56,9 @@ function renderWeek() {
       <div style="display:grid;grid-template-columns:60px repeat(7,1fr);min-height:52px">
         <div style="padding:.35rem .5rem;text-align:right;font-size:.7rem;color:var(--g400);font-weight:500;border-right:1px solid var(--border);border-top:1px solid var(--g100)">${h}:00</div>
         ${days.map(d => {
-          const dayEvents = events.filter(e => e.date === dateStr(d) && e.heure && parseInt(e.heure) === h);
+          const dayEvents = events.filter(e => eventOnDay(e, dateStr(d)) && (e.heure||e.time) && parseInt(e.heure||e.time) === h);
           return `<div style="border-left:1px solid var(--border);border-top:1px solid var(--g100);padding:2px;position:relative;cursor:pointer" onclick="quickAddEvent('${dateStr(d)}','${h}:00')">
-            ${dayEvents.map(ev => `<div class="cal-event" style="background:${ev.color||TYPE_COLORS[ev.type]||'#3b82f6'}" onclick="event.stopPropagation();editEvent('${ev.id}')" title="${ev.titre}">${ev.titre}</div>`).join('')}
+            ${dayEvents.map(ev => `<div class="cal-event" style="background:${ev.color||TYPE_COLORS[ev.type]||'#3b82f6'}" onclick="event.stopPropagation();editEvent('${ev.id}')" title="${ev.residentName?ev.residentName+' — ':''}${ev.titre}">${ev.residentName?'<span style="font-weight:400;opacity:.85">'+ev.residentName+'</span> ':''}${ev.titre}</div>`).join('')}
           </div>`;
         }).join('')}
       </div>`).join('')}
@@ -80,10 +87,10 @@ function renderMonth() {
       ${cells.map(d => {
         if (!d) return `<div style="min-height:90px;background:var(--g50);border:1px solid var(--border)"></div>`;
         const isTod = sameDay(d, todayD);
-        const dayEvs = events.filter(e => e.date === dateStr(d));
+        const dayEvs = events.filter(e => eventOnDay(e, dateStr(d)));
         return `<div style="min-height:90px;padding:.4rem;border:1px solid var(--border);${isTod?'background:#eff6ff':''}" onclick="quickAddEvent('${dateStr(d)}','')">
           <div style="font-size:.8rem;font-weight:700;${isTod?'background:var(--blue);color:#fff;width:22px;height:22px;border-radius:50%;display:flex;align-items:center;justify-content:center;margin-bottom:3px':'color:var(--text);margin-bottom:3px'}">${d.getDate()}</div>
-          ${dayEvs.slice(0,3).map(ev=>`<div style="background:${ev.color||TYPE_COLORS[ev.type]||'#3b82f6'};color:#fff;border-radius:3px;padding:1px 5px;font-size:.68rem;font-weight:600;cursor:pointer;margin-bottom:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis" onclick="event.stopPropagation();editEvent('${ev.id}')">${ev.titre}</div>`).join('')}
+          ${dayEvs.slice(0,3).map(ev=>`<div style="background:${ev.color||TYPE_COLORS[ev.type]||'#3b82f6'};color:#fff;border-radius:3px;padding:1px 5px;font-size:.68rem;font-weight:600;cursor:pointer;margin-bottom:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis" onclick="event.stopPropagation();editEvent('${ev.id}')">${ev.residentName?ev.residentName+' ':' '}${ev.titre}</div>`).join('')}
           ${dayEvs.length>3?`<div style="font-size:.68rem;color:var(--muted)">+${dayEvs.length-3} autres</div>`:''}
         </div>`;
       }).join('')}
@@ -93,7 +100,7 @@ function renderMonth() {
 }
 
 function renderListView() {
-  const events = (getFilteredEvents()).sort((a,b) => (a.date+a.heure) > (b.date+b.heure) ? 1 : -1);
+  const events = (getFilteredEvents()).sort((a,b) => ((a.date||'')+(a.heure||a.time||'')) > ((b.date||'')+(b.heure||b.time||'')) ? 1 : -1);
   document.getElementById('calTitle').textContent = 'Tous les événements';
   document.getElementById('calContainer').style.display = 'none';
   const listEl = document.getElementById('listContainer');
@@ -104,10 +111,10 @@ function renderListView() {
     return;
   }
   tbody.innerHTML = events.map(ev => `<tr>
-    <td><span style="display:inline-flex;align-items:center;gap:.4rem"><span style="width:10px;height:10px;border-radius:50%;background:${ev.color||TYPE_COLORS[ev.type]||'#3b82f6'};flex-shrink:0"></span><strong>${ev.titre}</strong></span></td>
+    <td><span style="display:inline-flex;align-items:center;gap:.4rem"><span style="width:10px;height:10px;border-radius:50%;background:${ev.color||TYPE_COLORS[ev.type]||'#3b82f6'};flex-shrink:0"></span><strong>${ev.residentName?ev.residentName+' — ':''}${ev.titre}</strong></span></td>
     <td>${ev.residentName||'Tous'}</td>
     <td>${ev.date ? formatDate(ev.date) : '—'}</td>
-    <td>${ev.heure||'—'}</td>
+    <td>${ev.heure||ev.time||'—'}</td>
     <td><span class="badge badge-gray">${TYPE_LABELS[ev.type]||ev.type||'—'}</span></td>
     <td><div class="table-actions"><button class="btn btn-ghost btn-sm" onclick="editEvent('${ev.id}')">Modifier</button></div></td>
   </tr>`).join('');
@@ -146,7 +153,7 @@ function editEvent(id) {
   document.getElementById('evResident').value = ev.residentId || '';
   document.getElementById('evType').value = ev.type || 'activite';
   document.getElementById('evDate').value = ev.date || '';
-  document.getElementById('evHeure').value = ev.heure || '09:00';
+  document.getElementById('evHeure').value = ev.heure || ev.time || '09:00';
   document.getElementById('evDuree').value = ev.duree || '60';
   document.getElementById('evColor').value = ev.color || '#3b82f6';
   document.getElementById('evDesc').value = ev.desc || '';
@@ -166,6 +173,7 @@ function saveEvent() {
     residentName: res ? `${res.prenom||''} ${res.nom||''}`.trim() : '',
     type: document.getElementById('evType').value,
     date: document.getElementById('evDate').value,
+    time: document.getElementById('evHeure').value,
     heure: document.getElementById('evHeure').value,
     duree: document.getElementById('evDuree').value,
     color: document.getElementById('evColor').value,

@@ -1,0 +1,558 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head><meta charset="UTF-8"><title>Génération données de démo</title></head>
+<body style="font-family:system-ui;display:flex;align-items:center;justify-content:center;min-height:100vh;background:#f1f5f9;margin:0">
+<div style="background:#fff;padding:3rem;border-radius:16px;box-shadow:0 10px 40px rgba(0,0,0,.1);text-align:center;max-width:500px">
+  <div style="font-size:3rem;margin-bottom:1rem">🎲</div>
+  <h2 style="margin:0 0 .5rem">Génération des données de démo</h2>
+  <p style="color:#64748b;margin:0 0 1.5rem">Résidents, journal, planning, présences, avenants — tout sera créé.</p>
+  <button onclick="generateDemo()" style="background:#e85d04;color:#fff;border:none;padding:1rem 2rem;border-radius:10px;font-size:1rem;font-weight:700;cursor:pointer;width:100%">Générer les données de démonstration</button>
+  <div id="status" style="margin-top:1.5rem;font-size:.9rem;color:#64748b"></div>
+</div>
+<script src="js/app.js"></script>
+<script>
+function log(msg) { document.getElementById('status').innerHTML += msg + '<br>'; }
+
+function generateDemo() {
+  initDefaults();
+
+  // ── RÉSIDENTS ──
+  const residents = [
+    { prenom:'Amine', nom:'Benali', dob:'2002-03-15', entree:'2024-01-10', statut:'present', chambre:'101', color:'#3b82f6', referent:'M. Dubois', genre:'M', notes:'Arrivé suite à rupture familiale. Bonne intégration.', contacts:'Mme Benali (mère) : 06 12 34 56 01', medecin:'Dr Moreau', tuteur:'', tuteurTel:'', ecole:'', classe:'', organisme:'ase', dossier:'ASE-2024-045', situationPro:'formation', ressources:'', organismeA:'', dossierA:'', situationAdmin:'', allergies:'', nss:'', objectifs:['1','2'] },
+    { prenom:'Sofia', nom:'Petit', dob:'1998-07-22', entree:'2023-09-01', statut:'present', chambre:'102', color:'#10b981', referent:'Mme Martin', genre:'F', notes:'Recherche un logement autonome. Suivi social en cours.', contacts:'M. Petit (père) : 06 12 34 56 02', medecin:'Dr Laurent', tuteur:'', tuteurTel:'', ecole:'', classe:'', organisme:'', dossier:'', situationPro:'recherche', ressources:'rsa', organismeA:'siao', dossierA:'SIAO-2023-112', situationAdmin:'francais', allergies:'', nss:'', objectifs:['2','6'] },
+    { prenom:'Thomas', nom:'Leroy', dob:'2005-11-08', entree:'2024-03-15', statut:'present', chambre:'103', color:'#8b5cf6', referent:'M. Dubois', genre:'M', notes:'Jeune suivi par l\'ASE. Scolarité en lycée professionnel.', contacts:'Mme Leroy (tutrice) : 06 12 34 56 03\nASE Référent : Mme Fontaine', medecin:'Dr Petit', tuteur:'Mme Leroy', tuteurTel:'06 12 34 56 03', ecole:'Lycée Professionnel Charles de Gaulle', classe:'1ère Bac Pro MELEC', organisme:'ase', dossier:'ASE-2024-078', situationPro:'', ressources:'', organismeA:'', dossierA:'', situationAdmin:'', allergies:'Arachides', nss:'1 89 12 75 021 085', objectifs:['1','4'] },
+    { prenom:'Fatima', nom:'Zahra', dob:'1995-04-30', entree:'2024-06-01', statut:'present', chambre:'104', color:'#f59e0b', referent:'Mme Martin', genre:'F', notes:'Mère isolée avec enfant de 3 ans. En attente de logement social.', contacts:'M. Diop (voisin) : 06 12 34 56 04', medecin:'Dr Dubois', tuteur:'', tuteurTel:'', ecole:'', classe:'', organisme:'', dossier:'', situationPro:'inactif', ressources:'aah', organismeA:'ccas', dossierA:'CCAS-2024-033', situationAdmin:'francais', allergies:'', nss:'2 92 06 75 042 176', objectifs:['3','6'] },
+    { prenom:'Lucas', nom:'Moreau', dob:'2010-09-12', entree:'2024-02-20', statut:'present', chambre:'105', color:'#ef4444', referent:'M. Dubois', genre:'M', notes:'Jeune confié à l\'ASE. Suivi psychologique en cours. Troubles du comportement.', contacts:'Mme Moreau (mère) : 06 12 34 56 05\nASE : Mme Legrand', medecin:'Dr Rousseau', tuteur:'Mme Moreau', tuteurTel:'06 12 34 56 05', ecole:'Collège Victor Hugo', classe:'4ème', organisme:'pjj', dossier:'PJJ-2024-015', situationPro:'', ressources:'', organismeA:'', dossierA:'', situationAdmin:'', allergies:'Lactose', nss:'1 95 09 75 021 092', objectifs:['1','3','5'] },
+    { prenom:'Clara', nom:'Bernard', dob:'2000-12-05', entree:'2023-11-15', statut:'present', chambre:'106', color:'#06b6d4', referent:'Mme Martin', genre:'F', notes:'En contrat de professionnalisation. Prépare son projet de sortie.', contacts:'M. Bernard (père) : 06 12 34 56 06', medecin:'Dr Martin', tuteur:'', tuteurTel:'', ecole:'', classe:'', organisme:'', dossier:'', situationPro:'emploi', ressources:'salaire', organismeA:'siao', dossierA:'SIAO-2023-089', situationAdmin:'francais', allergies:'', nss:'', objectifs:['2','6'] },
+    { prenom:'Ibrahim', nom:'Diallo', dob:'2003-06-18', entree:'2024-04-01', statut:'present', chambre:'107', color:'#3b82f6', referent:'M. Dubois', genre:'M', notes:'Demandeur d\'asile. Apprentissage du français. Suivi OFII.', contacts:'M. Diallo (frère) : 06 12 34 56 07\nInterprète : Mme Ba', medecin:'Dr Blanc', tuteur:'', tuteurTel:'', ecole:'', classe:'', organisme:'', dossier:'', situationPro:'formation', ressources:'', organismeA:'prefecture', dossierA:'PRE-2024-201', situationAdmin:'demandeur', allergies:'', nss:'', objectifs:['1','2'] },
+    { prenom:'Emma', nom:'Garcia', dob:'1997-02-14', entree:'2024-01-05', statut:'present', chambre:'108', color:'#10b981', referent:'Mme Martin', genre:'F', notes:'Victime de violences conjugales. Suivi psychologique. Recherche emploi.', contacts:'Mme Garcia (mère) : 06 12 34 56 08\nCIDFF : Mme Robin', medecin:'Dr Moreau', tuteur:'', tuteurTel:'', ecole:'', classe:'', organisme:'', dossier:'', situationPro:'recherche', ressources:'rsa', organismeA:'ccas', dossierA:'CCAS-2024-012', situationAdmin:'francais', allergies:'', nss:'2 92 02 75 021 061', objectifs:['2','3'] },
+    { prenom:'Yanis', nom:'Rousseau', dob:'2012-05-25', entree:'2024-09-01', statut:'present', chambre:'109', color:'#f59e0b', referent:'M. Dubois', genre:'M', notes:'Placement d\'urgence. Frère et soeur également placés dans d\'autres structures.', contacts:'ASE : Mme Legrand\nJuge des Enfants : Mme Fontaine', medecin:'Dr Rousseau', tuteur:'Mme Legrand (ASE)', tuteurTel:'01 23 45 67 89', ecole:'École élémentaire Jules Ferry', classe:'CM2', organisme:'ase', dossier:'ASE-2024-156', situationPro:'', ressources:'', organismeA:'', dossierA:'', situationAdmin:'', allergies:'', nss:'', objectifs:['4','5'] },
+    { prenom:'Leila', nom:'Haddad', dob:'2001-08-30', entree:'2023-05-10', statut:'present', chambre:'110', color:'#8b5cf6', referent:'Mme Martin', genre:'F', notes:'Étudiante en droit. Boursière. Préparation à la sortie autonome.', contacts:'M. Haddad (père) : 06 12 34 56 10', medecin:'Dr Laurent', tuteur:'', tuteurTel:'', ecole:'Université Paris Cité', classe:'L3 Droit', organisme:'ase', dossier:'ASE-2023-034', situationPro:'', ressources:'', organismeA:'', dossierA:'', situationAdmin:'francais', allergies:'', nss:'', objectifs:['4','6'] },
+    { prenom:'Hugo', nom:'Martin', dob:'2007-12-01', entree:'2024-08-15', statut:'sortie', chambre:'111', color:'#ef4444', referent:'M. Dubois', genre:'M', notes:'Réintégré dans sa famille après 6 mois de placement.', contacts:'Mme Martin (mère) : 06 12 34 56 11', medecin:'Dr Petit', tuteur:'Mme Martin', tuteurTel:'06 12 34 56 11', ecole:'Collège Jean Moulin', classe:'5ème', organisme:'pjj', dossier:'PJJ-2024-042', situationPro:'', ressources:'', organismeA:'', dossierA:'', situationAdmin:'', allergies:'', nss:'', objectifs:['5'] },
+    { prenom:'Sarah', nom:'Cohen', dob:'1999-04-20', entree:'2024-10-01', statut:'present', chambre:'112', color:'#06b6d4', referent:'Mme Martin', genre:'F', notes:'Sortie d\'hospitalisation psychiatrique. Suivi CMP. Réinsertion progressive.', contacts:'M. Cohen (père) : 06 12 34 56 12\nCMP : Dr Lefèvre', medecin:'Dr Lefèvre', tuteur:'', tuteurTel:'', ecole:'', classe:'', organisme:'', dossier:'', situationPro:'inactif', ressources:'aah', organismeA:'mdph', dossierA:'MDPH-2024-188', situationAdmin:'francais', allergies:'', nss:'2 96 04 75 021 123', objectifs:['1','3'] }
+  ];
+
+  // Clear existing
+  DB.set(DB.keys.residents, []);
+  const resList = [];
+  const now = new Date();
+  const today = now.toISOString().slice(0,10);
+
+  residents.forEach((r, i) => {
+    const id = 'demo-' + (i+1);
+    const age = ageFromDob(r.dob);
+    resList.push({
+      id, ...r,
+      photo: '',
+      entree: r.entree || today,
+      createdAt: new Date(now.getTime() - (residents.length - i) * 86400000).toISOString(),
+      updatedAt: new Date().toISOString()
+    });
+  });
+  DB.set(DB.keys.residents, resList);
+  log(`✅ ${residents.length} résidents créés`);
+
+  // ── CATÉGORIES ──
+  const cats = [
+    { id: 1, name: 'Accompagnement', color: '#3b82f6' },
+    { id: 2, name: 'Médical', color: '#ef4444' },
+    { id: 3, name: 'Éducatif', color: '#10b981' },
+    { id: 4, name: 'Administratif', color: '#f59e0b' },
+    { id: 5, name: 'Familial', color: '#8b5cf6' },
+    { id: 6, name: 'Loisirs', color: '#06b6d4' },
+    { id: 7, name: 'Incident', color: '#dc2626' },
+    { id: 8, name: 'Psychologique', color: '#9333ea' }
+  ];
+  DB.set(DB.keys.categories, cats);
+  log('✅ 8 catégories créées');
+
+  // ── JOURNAL ──
+  const journal = [];
+  const entries = [
+    { resid: 0, cat: 1, content: 'Entretien individuel avec Amine. Il exprime le souhait de suivre une formation en mécanique. Nous allons contacter l\'AFPA pour un stage d\'orientation.' },
+    { resid: 1, cat: 1, content: 'Sofia a eu un entretien à Pôle Emploi. Son CV est à jour. Prochaine étape : préparation aux entretiens.' },
+    { resid: 2, cat: 3, content: 'Thomas a eu un conseil de classe. Résultats satisfaisants malgré des absences en mathématiques. RDV avec le professeur principal programmé.' },
+    { resid: 3, cat: 2, content: 'Fatima a consulté le Dr Dubois pour son suivi médical mensuel. Traitement bien suivi. Rendez-vous ophtalmologie à prendre.' },
+    { resid: 4, cat: 5, content: 'Appel téléphonique avec la mère de Lucas. Situation familiale toujours tendue. Proposer une médiation familiale.' },
+    { resid: 5, cat: 1, content: 'Clara a signé son contrat d\'apprentissage en ressources humaines. Félicitations !' },
+    { resid: 6, cat: 4, content: 'Dossier OFII d\'Ibrahim complété et envoyé. Attestation de domicile fournie. Prochain cours de français : lundi.' },
+    { resid: 7, cat: 2, content: 'Emma a eu son premier RDV psychologique au CIDFF. Bilan positif. Prochain RDV dans 15 jours.' },
+    { resid: 8, cat: 3, content: 'Yanis s\'est bien intégré à l\'école. La maîtresse note des progrès en lecture. Suivi éducatif renforcé.' },
+    { resid: 9, cat: 3, content: 'Leila a validé son semestre de droit avec mention. Très bonne nouvelle !' },
+    { resid: 10, cat: 5, content: 'Point téléphonique avec la mère de Hugo. La réintégration se passe bien. Maintenir un suivi mensuel.' },
+    { resid: 11, cat: 2, content: 'Sarah a eu son RDV mensuel au CMP. Adaptation au traitement. Sommeil de meilleure qualité.' },
+    { resid: 0, cat: 6, content: 'Sortie cinéma organisée pour le groupe. Amine, Thomas et Lucas ont participé. Bonne ambiance.' },
+    { resid: 3, cat: 4, content: 'Dossier de demande de logement social mis à jour pour Fatima. Nouveau point dans 1 mois.' },
+    { resid: 2, cat: 3, content: 'Atelier "Gestion du budget" animé par l\'éducateur. Thomas et Clara présents. Participation active.' },
+    { resid: 7, cat: 1, content: 'Point mensuel avec Emma sur son projet professionnel. Intérêt pour la petite enfance. Recherche de formations.' },
+    { resid: 6, cat: 3, content: 'Ibrahim a passé son DELF A2 avec succès. Résultat : 85/100. Félicitations !' },
+    { resid: 8, cat: 5, content: 'Médiation familiale : appel avec la mère de Yanis. Visite médiatisée programmée samedi.' },
+    { resid: 9, cat: 1, content: 'Entretien de préparation à la sortie pour Leila. Recherche de logement en cours. Objectif : juin.' },
+    { resid: 5, cat: 6, content: 'Sortie au musée d\'Orsay avec Clara et Sofia. Très apprécié.' }
+  ];
+
+  entries.forEach((e, i) => {
+    const res = resList[e.resid];
+    const d = new Date(now.getTime() - (entries.length - i) * 86400000 * 2);
+    journal.push({
+      id: 'dj-' + (i+1),
+      residentId: res.id,
+      resident: `${res.prenom} ${res.nom}`,
+      residentColor: res.color,
+      categorie: e.cat,
+      date: d.toISOString(),
+      contenu: e.content,
+      visibilite: 'equipe',
+      objectif: '',
+      createdAt: d.toISOString(),
+      updatedAt: d.toISOString()
+    });
+  });
+  DB.set(DB.keys.journal, journal);
+  log(`✅ ${journal.length} entrées journal créées`);
+
+  // ── PLANNING ──
+  const planning = [];
+  const todayDate = today;
+
+  const events = [
+    { day: 0, title: 'Réunion d\'équipe', type: 'reunion', color: '#8b5cf6', time: '09:00', dur: '60' },
+    { day: 0, title: 'Atelier budget - Groupe A', type: 'activite', color: '#3b82f6', time: '14:00', dur: '90', residx: 0 },
+    { day: 1, title: 'RDV Pôle Emploi Sofia', type: 'rdv', color: '#ef4444', time: '10:00', dur: '60', residx: 1 },
+    { day: 1, title: 'Sortie piscine', type: 'sortie', color: '#10b981', time: '15:00', dur: '120' },
+    { day: 2, title: 'Consultation médicale Fatima', type: 'rdv', color: '#ef4444', time: '11:00', dur: '60', residx: 3 },
+    { day: 2, title: 'Réunion ASE - Lucas', type: 'rdv', color: '#f59e0b', time: '14:30', dur: '90', residx: 4 },
+    { day: 3, title: 'Cours de français Ibrahim', type: 'activite', color: '#06b6d4', time: '09:00', dur: '120', residx: 6 },
+    { day: 3, title: 'Entretien psychologue Clara', type: 'rdv', color: '#9333ea', time: '15:00', dur: '60', residx: 5 },
+    { day: 4, title: 'Atelier cuisine collectif', type: 'activite', color: '#f59e0b', time: '10:00', dur: '180' },
+    { day: -5, title: 'RDV MDPH Sarah', type: 'rdv', color: '#ef4444', time: '14:00', dur: '60', residx: 11 },
+    { day: 6, title: 'Sortie culturelle - Musée', type: 'sortie', color: '#10b981', time: '13:00', dur: '240' }
+  ];
+
+  events.forEach((ev, i) => {
+    const d = new Date(todayDate + 'T00:00:00');
+    d.setDate(d.getDate() + ev.day);
+    const dateStr = d.toISOString().slice(0,10);
+    const residx = ev.residx;
+    const res = residx !== undefined ? resList[residx] : null;
+    planning.push({
+      id: 'dp-' + (i+1),
+      titre: ev.title,
+      type: ev.type,
+      color: ev.color,
+      date: dateStr,
+      time: ev.time,
+      duree: ev.dur,
+      residentId: res ? res.id : '',
+      residentName: res ? `${res.prenom} ${res.nom}` : '',
+      desc: '',
+      dateEnd: dateStr,
+      timeEnd: '',
+      createdAt: d.toISOString(),
+      updatedAt: d.toISOString()
+    });
+  });
+  // Add a vehicle reservation
+  const vehDate = new Date(todayDate + 'T00:00:00');
+  vehDate.setDate(vehDate.getDate() + 2);
+  planning.push({
+    id: 'dp-v1',
+    titre: 'Véhicule — Renault Kangoo',
+    type: 'vehicule',
+    color: '#6366f1',
+    date: vehDate.toISOString().slice(0,10),
+    time: '10:00',
+    dateEnd: vehDate.toISOString().slice(0,10),
+    timeEnd: '16:00',
+    duree: '360',
+    residentId: '',
+    residentName: '',
+    desc: 'Réservé par : Amine Benali\nVéhicule : Renault Kangoo\nDestination : IKEA Paris-Nord\nMotif : Achat mobilier chambre',
+    vehicule: 'Renault Kangoo',
+    destination: 'IKEA Paris-Nord',
+    reservedBy: 'Amine Benali',
+    reservedPrenom: 'Amine',
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString()
+  });
+
+  DB.set(DB.keys.planning, planning);
+  log(`✅ ${planning.length} événements planning créés`);
+
+  // ── PRÉSENCES (7 derniers jours) ──
+  const presences = {};
+  for (let j = -6; j <= 0; j++) {
+    const d = new Date(todayDate + 'T00:00:00');
+    d.setDate(d.getDate() + j);
+    const ds = d.toISOString().slice(0,10);
+    const dayPresences = {};
+    resList.forEach((r, idx) => {
+      if (r.statut === 'sorti') return;
+      const statuses = ['present', 'present', 'present', 'absent', 'sortie'];
+      const rand = Math.random();
+      const status = rand < 0.7 ? 'present' : rand < 0.85 ? 'absent' : 'sortie';
+      dayPresences[r.id] = status;
+    });
+    presences[ds] = dayPresences;
+  }
+  DB.set(DB.keys.presences, presences);
+  log(`✅ Présences générées sur 7 jours`);
+
+  // ── VÉHICULES ──
+  DB.set(DB.keys.vehicules, ['Renault Kangoo', 'Citroën Berlingo', 'Peugeot Partner', 'Volkswagen Caddy']);
+  log('✅ 4 véhicules créés');
+
+  // ── VÉHICULES : RÉSERVATIONS SUPPLÉMENTAIRES ──
+  const extraReservations = [
+    { veh: 'Citroën Berlingo', day: 1, time: '14:00', endTime: '17:00', duree: '180', dest: 'Déchetterie municipale', par: 'Thomas Leroy', prenom: 'Thomas' },
+    { veh: 'Peugeot Partner', day: 3, time: '08:00', endTime: '12:00', duree: '240', dest: 'Marché de Rungis', par: 'Ibrahim Diallo', prenom: 'Ibrahim' },
+    { veh: 'Volkswagen Caddy', day: 5, time: '09:00', endTime: '18:00', duree: '540', dest: 'Aéroport CDG — Retour de vacances', par: 'Sofia Petit', prenom: 'Sofia' },
+    { veh: 'Renault Kangoo', day: -2, time: '10:00', endTime: '15:00', duree: '300', dest: 'Pharmacie centrale', par: 'Clara Bernard', prenom: 'Clara' },
+    { veh: 'Citroën Berlingo', day: 7, time: '13:00', endTime: '16:00', duree: '180', dest: 'ESAT Les Ateliers du Val', par: 'Yanis Rousseau', prenom: 'Yanis' }
+  ];
+  extraReservations.forEach((ev, i) => {
+    const d = new Date(todayDate + 'T00:00:00');
+    d.setDate(d.getDate() + ev.day);
+    const ds = d.toISOString().slice(0,10);
+    planning.push({
+      id: 'dp-v' + (i+2),
+      titre: 'Véhicule — ' + ev.veh,
+      type: 'vehicule',
+      color: '#6366f1',
+      date: ds,
+      time: ev.time,
+      dateEnd: ds,
+      timeEnd: ev.endTime,
+      duree: ev.duree,
+      residentId: '',
+      residentName: '',
+      desc: 'Réservé par : ' + ev.par + '\nVéhicule : ' + ev.veh + '\nDestination : ' + ev.dest + '\nMotif : Sortie accompagnée',
+      vehicule: ev.veh,
+      destination: ev.dest,
+      reservedBy: ev.par,
+      reservedPrenom: ev.prenom,
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString()
+    });
+  });
+  DB.set(DB.keys.planning, planning);
+  log('✅ ' + extraReservations.length + ' réservations véhicule supplémentaires');
+
+  // ── UTILISATEURS SUPPLÉMENTAIRES ──
+  const users = DB.get(DB.keys.users) || [];
+  if (users.length <= 1) {
+    users.push(
+      { id: 2, prenom: 'Sophie', nom: 'Martin', fonction: 'Éducatrice spécialisée', username: 'smartin', password: 'educ123', role: 'educ' },
+      { id: 3, prenom: 'Pierre', nom: 'Dubois', fonction: 'Éducateur jeunesse', username: 'pdubois', password: 'educ123', role: 'educ' },
+      { id: 4, prenom: 'Camille', nom: 'Legrand', fonction: 'Psychologue', username: 'clegrand', password: 'educ123', role: 'educ' },
+      { id: 5, prenom: 'Julien', nom: 'Fontaine', fonction: 'Moniteur éducateur', username: 'jfontaine', password: 'educ123', role: 'educ' },
+      { id: 6, prenom: 'Nathalie', nom: 'Petit', fonction: 'Chef de service', username: 'npetit', password: 'educ123', role: 'educ' },
+      { id: 7, prenom: 'Antoine', nom: 'Leroy', fonction: 'Éducateur sportif', username: 'aleroy', password: 'educ123', role: 'educ' },
+      { id: 8, prenom: 'Mélanie', nom: 'Roux', fonction: 'Assistante sociale', username: 'mroux', password: 'educ123', role: 'educ' },
+      { id: 9, prenom: 'David', nom: 'Moreau', fonction: 'Infirmier', username: 'dmoreau', password: 'educ123', role: 'educ' },
+      { id: 10, prenom: 'Élodie', nom: 'Fournier', fonction: 'Éducatrice jeunes enfants', username: 'efournier', password: 'educ123', role: 'educ' },
+      { id: 11, prenom: 'Sébastien', nom: 'Girard', fonction: 'VEilleur de nuit', username: 'sgirard', password: 'educ123', role: 'educ' },
+      { id: 12, prenom: 'Caroline', nom: 'Bonnet', fonction: 'Psychomotricienne', username: 'cbonnet', password: 'educ123', role: 'educ' },
+      { id: 13, prenom: 'Alexandre', nom: 'Dupont', fonction: 'Médiateur social', username: 'adupont', password: 'educ123', role: 'educ' },
+      { id: 14, prenom: 'Virginie', nom: 'Lambert', fonction: 'Conseillère en économie sociale', username: 'vlambert', password: 'educ123', role: 'educ' },
+      { id: 15, prenom: 'Romain', nom: 'Chevallier', fonction: 'Animateur socioculturel', username: 'rchevallier', password: 'educ123', role: 'educ' },
+      { id: 16, prenom: 'Isabelle', nom: 'Perrin', fonction: 'Coordinatrice de parcours', username: 'iperrin', password: 'educ123', role: 'educ' },
+      { id: 17, prenom: 'Laurent', nom: 'Gauthier', fonction: 'Éducateur technique', username: 'lgauthier', password: 'educ123', role: 'educ' },
+      { id: 18, prenom: 'Stéphanie', nom: 'Caron', fonction: 'Secrétaire médico-sociale', username: 'scaron', password: 'educ123', role: 'educ' },
+      { id: 19, prenom: 'Grégory', nom: 'Moulin', fonction: 'Agent de maintien', username: 'gmoulin', password: 'educ123', role: 'educ' },
+      { id: 20, prenom: 'Audrey', nom: 'Renard', fonction: 'Référente ASE', username: 'arenard', password: 'educ123', role: 'educ' },
+      { id: 21, prenom: 'Florian', nom: 'Marchand', fonction: 'Stagiaire éducateur', username: 'fmarchand', password: 'educ123', role: 'educ' }
+    );
+    DB.set(DB.keys.users, users);
+  }
+  log('✅ ' + users.length + ' utilisateurs (admin + 20 profils)');
+
+  // ── MESSAGES ──
+  const conversations = {};
+  const allMsgs = [];
+
+  // Conversation 1 : Admin(1) + Sophie(2) + Pierre(3) — groupe éducatif
+  const conv1Id = [1,2,3].sort((a,b)=>a-b).join('_');
+  conversations[conv1Id] = { id: conv1Id, userIds: [1,2,3], createdAt: new Date(now.getTime() - 86400000*7).toISOString() };
+
+  // Conversation 2 : Admin(1) + Camille(4) — suivi individuel
+  const conv2Id = [1,4].sort((a,b)=>a-b).join('_');
+  conversations[conv2Id] = { id: conv2Id, userIds: [1,4], createdAt: new Date(now.getTime() - 86400000*5).toISOString() };
+
+  // Conversation 3 : Sophie(2) + Pierre(3) + Camille(4) + Julien(5) — équipe éducative
+  const conv3Id = [2,3,4,5].sort((a,b)=>a-b).join('_');
+  conversations[conv3Id] = { id: conv3Id, userIds: [2,3,4,5], createdAt: new Date(now.getTime() - 86400000*3).toISOString() };
+
+  // Conversation 4 : Admin(1) + Julien(5)
+  const conv4Id = [1,5].sort((a,b)=>a-b).join('_');
+  conversations[conv4Id] = { id: conv4Id, userIds: [1,5], createdAt: new Date(now.getTime() - 86400000).toISOString() };
+
+  const msgTemplates = [
+    // Groupe éducatif (conv1: 1,2,3)
+    { convId: conv1Id, from: 1, body: 'Bonjour à tous, réunion d\'équipe demain à 14h en salle de réunion. Merci de confirmer votre présence.', dateOffset: -7, hourOffset: 0 },
+    { convId: conv1Id, from: 2, body: 'Présente, merci !', dateOffset: -7, hourOffset: 1 },
+    { convId: conv1Id, from: 3, body: 'Présent également. Je dois faire le point sur le suivi de Thomas.', dateOffset: -7, hourOffset: 2 },
+    { convId: conv1Id, from: 1, body: 'Parfait. Pierre, prépare un rapport sur l\'évolution de Thomas depuis son arrivée.', dateOffset: -6, hourOffset: 10 },
+    { convId: conv1Id, from: 3, body: 'OK, je m\'en occupe. Ses résultats scolaires se sont améliorés ce trimestre.', dateOffset: -6, hourOffset: 11 },
+
+    // Suivi individuel (conv2: 1,4)
+    { convId: conv2Id, from: 4, body: 'Bonjour, je vous confirme le rendez-vous de Sarah au CMP demain à 15h.', dateOffset: -5, hourOffset: 8 },
+    { convId: conv2Id, from: 1, body: 'Merci Camille. Le transport est-il organisé ?', dateOffset: -5, hourOffset: 9 },
+    { convId: conv2Id, from: 4, body: 'Oui, j\'ai réservé le Kangoo. Je l\'emmène personnellement.', dateOffset: -5, hourOffset: 10 },
+    { convId: conv2Id, from: 1, body: 'Très bien. Tenez-moi au courant du retour.', dateOffset: -4, hourOffset: 14 },
+    { convId: conv2Id, from: 4, body: 'RDV bien passé. Le médecin ajuste son traitement, elle va mieux.', dateOffset: -4, hourOffset: 17 },
+
+    // Équipe éducative (conv3: 2,3,4,5)
+    { convId: conv3Id, from: 2, body: 'Info : Fatima a trouvé un stage en crèche ! Elle commence lundi prochain.', dateOffset: -3, hourOffset: 9 },
+    { convId: conv3Id, from: 3, body: 'Super nouvelle ! Il faut prévoir un suivi rapproché la première semaine.', dateOffset: -3, hourOffset: 10 },
+    { convId: conv3Id, from: 4, body: 'Je peux m\'en charger, je passe tous les matins.', dateOffset: -3, hourOffset: 11 },
+    { convId: conv3Id, from: 5, body: 'Parfait. J\'ai aussi une bonne nouvelle : Leila a eu son stage en cabinet d\'avocat.', dateOffset: -2, hourOffset: 8 },
+    { convId: conv3Id, from: 2, body: 'Génial ! Décidément une bonne semaine pour les stages !', dateOffset: -2, hourOffset: 9 },
+    { convId: conv3Id, from: 3, body: 'Est-ce qu\'on prévoit un atelier "préparation à l\'entretien" pour les autres ?', dateOffset: -2, hourOffset: 10 },
+    { convId: conv3Id, from: 5, body: 'Bonne idée. Je peux l\'animer jeudi après-midi.', dateOffset: -2, hourOffset: 11 },
+    { convId: conv3Id, from: 4, body: 'Je note. J\'actualise le planning.', dateOffset: -1, hourOffset: 8 },
+
+    // Admin + Julien (conv4: 1,5)
+    { convId: conv4Id, from: 5, body: 'Bonjour, Lucas a fait une crise cette nuit. Rien de grave mais il faudrait peut-être avancer son RDV psy.', dateOffset: -1, hourOffset: 7 },
+    { convId: conv4Id, from: 1, body: 'OK, je contacte le CMP ce matin pour voir s\'ils ont une disponibilité.', dateOffset: -1, hourOffset: 8 },
+    { convId: conv4Id, from: 5, body: 'Merci. Je reste avec lui ce matin au calme.', dateOffset: -1, hourOffset: 8 },
+    { convId: conv4Id, from: 1, body: 'RDV avancé à demain 11h. Préviens-moi si ça ne va pas d\'ici là.', dateOffset: -1, hourOffset: 10 },
+    { convId: conv4Id, from: 5, body: 'OK merci beaucoup. Je vous tiens au courant.', dateOffset: -1, hourOffset: 10 }
+  ];
+
+  msgTemplates.forEach((t, i) => {
+    const d = new Date(now.getTime() + t.dateOffset * 86400000);
+    d.setHours(t.hourOffset, Math.floor(Math.random()*60), 0, 0);
+    allMsgs.push({
+      id: 'dm-' + (i+1),
+      convId: t.convId,
+      from: t.from,
+      body: t.body,
+      date: d.toISOString(),
+      readBy: [t.from]
+    });
+  });
+  DB.set(DB.keys.messages, allMsgs);
+  localStorage.setItem('ftr_conversations', JSON.stringify(conversations));
+  log('✅ ' + allMsgs.length + ' messages dans ' + Object.keys(conversations).length + ' conversations');
+
+  // ── RÉPERTOIRE ──
+  const contacts = [
+    { organisme: 'CMP Maison Blanche', nom: 'Dr Anne Moreau', tel: '01 45 67 89 01', email: 'anne.moreau@gh-paris.fr', fonction: 'Pédopsychiatre', adresse: '15 Rue de la Santé, 75014 Paris', notes: 'Suivi de Lucas et Sarah. Disponible les mardis et jeudis.' },
+    { organisme: 'ASE Paris', nom: 'Mme Valérie Legrand', tel: '01 23 45 67 10', email: 'valerie.legrand@paris.fr', fonction: 'Référente ASE', adresse: '12 Rue du Château, 75010 Paris', notes: 'Référente pour les dossiers ASE. Permanent le lundi.' },
+    { organisme: 'PJJ Paris', nom: 'M. Christophe Fontaine', tel: '01 23 45 67 20', email: 'christophe.fontaine@justice.fr', fonction: 'Éducateur PJJ', adresse: '3 Boulevard du Palais, 75001 Paris', notes: 'Suivi des mesures PJJ.' },
+    { organisme: 'Mission Locale Paris Centre', nom: 'Mme Karima Saadi', tel: '01 45 78 90 12', email: 'k.saadi@ml-paris.fr', fonction: 'Conseillère insertion', adresse: '8 Rue de la Paix, 75002 Paris', notes: 'Suit Amine et Clara pour l\'insertion professionnelle.' },
+    { organisme: 'CIDFF Paris', nom: 'Mme Laure Blanc', tel: '01 45 67 89 34', email: 'l.blanc@cidff.fr', fonction: 'Psychologue', adresse: '20 Rue de la Roquette, 75011 Paris', notes: 'Suivi d\'Emma. Disponible le mercredi.' },
+    { organisme: 'Hôpital Saint-Antoine', nom: 'Dr Paul Lefèvre', tel: '01 49 28 20 00', email: 'paul.lefevre@aphp.fr', fonction: 'Psychiatre', adresse: '184 Rue du Faubourg Saint-Antoine, 75012 Paris', notes: 'Suivi psychiatrique de Sarah.' },
+    { organisme: 'OFII Paris', nom: 'M. Amadou Ba', tel: '01 40 77 25 00', email: 'amadou.ba@ofii.fr', fonction: 'Référent intégration', adresse: '44 Rue Bargue, 75015 Paris', notes: 'Suivi du dossier d\'Ibrahim. Cours de français.' },
+    { organisme: 'École Élémentaire Jules Ferry', nom: 'Mme Christine Petit', tel: '01 43 56 78 90', email: 'ce.0751234a@ac-paris.fr', fonction: 'Directrice', adresse: '2 Rue Jules Ferry, 75011 Paris', notes: 'École de Yanis. Bonne communication.' },
+    { organisme: 'Collège Victor Hugo', nom: 'M. Laurent Roux', tel: '01 43 56 78 91', email: 'ce.0751235b@ac-paris.fr', fonction: 'CPE', adresse: '5 Rue Victor Hugo, 75011 Paris', notes: 'Collège de Lucas. Problèmes d\'absentéisme.' },
+    { organisme: 'ESAT Les Ateliers du Val', nom: 'M. Franck Morel', tel: '01 48 90 12 34', email: 'f.morel@esat-val.fr', fonction: 'Directeur adjoint', adresse: 'Route de la Vallée, 94120 Fontenay-sous-Bois', notes: 'Stage possible pour Fatima.' },
+    { organisme: 'MDPH Val-de-Marne', nom: 'Mme Sophie Leroy', tel: '09 72 12 34 56', email: 'sophie.leroy@mdph94.fr', fonction: 'Chargée de dossier', adresse: '1 Place de la Préfecture, 94000 Créteil', notes: 'Dossier Sarah en cours. N° dossier : MDPH-2024-188.' },
+    { organisme: 'CCAS Paris 10e', nom: 'M. David Cohen', tel: '01 45 67 89 50', email: 'd.cohen@ccas-paris.fr', fonction: 'Travailleur social', adresse: '10 Rue de la Grange aux Belles, 75010 Paris', notes: 'Suit Fatima et Emma pour le logement social.' }
+  ].map(c => ({ id: 'dc-' + Math.random().toString(36).slice(2,8), ...c }));
+  DB.set(DB.keys.repertoire, contacts);
+  log('✅ ' + contacts.length + ' contacts répertoire créés');
+
+  // ── AVENANTS / PPE ──
+  const avenants = [];
+  const domaines = ['autonomie','sante','viePro','logement','vieSociale','vieAffective','budget','transport','orientation'];
+  const avenantTemplates = [
+    {
+      resIdx: 0, statut: 'actif',
+      dateRedac: '2026-02-10', dateRev: '2026-08-10',
+      referent: 'M. Dubois', protection: 'Curatelle simple',
+      employeur: 'ESAT Les Ateliers du Val', atelier: 'Espaces verts', entreeEsat: '2024-06-01',
+      sections: {
+        autonomie: { bilan: 'Amine a gagné en autonomie sur les gestes quotidiens, mais nécessite encore des rappels pour la gestion du réveil et l\'hygiène.', objectifs: [
+          { objectif:'Se lever seul sans rappel', moyens:'Réveil avec alarme + check éducateur à 8h', echeance:'2026-06-01', evaluation:'' },
+          { objectif:'Préparer son petit-déjeuner', moyens:'Atelier cuisine autonomie 2x/semaine', echeance:'2026-07-01', evaluation:'' }
+        ], expression:'Je veux pouvoir me débrouiller comme les grands.' },
+        sante: { bilan: 'Bonne santé générale. Suivi ophtalmologique à prévoir.', objectifs: [
+          { objectif:'RDV ophtalmologue', moyens:'Prendre RDV + accompagnement', echeance:'2026-05-01', evaluation:'' }
+        ], expression:'Mes yeux me font un peu mal quand je lis.' },
+        viePro: { bilan: 'Stage à l\'ESAT bien intégré. Apprécie le travail en extérieur.', objectifs: [
+          { objectif:'Valider les compétences en taille haie', moyens:'Formation avec le maître d\'atelier', echeance:'2026-06-15', evaluation:'' }
+        ], expression:'J\'aime bien travailler dehors, je voudrais continuer.' },
+        logement: { bilan: 'À ce stade, vit en foyer. Pas de projet immédiat de logement autonome.', objectifs: [], expression:'' },
+        vieSociale: { bilan: 'Relations sociales restreintes. Quelques amis au sein du foyer.', objectifs: [
+          { objectif:'Participer à une activité collective', moyens:'Inscription à l\'atelier théâtre du foyer', echeance:'2026-06-01', evaluation:'' }
+        ], expression:'J\'aimerais me faire plus d\'amis.' },
+        vieAffective: { bilan: 'Relations familiales distantes. Contact téléphonique régulier avec la mère.', objectifs: [
+          { objectif:'Appel hebdomadaire à la mère', moyens:'Tous les mercredis à 18h avec l\'éducateur', echeance:'2026-12-31', evaluation:'' }
+        ], expression:'Ma mère me manque mais je comprends.' },
+        budget: { bilan: 'Difficultés à gérer son argent de poche. Achats impulsifs.', objectifs: [
+          { objectif:'Suivi budgétaire hebdomadaire', moyens:'Tableau de suivi + accompagnement éducateur', echeance:'2026-08-01', evaluation:'' }
+        ], expression:'Je veux apprendre à économiser.' },
+        transport: { bilan: 'Se déplace principalement à pied ou accompagné. Ne maîtrise pas les transports en commun.', objectifs: [
+          { objectif:'Apprendre à prendre le bus seul', moyens:'Parcours accompagné 2x, puis en autonomie surveillée', echeance:'2026-09-01', evaluation:'' }
+        ], expression:'J\'ai peur de me perdre.' },
+        orientation: { bilan: 'Souhait de travailler dans les espaces verts.', objectifs: [
+          { objectif:'Visite de formation en paysage', moyens:'Contacter l\'AFPA + visite avec l\'éducateur', echeance:'2026-07-01', evaluation:'' }
+        ], expression:'Je sais ce que je veux faire plus tard.' }
+      },
+      conclusion: 'Amine est motivé par son projet professionnel. L\'accompagnement doit se concentrer sur l\'autonomie quotidienne et la gestion budgétaire tout en favorisant son insertion professionnelle en milieu protégé.'
+    },
+    {
+      resIdx: 1, statut: 'actif',
+      dateRedac: '2026-01-15', dateRev: '2026-07-15',
+      referent: 'Mme Martin', protection: '',
+      employeur: '', atelier: '', entreeEsat: '',
+      sections: {
+        autonomie: { bilan: 'Bonne autonomie dans la vie quotidienne. Gère son linge et ses repas.', objectifs: [], expression:'Je me sens indépendante.' },
+        sante: { bilan: 'Suivi gynécologique à jour. Bon état général.', objectifs: [], expression:'' },
+        viePro: { bilan: 'En recherche active d\'emploi. CV à jour. Entretiens réguliers.', objectifs: [
+          { objectif:'Obtenir un CDI dans la vente', moyens:'Candidatures spontanées + Pôle Emploi + réseau', echeance:'2026-09-01', evaluation:'' },
+          { objectif:'Préparation aux entretiens', moyens:'Atelier simulation avec l\'éducatrice 1x/semaine', echeance:'2026-06-01', evaluation:'' }
+        ], expression:'Je veux un travail stable pour pouvoir me loger.' },
+        logement: { bilan: 'Inscrite sur la liste d\'attente pour un logement social. Dossier complet.', objectifs: [
+          { objectif:'Obtenir un logement autonome', moyens:'Relance CCAS mensuelle + recherche logement privé', echeance:'2026-12-31', evaluation:'' }
+        ], expression:'J\'ai hâte d\'avoir mon propre appartement.' },
+        vieSociale: { bilan: 'Bon réseau social. Sportive, pratique le basket.', objectifs: [], expression:'' },
+        vieAffective: { bilan: 'Relation compliquée avec le père. Bons contacts avec la mère.', objectifs: [
+          { objectif:'Médiation père-fille', moyens:'Proposer une séance de médiation familiale', echeance:'2026-08-01', evaluation:'' }
+        ], expression:'J\'aimerais renouer avec mon père.' },
+        budget: { bilan: 'Gère bien son budget. Épargne un peu chaque mois.', objectifs: [
+          { objectif:'Ouvrir un livret d\'épargne', moyens:'Accompagnement à la banque', echeance:'2026-05-01', evaluation:'Livret ouvert le 15 mars 2026' }
+        ], expression:'Je veux mettre de côté pour mon futur logement.' },
+        transport: { bilan: 'Se déplace en métro et bus de manière autonome. A le permis.', objectifs: [], expression:'' },
+        orientation: { bilan: 'Projet professionnel clair : vente en prêt-à-porter.', objectifs: [
+          { objectif:'Stage découverte en boutique', moyens:'Contacter les enseignes du centre commercial', echeance:'2026-06-01', evaluation:'' }
+        ], expression:'Je sais ce que je veux faire.' }
+      },
+      conclusion: 'Sofia est une jeune femme dynamique et déterminée. Son projet professionnel est bien défini. L\'accompagnement doit désormais se concentrer sur la recherche de logement autonome et la consolidation de son projet professionnel.'
+    },
+    {
+      resIdx: 4, statut: 'actif',
+      dateRedac: '2026-03-01', dateRev: '2026-09-01',
+      referent: 'M. Dubois', protection: 'Tutelle',
+      employeur: '', atelier: '', entreeEsat: '',
+      sections: {
+        autonomie: { bilan: 'Autonomie partielle. A besoin d\'être stimulé pour les routines quotidiennes.', objectifs: [
+          { objectif:'Respecter les horaires de lever/coucher', moyens:'Tableau de routines visuel + check éducateur', echeance:'2026-06-01', evaluation:'' },
+          { objectif:'Ranger sa chambre seul', moyens:'Check-list quotidienne avec photo', echeance:'2026-07-01', evaluation:'' }
+        ], expression:'' },
+        sante: { bilan: 'Suivi psychologique en cours (troubles du comportement). Traitement médicamenteux.', objectifs: [
+          { objectif:'Stabilisation du comportement', moyens:'Suivi CMP bi-mensuel + respect du traitement', echeance:'2026-12-31', evaluation:'' }
+        ], expression:'J\'ai du mal à contrôler ma colère.' },
+        viePro: { bilan: 'Scolarisé en 4ème au collège Victor Hugo. Résultats fragiles.', objectifs: [
+          { objectif:'Améliorer les résultats en maths', moyens:'Soutien scolaire 2x/semaine avec un bénévole', echeance:'2026-06-15', evaluation:'' }
+        ], expression:'Les maths c\'est trop dur.' },
+        logement: { bilan: 'Vit en foyer. Pas de projet de logement immédiat.', objectifs: [], expression:'' },
+        vieSociale: { bilan: 'Difficultés relationnelles avec les autres jeunes. Tendances à l\'isolement.', objectifs: [
+          { objectif:'Participer à une activité en groupe', moyens:'Inscription au club de foot du quartier', echeance:'2026-05-01', evaluation:'' }
+        ], expression:'Les autres ils m\'énervent.' },
+        vieAffective: { bilan: 'Relation tendue avec la mère. Absence du père.', objectifs: [
+          { objectif:'Maintenir le lien avec la mère', moyens:'Appels téléphoniques supervisés 1x/semaine', echeance:'2026-12-31', evaluation:'' }
+        ], expression:'Ma mère elle comprend rien.' },
+        budget: { bilan: 'Argent de poche géré par le foyer. Pas de notion du budget.', objectifs: [
+          { objectif:'Apprendre la valeur de l\'argent', moyens:'Petites tâches rémunérées + suivi éducatif', echeance:'2026-09-01', evaluation:'' }
+        ], expression:'' },
+        transport: { bilan: 'Prend le bus pour aller au collège. Parfois oublie son trajet.', objectifs: [
+          { objectif:'Trajet collège-foyer en autonomie', moyens:'Accompagnement éducatif 1ère semaine, puis autonomie', echeance:'2026-05-15', evaluation:'' }
+        ], expression:'' },
+        orientation: { bilan: 'Aucun projet professionnel identifié.', objectifs: [
+          { objectif:'Identifier un secteur d\'intérêt', moyens:'Ateliers découverte des métiers (CIO)', echeance:'2026-12-31', evaluation:'' }
+        ], expression:'Je sais pas ce que je veux faire plus tard.' }
+      },
+      conclusion: 'Lucas présente des troubles du comportement qui nécessitent un cadre éducatif renforcé et un suivi psychologique régulier. Son parcours scolaire doit être soutenu. La relation mère-fils reste à travailler.'
+    },
+    {
+      resIdx: 7, statut: 'brouillon',
+      dateRedac: '2026-05-01', dateRev: '2026-11-01',
+      referent: 'Mme Martin', protection: '',
+      employeur: '', atelier: '', entreeEsat: '',
+      sections: {
+        autonomie: { bilan: 'Bonne autonomie. Gère son quotidien sans difficulté.', objectifs: [], expression:'Je me sens bien.' },
+        sante: { bilan: 'Suivi psychologique CIDFF en cours. Traumatisme lié aux violences conjugales.', objectifs: [
+          { objectif:'Poursuivre le suivi psychologique', moyens:'Séances hebdomadaires au CIDFF', echeance:'2026-12-31', evaluation:'' }
+        ], expression:'Je vais mieux depuis que je suis au foyer.' },
+        viePro: { bilan: 'Intérêt pour la petite enfance. Souhaite passer le CAP AEPE.', objectifs: [
+          { objectif:'Inscription au CAP AEPE', moyens:'Contacter le GRETA + financement', echeance:'2026-09-01', evaluation:'' },
+          { objectif:'Stage en crèche', moyens:'Démarchage des crèches municipales', echeance:'2026-07-01', evaluation:'' }
+        ], expression:'J\'adore les enfants, je veux travailler avec eux.' },
+        logement: { bilan: 'En attente d\'un logement social. Dossier CCAS en cours.', objectifs: [
+          { objectif:'Relancer le CCAS', moyens:'Point mensuel avec le travailleur social', echeance:'2026-12-31', evaluation:'' }
+        ], expression:'J\'ai besoin d\'un logement pour me reconstruire.' },
+        vieSociale: { bilan: 'A repris contact avec quelques amies. Sort occasionnel.', objectifs: [
+          { objectif:'Reprendre une activité sociale', moyens:'Inscription à un cours de yoga', echeance:'2026-06-01', evaluation:'' }
+        ], expression:'Je veux refaire des activités comme avant.' },
+        vieAffective: { bilan: 'Procédure de divorce en cours. Relation avec la mère compliquée.', objectifs: [
+          { objectif:'Soutien juridique', moyens:'Suivi avocat + CIDFF', echeance:'2026-09-01', evaluation:'' }
+        ], expression:'Je veux tourner la page.' },
+        budget: { bilan: 'Ressources RSA. Gère correctement son budget.', objectifs: [], expression:'' },
+        transport: { bilan: 'Se déplace seule en transports en commun.', objectifs: [], expression:'' },
+        orientation: { bilan: 'Projet professionnel identifié : CAP AEPE / petite enfance.', objectifs: [], expression:'' }
+      },
+      conclusion: 'Emma est en reconstruction après des violences conjugales. Son projet professionnel est une excellente motivation. L\'accompagnement doit soutenir sa formation et son autonomie résidentielle.'
+    },
+    {
+      resIdx: 9, statut: 'actif',
+      dateRedac: '2026-04-01', dateRev: '2026-10-01',
+      referent: 'Mme Martin', protection: '',
+      employeur: '', atelier: '', entreeEsat: '',
+      sections: {
+        autonomie: { bilan: 'Autonomie complète dans la vie quotidienne.', objectifs: [], expression:'Je gère ma vie.' },
+        sante: { bilan: 'Bonne santé. Suivi médical à jour.', objectifs: [], expression:'' },
+        viePro: { bilan: 'Étudiante en L3 Droit à l\'Université Paris Cité. Excellents résultats.', objectifs: [
+          { objectif:'Valider la L3 avec mention', moyens:'Révisions régulières + tutorat si besoin', echeance:'2026-06-30', evaluation:'' },
+          { objectif:'Trouver un stage en cabinet d\'avocat', moyens:'Candidatures + réseau universitaire', echeance:'2026-07-01', evaluation:'Stage trouvé chez Maître Dupont' }
+        ], expression:'Je veux devenir avocate pour défendre les enfants.' },
+        logement: { bilan: 'Logement autonome prévu pour juin 2026. Recherche en cours.', objectifs: [
+          { objectif:'Signer un bail', moyens:'Visites d\'appartements + garantie solidaire', echeance:'2026-06-15', evaluation:'' }
+        ], expression:'J\'ai hâte d\'avoir mon studio.' },
+        vieSociale: { bilan: 'Bonne intégration sociale. Amis à la fac.', objectifs: [], expression:'' },
+        vieAffective: { bilan: 'Relation stable avec la famille. Soutien du père.', objectifs: [
+          { objectif:'Préparer l\'autonomie familiale', moyens:'Points réguliers avec le père sur le projet de sortie', echeance:'2026-06-01', evaluation:'' }
+        ], expression:'Ma famille me soutient dans mon projet.' },
+        budget: { bilan: 'Boursière. Gère son budget avec rigueur.', objectifs: [
+          { objectif:'Anticiper le budget logement', moyens:'Simulation financière avec l\'éducatrice', echeance:'2026-05-01', evaluation:'Budget prévisionnel établi' }
+        ], expression:'Je sais compter.' },
+        transport: { bilan: 'Se déplace en métro de manière autonome.', objectifs: [], expression:'' },
+        orientation: { bilan: 'Projet professionnel solide : avocate en droit de la famille.', objectifs: [], expression:'' }
+      },
+      conclusion: 'Leila est une jeune femme brillante et déterminée. Son projet universitaire et professionnel est solide. L\'accompagnement se concentre sur la préparation de sa sortie du foyer vers un logement autonome et la consolidation de son parcours universitaire.'
+    }
+  ];
+
+  avenantTemplates.forEach((t, i) => {
+    const res = resList[t.resIdx];
+    const sections = {};
+    domaines.forEach(d => {
+      sections[d] = t.sections[d] || { bilan:'', objectifs:[], expression:'' };
+    });
+    avenants.push({
+      id: 'da-' + (i+1),
+      residentId: res.id,
+      residentName: `${res.prenom} ${res.nom}`,
+      dateRedaction: t.dateRedac,
+      dateRevision: t.dateRev,
+      referent: t.referent,
+      protection: t.protection,
+      employeur: t.employeur,
+      atelier: t.atelier,
+      entreeEsat: t.entreeEsat,
+      statut: t.statut,
+      sections,
+      conclusion: t.conclusion,
+      signatures: { resident: null, referent: null, direction: null, date: null },
+      createdBy: 'Admin',
+      createdAt: new Date(now.getTime() - (avenantTemplates.length - i) * 86400000 * 3).toISOString()
+    });
+  });
+  DB.set(DB.keys.ppe, avenants);
+  log('✅ ' + avenants.length + ' avenants créés (dont ' + avenants.filter(a=>a.statut==='actif').length + ' actifs)');
+
+  log('<br><strong style="color:#16a34a;font-size:1.1rem">🎉 Données de démonstration prêtes !</strong>');
+  log('<a href="index.html" style="display:inline-block;margin-top:1rem;background:#0f2b4a;color:#fff;padding:.75rem 2rem;border-radius:10px;text-decoration:none;font-weight:700;font-size:1rem">→ Aller à la page de connexion</a>');
+  log('<div style="margin-top:.5rem;font-size:.8rem;color:#94a3b8">Identifiants : admin / admin123</div>');
+}
+
+function ageFromDob(dob) {
+  if (!dob) return 0;
+  const diff = Date.now() - new Date(dob).getTime();
+  return Math.floor(diff / 31557600000);
+}
+</script>
+</body>
+</html>

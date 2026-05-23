@@ -9,117 +9,81 @@
 <body>
 <div class="app-layout">
 
-  <!-- SIDEBAR -->
   <aside class="sidebar">
-    <a href="dashboard.html" class="sidebar-logo">
-      <img class="sidebar-logo-img" src="" style="display:none" alt="Logo"/>
-      <div class="logo-icon">FTR</div>
-      <div class="logo-text"><span id="sidebarEtab">Foyer Trois Rivières</span><strong>Administration</strong></div>
-    </a>
+    <a href="dashboard.html" class="sidebar-logo"><img class="sidebar-logo-img" src="" style="display:none" alt="Logo"/><div class="logo-icon">FTR</div><div class="logo-text"><span id="sidebarEtab">Foyer Trois Rivières</span><strong>Administration</strong></div></a>
     <div class="sidebar-section">
       <div class="sidebar-label">Principal</div>
-      <a href="dashboard.html" class="nav-item" data-page="dashboard.html">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
-        Tableau de bord
-      </a>
-      <a href="residents.html" class="nav-item" data-page="residents.html">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
-        Résidents <span class="badge" id="navResCount" style="display:none"></span>
-      </a>
-      <a href="journal.html" class="nav-item" data-page="journal.html">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
-        Journal de bord
-      </a>
-      <a href="planning.html" class="nav-item" data-page="planning.html">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
-        Planning
-      </a>
-      <a href="presences.html" class="nav-item" data-page="presences.html">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
-        Présences
-      </a>
+      <a href="dashboard.html" class="nav-item active" data-page="dashboard.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>Tableau de bord</a>
+      <a href="residents.html" class="nav-item" data-page="residents.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>Résidents</a>
+      <a href="journal.html" class="nav-item" data-page="journal.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/>      </svg>Journal de bord</a>
+      <a href="ppe.html" class="nav-item" data-page="ppe.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>Avenants</a>
+      <a href="planning.html" class="nav-item" data-page="planning.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>Planning</a>
+      <a href="presences.html" class="nav-item" data-page="presences.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>Présences</a>
+      <a href="vehicules.html" class="nav-item" data-page="vehicules.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 16H9m10 0h3v-3.15a1 1 0 0 0-.84-.99L16 11l-2.7-3.6a1 1 0 0 0-.8-.4H5.5a1 1 0 0 0-.8.4L2 11v5h2m10 1.5a1.5 1.5 0 0 1-3 0m3 0a1.5 1.5 0 0 0-3 0m3 0h3m-3 0H9m6-6V7a1 1 0 0 0-1-1h-3a1 1 0 0 0-1 1v3M6 17.5a1.5 1.5 0 0 1-3 0m3 0a1.5 1.5 0 0 0-3 0"/>      </svg>Véhicules</a>
+      <a href="incidents.html" class="nav-item" data-page="incidents.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>Incidents</a>
+      <a href="messages.html" class="nav-item" data-page="messages.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>Messages</a>
+      <a href="repertoire.html" class="nav-item" data-page="repertoire.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>Répertoire</a>
     </div>
-    <div class="sidebar-section">
-      <div class="sidebar-label">Paramètres</div>
-      <a href="admin.html" class="nav-item admin-only" data-page="admin.html">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.07 4.93l-1.41 1.41M4.93 4.93l1.41 1.41M12 2v2M12 20v2M2 12h2M20 12h2M19.07 19.07l-1.41-1.41M4.93 19.07l1.41-1.41"/></svg>
-        Administration
-      </a>
-    </div>
+    <div class="sidebar-section"><div class="sidebar-label">Paramètres</div><a href="admin.html" class="nav-item admin-only" data-page="admin.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.07 4.93l-1.41 1.41M4.93 4.93l1.41 1.41M12 2v2M12 20v2M2 12h2M20 12h2M19.07 19.07l-1.41-1.41M4.93 19.07l1.41-1.41"/></svg>Administration</a></div>
     <div class="sidebar-footer">
-      <div class="user-card">
-        <div class="avatar" id="sidebarAvatar">A</div>
-        <div>
-          <div class="user-name" id="sidebarUserName">Administrateur</div>
-          <div class="user-role" id="sidebarUserRole">Admin</div>
-        </div>
-      </div>
-      <a href="#" onclick="Auth.logout()" class="nav-item" style="margin-top:.25rem;color:rgba(255,255,255,.4)">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
-        Déconnexion
-      </a>
+      <div class="user-card"><div class="avatar" id="sidebarAvatar">A</div><div><div class="user-name" id="sidebarUserName">Administrateur</div><div class="user-role" id="sidebarUserRole">Admin</div></div></div>
+      <a href="#" onclick="Auth.logout()" class="nav-item" style="margin-top:.25rem;color:rgba(255,255,255,.4)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>Déconnexion</a>
     </div>
   </aside>
 
   <!-- MAIN -->
   <div class="main">
     <header class="header">
-      <button class="header-btn" id="sidebarToggle" style="display:none"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg></button>
       <div>
         <div class="header-title">Tableau de bord</div>
         <div class="header-sub" id="headerDate"></div>
       </div>
       <div class="header-right">
-        <a href="residents.html" class="btn btn-accent btn-sm admin-only">+ Ajouter un résident</a>
+        <a href="residents.html?new=true" class="btn btn-accent btn-sm admin-only">+ Ajouter un résident</a>
       </div>
     </header>
 
     <main class="content">
 
       <!-- STATS -->
-      <div class="grid grid-4" style="margin-bottom:1.5rem" id="statsGrid">
+      <div class="grid grid-auto" style="margin-bottom:1.5rem" id="statsGrid">
         <div class="stat-card">
           <div class="stat-card-top"><span class="stat-label">Résidents</span><div class="stat-icon blue"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></div></div>
           <div class="stat-num" id="statResidents">0</div>
           <div class="stat-change">Résidents actifs</div>
         </div>
-        <div class="stat-card">
-          <div class="stat-card-top"><span class="stat-label">Présents aujourd'hui</span><div class="stat-icon green"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg></div></div>
+        <div class="stat-card" id="presenceStatCard">
+          <div class="stat-card-top"><span class="stat-label">Présents aujourd'hui</span><div class="stat-icon green" id="presenceStatIcon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg></div></div>
           <div class="stat-num" id="statPresents">0</div>
-          <div class="stat-change">Présences enregistrées</div>
+          <div class="stat-change" id="presenceStatLabel">Présences enregistrées</div>
+          <div id="presenceAlert" style="display:none;margin-top:.4rem;padding:.3rem .6rem;background:#fef2f2;color:#b91c1c;border:1px solid #fecaca;border-radius:var(--r-sm);font-size:.72rem;font-weight:600;text-align:center;cursor:pointer" onclick="window.location='presences.html'">⚠ Présences non saisies — Cliquez pour saisir</div>
         </div>
         <div class="stat-card">
           <div class="stat-card-top"><span class="stat-label">Entrées journal</span><div class="stat-icon orange"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg></div></div>
           <div class="stat-num" id="statJournal">0</div>
           <div class="stat-change">Aujourd'hui</div>
         </div>
-        <div class="stat-card">
-          <div class="stat-card-top"><span class="stat-label">Événements planning</span><div class="stat-icon purple"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></div></div>
-          <div class="stat-num" id="statPlanning">0</div>
-          <div class="stat-change">Total planifiés</div>
-        </div>
-        <div class="stat-card" onclick="openModalVehicule()" style="cursor:pointer" title="Réserver un véhicule">
-          <div class="stat-card-top"><span class="stat-label">Véhicules</span><div class="stat-icon" style="background:#eef2ff;color:#6366f1"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="7" width="20" height="12" rx="2"/><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/><line x1="12" y1="12" x2="12" y2="12"/><path d="M5 19v2M19 19v2"/><circle cx="7.5" cy="16.5" r="1.5"/><circle cx="16.5" cy="16.5" r="1.5"/></svg></div></div>
-          <div class="stat-num" id="statVehicules">0</div>
-          <div class="stat-change" style="color:#6366f1;font-weight:600">Réserver un véhicule →</div>
-        </div>
+
+        <a href="ppe.html" class="stat-card" style="cursor:pointer;text-decoration:none;color:inherit" title="Avenants actifs">
+          <div class="stat-card-top"><span class="stat-label">Avenants actifs</span><div class="stat-icon" style="background:#f0fdf4;color:#16a34a"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2"/><rect x="9" y="3" width="6" height="4" rx="1"/><path d="M9 14l2 2 4-4"/></svg></div></div>
+          <div class="stat-value" id="statPpeInfo">0</div>
+          <div class="stat-detail" id="statPpeDetail">Aucun avenant actif</div>
+        </a>
+        <a href="vehicules.html" class="stat-card" style="cursor:pointer;text-decoration:none;color:inherit" title="Réserver un véhicule">
+          <div class="stat-card-top"><span class="stat-label">Véhicules</span><div class="stat-icon" style="background:#eef2ff;color:#6366f1"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 16H9m10 0h3v-3.15a1 1 0 0 0-.84-.99L16 11l-2.7-3.6a1 1 0 0 0-.8-.4H5.5a1 1 0 0 0-.8.4L2 11v5h2m10 1.5a1.5 1.5 0 0 1-3 0m3 0a1.5 1.5 0 0 0-3 0m3 0h3m-3 0H9m6-6V7a1 1 0 0 0-1-1h-3a1 1 0 0 0-1 1v3M6 17.5a1.5 1.5 0 0 1-3 0m3 0a1.5 1.5 0 0 0-3 0"/></svg></div></div>
+          <div style="font-size:.9rem;font-weight:700;color:var(--g800);margin:.25rem 0 .1rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis" id="statVehiculeInfo">Aucune</div>
+          <div style="font-size:.72rem;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis" id="statVehiculeDetail">Réservation à venir</div>
+        </a>
+
+        <a href="planning.html?filter=avenant" class="stat-card" style="cursor:pointer;text-decoration:none;color:inherit" title="Voir les avenants">
+          <div class="stat-card-top"><span class="stat-label">Prochain Avenant</span><div class="stat-icon" style="background:#fefce8;color:#f59e0b"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg></div></div>
+          <div style="font-size:.9rem;font-weight:700;color:var(--g800);margin:.25rem 0 .1rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis" id="statAvenantInfo">Aucun</div>
+          <div style="font-size:.72rem;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis" id="statAvenantDetail">Prochain avenant</div>
+        </a>
       </div>
 
       <div class="grid grid-2" style="gap:1.5rem">
 
-        <!-- DERNIERS RÉSIDENTS -->
-        <div class="card">
-          <div class="card-header">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:18px;height:18px;color:var(--blue)"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>
-            <span class="card-title">Résidents récents</span>
-            <a href="residents.html" class="btn btn-ghost btn-sm" style="margin-left:auto">Voir tout</a>
-          </div>
-          <div class="card-body" style="padding:0">
-            <div id="recentResidents">
-              <div class="empty" style="padding:2rem"><div class="empty-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg></div><p>Aucun résident enregistré</p><a href="residents.html" class="btn btn-outline btn-sm">Ajouter un résident</a></div>
-            </div>
-          </div>
-        </div>
 
         <!-- DERNIÈRES ENTRÉES JOURNAL -->
         <div class="card">
@@ -135,6 +99,18 @@
           </div>
         </div>
 
+      </div>
+
+      <!-- AVENANTS RÉCENTS -->
+      <div class="card" style="margin-top:1.5rem">
+        <div class="card-header">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:18px;height:18px;color:#16a34a"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+          <span class="card-title">Avenants récents</span>
+          <a href="ppe.html" class="btn btn-ghost btn-sm" style="margin-left:auto">Voir tout</a>
+        </div>
+        <div class="card-body" style="padding:0" id="dashboardAvenants">
+          <div class="empty" style="padding:2rem"><div class="empty-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2"/><rect x="9" y="3" width="6" height="4" rx="1"/><path d="M9 14l2 2 4-4"/></svg></div><p>Aucun avenant</p><a href="ppe.html" class="btn btn-outline btn-sm">Créer un avenant</a></div>
+        </div>
       </div>
 
       <!-- RACCOURCIS -->
@@ -158,10 +134,10 @@
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:24px;height:24px;color:var(--purple)"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
               Ajouter événement
             </a>
-            <button onclick="openModalVehicule()" class="btn btn-outline" style="flex-direction:column;height:80px;gap:.5rem;border-radius:var(--r)">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:24px;height:24px;color:#6366f1"><rect x="2" y="7" width="20" height="12" rx="2"/><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/><circle cx="7.5" cy="16.5" r="1.5"/><circle cx="16.5" cy="16.5" r="1.5"/></svg>
+            <a href="vehicules.html" class="btn btn-outline" style="flex-direction:column;height:80px;gap:.5rem;border-radius:var(--r);text-decoration:none">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:24px;height:24px;color:#6366f1"><path d="M14 16H9m10 0h3v-3.15a1 1 0 0 0-.84-.99L16 11l-2.7-3.6a1 1 0 0 0-.8-.4H5.5a1 1 0 0 0-.8.4L2 11v5h2m10 1.5a1.5 1.5 0 0 1-3 0m3 0a1.5 1.5 0 0 0-3 0m3 0h3m-3 0H9m6-6V7a1 1 0 0 0-1-1h-3a1 1 0 0 0-1 1v3M6 17.5a1.5 1.5 0 0 1-3 0m3 0a1.5 1.5 0 0 0-3 0"/></svg>
               Réserver véhicule
-            </button>
+            </a>
           </div>
         </div>
       </div>
@@ -251,37 +227,6 @@
   </div>
 </div>
 
-<!-- MODAL RÉSERVATION VÉHICULE -->
-<div class="modal-overlay" id="modalVehicule">
-  <div class="modal">
-    <div class="modal-header">
-      <span class="modal-title">🚗 Réservation de véhicule</span>
-      <button class="modal-close"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
-    </div>
-    <div class="modal-body" style="display:flex;flex-direction:column;gap:1rem">
-      <div class="form-row">
-        <div class="form-group"><label class="required">Date &amp; heure de départ</label><input type="datetime-local" id="vDateAller"/></div>
-        <div class="form-group"><label class="required">Date &amp; heure de retour</label><input type="datetime-local" id="vDateRetour"/></div>
-      </div>
-      <div class="form-group">
-        <label class="required">Véhicule</label>
-        <input type="text" id="vVehicule" list="vehiculesList" placeholder="Sélectionner ou saisir un véhicule"/>
-        <datalist id="vehiculesList"></datalist>
-      </div>
-      <div class="form-group"><label class="required">Destination</label><input type="text" id="vDestination" placeholder="Lieu de destination"/></div>
-      <div class="form-group"><label>Motif</label><input type="text" id="vMotif" placeholder="Objet du déplacement (optionnel)"/></div>
-      <div id="vReservataire" style="font-size:.8rem;color:var(--muted);padding:.5rem .75rem;background:var(--g50);border-radius:var(--r)"></div>
-    </div>
-    <div class="modal-footer">
-      <button class="btn btn-outline" onclick="closeAllModals()">Annuler</button>
-      <button class="btn btn-primary" onclick="reserverVehicule()">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:15px;height:15px"><polyline points="20 6 9 17 4 12"/></svg>
-        Confirmer la réservation
-      </button>
-    </div>
-  </div>
-</div>
-
 <div id="toast-container" class="toast-container"></div>
 <script src="js/app.js"></script>
 <script>Auth.requireAuth();</script>
@@ -366,79 +311,107 @@
     wizardGoTo(0);
   }
 
-  function openModalVehicule() {
-    const now = new Date();
-    const later = new Date(now.getTime() + 3600000);
-    const fmt = d => d.toISOString().slice(0,16);
-    document.getElementById('vDateAller').value = fmt(now);
-    document.getElementById('vDateRetour').value = fmt(later);
-    document.getElementById('vVehicule').value = '';
-    document.getElementById('vDestination').value = '';
-    document.getElementById('vMotif').value = '';
-    const vehicules = DB.get(DB.keys.vehicules) || [];
-    document.getElementById('vehiculesList').innerHTML = vehicules.map(v=>`<option value="${v}"/>`).join('');
-    const session = Auth.getSession();
-    const name = session ? [session.prenom, session.nom].filter(Boolean).join(' ') || session.username : '';
-    document.getElementById('vReservataire').textContent = `Réservation au nom de : ${name}`;
-    openModal('modalVehicule');
-  }
-
-  function reserverVehicule() {
-    const dateAller  = document.getElementById('vDateAller').value;
-    const dateRetour = document.getElementById('vDateRetour').value;
-    const vehicule   = document.getElementById('vVehicule').value.trim();
-    const destination = document.getElementById('vDestination').value.trim();
-    const motif      = document.getElementById('vMotif').value.trim();
-    if (!dateAller || !dateRetour || !vehicule || !destination) {
-      toast('Veuillez remplir tous les champs obligatoires', 'error'); return;
-    }
-    if (dateRetour <= dateAller) {
-      toast('La date de retour doit être après le départ', 'error'); return;
-    }
-    const session = Auth.getSession();
-    const userName = session ? [session.prenom, session.nom].filter(Boolean).join(' ') || session.username : 'Inconnu';
-    const planning = DB.get(DB.keys.planning) || [];
-    planning.push({
-      id: genId(),
-      title: `🚗 ${vehicule} — ${destination}`,
-      date: dateAller.slice(0,10),
-      dateEnd: dateRetour.slice(0,10),
-      time: dateAller.slice(11,16),
-      timeEnd: dateRetour.slice(11,16),
-      desc: `Réservé par : ${userName}${motif ? '\nMotif : '+motif : ''}`,
-      color: '#6366f1',
-      type: 'vehicule',
-      vehicule, destination, reservedBy: userName
-    });
-    DB.set(DB.keys.planning, planning);
-    closeAllModals();
-    toast(`🚗 ${vehicule} réservé vers ${destination}`);
-    renderDashboard();
-  }
-
   function renderDashboard() {
     const s = getStats();
     document.getElementById('statResidents').textContent = s.totalResidents;
     document.getElementById('statPresents').textContent = s.presentsToday;
+    // Alert if presences not fully completed for today
+    const allResidents = (DB.get(DB.keys.residents)||[]).filter(r => r.statut !== 'sorti');
+    const todayStr = new Date().toISOString().slice(0,10);
+    const todayPresences = (DB.get(DB.keys.presences)||{})[todayStr] || {};
+    const markedCount = allResidents.filter(r => todayPresences[r.id]).length;
+    const alertEl = document.getElementById('presenceAlert');
+    const labelEl = document.getElementById('presenceStatLabel');
+    const iconEl = document.getElementById('presenceStatIcon');
+    const cardEl = document.getElementById('presenceStatCard');
+    const incomplete = allResidents.length > 0 && markedCount < allResidents.length;
+    if (incomplete) {
+      alertEl.style.display = '';
+      labelEl.textContent = markedCount + '/' + allResidents.length + ' résidents pointés';
+      cardEl.style.border = '1.5px solid #fecaca';
+      iconEl.style.background = '#fef2f2';
+      iconEl.style.color = '#b91c1c';
+    } else {
+      alertEl.style.display = 'none';
+      labelEl.textContent = 'Présences enregistrées';
+      cardEl.style.border = '';
+      iconEl.style.background = '';
+      iconEl.style.color = '';
+    }
     document.getElementById('statJournal').textContent = s.todayEntries;
-    document.getElementById('statPlanning').textContent = s.totalEvents;
-    document.getElementById('statVehicules').textContent = s.vehiculeResa;
+    // PPE stats
+    const ppeList = DB.get(DB.keys.ppe) || [];
+    const ppeActifs = ppeList.filter(p => p.statut === 'actif').length;
+    const ppeInfo = document.getElementById('statPpeInfo');
+    const ppeDetail = document.getElementById('statPpeDetail');
+    ppeInfo.textContent = ppeActifs;
+    ppeDetail.textContent = ppeActifs ? `${ppeList.filter(p=>p.statut==='actif').length} avenant${ppeActifs>1?'s':''} en cours` : 'Aucun avenant actif';
+
+    // Réservation véhicule imminente (≤ 2h)
+    const planning = DB.get(DB.keys.planning) || [];
+    const now = new Date();
+    const today = now.toISOString().slice(0,10);
+    const upcoming = planning
+      .filter(e => e.type === 'vehicule' && (e.date > today || (e.date === today && e.time >= now.toTimeString().slice(0,5))))
+      .sort((a,b) => a.date.localeCompare(b.date) || (a.time||'').localeCompare(b.time||''));
+    const vehInfo = document.getElementById('statVehiculeInfo');
+    const vehDetail = document.getElementById('statVehiculeDetail');
+    const imminent = upcoming.filter(e => {
+      const start = new Date(e.date + 'T' + (e.time || '00:00'));
+      const diffMs = start.getTime() - now.getTime();
+      return diffMs >= 0 && diffMs <= 2 * 60 * 60 * 1000;
+    });
+    if (imminent.length) {
+      const r = imminent[0];
+      const dureeLabel = r.time && r.timeEnd ? `${r.time.slice(0,5)} → ${r.timeEnd.slice(0,5)}` : '';
+      vehInfo.textContent = `${r.vehicule||'?'} · ${r.reservedBy||'?'}`;
+      vehDetail.textContent = dureeLabel ? `${formatDate(r.date)} · ${dureeLabel}` : formatDate(r.date);
+    } else {
+      vehInfo.textContent = 'Aucune réservation imminente';
+      vehDetail.textContent = 'Prochaine dans plus de 2h';
+    }
+
+    // Avenants dans les 7 prochains jours
+    const avenantInfo = document.getElementById('statAvenantInfo');
+    const avenantDetail = document.getElementById('statAvenantDetail');
+    const nextAvenants = planning
+      .filter(e => e.type === 'avenant' && (e.date > today || (e.date === today && e.time >= now.toTimeString().slice(0,5))))
+      .sort((a,b) => a.date.localeCompare(b.date) || (a.time||'').localeCompare(b.time||''));
+    const avenants7j = nextAvenants.filter(e => {
+      const d = new Date(e.date + 'T' + (e.time || '00:00'));
+      return (d.getTime() - now.getTime()) <= 7 * 24 * 60 * 60 * 1000;
+    });
+    if (avenants7j.length) {
+      const a = avenants7j[0];
+      avenantInfo.textContent = `${a.titre||'Avenant'}${a.residentName ? ' · '+a.residentName : ''}`;
+      avenantDetail.textContent = a.date ? `${formatDate(a.date)} · ${a.time ? a.time.slice(0,5) : '—'}` : '—';
+    } else if (nextAvenants.length) {
+      avenantInfo.textContent = 'Aucun dans les 7 jours';
+      avenantDetail.textContent = nextAvenants[0].date ? `Prochain : ${formatDate(nextAvenants[0].date)}` : '—';
+    } else {
+      avenantInfo.textContent = 'Aucun avenant';
+      avenantDetail.textContent = 'Aucun avenant planifié';
+    }
+
+    // Avenants récents (dashboard cards)
+    const avenants = (DB.get(DB.keys.ppe)||[]).filter(p => p.statut !== 'termine').slice(-4).reverse();
+    const da = document.getElementById('dashboardAvenants');
+    if (avenants.length) {
+      da.innerHTML = avenants.map(p => {
+        const totalObj = Object.values(p.sections||{}).reduce((a, s) => a + (s.objectifs?.length||0), 0);
+        return `<div style="display:flex;align-items:center;gap:.75rem;padding:.85rem 1.25rem;border-bottom:1px solid var(--border)">
+          <div style="flex:1;min-width:0;cursor:pointer" onclick="window.location='ppe.html'">
+            <div style="font-weight:600;font-size:.875rem">${p.residentName||'?'}</div>
+            <div style="font-size:.75rem;color:var(--muted)">${totalObj} objectifs · ${p.dateRedaction||'—'}</div>
+          </div>
+          <span class="badge-ppe ${p.statut}">${STATUT_PPE_LABEL[p.statut]||p.statut}</span>
+        </div>`;
+      }).join('');
+    }
+
     const nc = document.getElementById('navResCount');
     if (s.totalResidents > 0) { nc.style.display=''; nc.textContent = s.totalResidents; }
 
-    const residents = (DB.get(DB.keys.residents)||[]).filter(r=>r.statut!=='sorti').slice(-5).reverse();
-    const resEl = document.getElementById('recentResidents');
-    if (residents.length) {
-      resEl.innerHTML = residents.map(r=>`
-        <div style="display:flex;align-items:center;gap:.75rem;padding:.85rem 1.25rem;border-bottom:1px solid var(--border)">
-          <div class="avatar sm" style="background:${r.color||'var(--blue)'}">${initials(r.prenom,r.nom)}</div>
-          <div style="flex:1;min-width:0">
-            <div style="font-weight:600;font-size:.875rem">${r.prenom||''} ${r.nom||''}</div>
-            <div style="font-size:.75rem;color:var(--muted)">${r.dob?age(r.dob):''} ${r.chambre?'· Ch. '+r.chambre:''}</div>
-          </div>
-          <span class="badge ${r.statut==='present'?'badge-green':r.statut==='absent'?'badge-red':'badge-gray'}">${r.statut||'—'}</span>
-        </div>`).join('');
-    }
     const journal = (DB.get(DB.keys.journal)||[]).slice(-5).reverse();
     const jEl = document.getElementById('recentJournal');
     const cats = DB.get(DB.keys.categories)||[];
