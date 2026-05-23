@@ -181,6 +181,13 @@ function initials(prenom='', nom='') {
   return ((prenom[0]||'') + (nom[0]||'')).toUpperCase() || '?';
 }
 
+function shortName(fullName) {
+  if (!fullName) return '';
+  const parts = fullName.trim().split(/\s+/);
+  if (parts.length === 1) return parts[0];
+  return parts[0] + ' ' + parts[parts.length-1][0] + '.';
+}
+
 // ── DATE HELPERS ──
 function today() { return new Date().toISOString().slice(0,10); }
 function formatDate(d) {
