@@ -1,0 +1,495 @@
+// ── TABS ──
+function activateTab(name) {
+  document.querySelectorAll('.tab').forEach(t => t.classList.toggle('active', t.dataset.tab === name));
+  ['etablissement','personnalisation','categories','objectifs','educateurs','compte','donnees'].forEach(n => {
+    const el = document.getElementById('tab-'+n);
+    if (el) el.style.display = n === name ? '' : 'none';
+  });
+}
+
+// ── TYPE DE STRUCTURE ──
+function loadTypeStructure() {
+  const s = DB.get(DB.keys.settings) || {};
+  const type = s.typeStructure || 'mixte';
+  const radio = document.querySelector(`input[name="typeStructure"][value="${type}"]`);
+  if (radio) radio.checked = true;
+  highlightTypeSelected();
+}
+
+function highlightTypeSelected() {
+  document.querySelectorAll('input[name="typeStructure"]').forEach(r => {
+    const label = r.closest('label');
+    if (!label) return;
+    label.style.borderColor = r.checked ? 'var(--blue)' : 'var(--border)';
+    label.style.background = r.checked ? '#eff6ff' : '';
+  });
+}
+
+function saveTypeStructure() {
+  const radio = document.querySelector('input[name="typeStructure"]:checked');
+  if (!radio) return;
+  const s = DB.get(DB.keys.settings) || {};
+  s.typeStructure = radio.value;
+  DB.set(DB.keys.settings, s);
+  toast(`Type de structure enregistré : ${radio.value}`);
+}
+
+// ── BRANDING ──
+function loadBranding() {
+  const b = DB.get(DB.keys.branding) || DEFAULTS.branding;
+  document.getElementById('bPrimary').value = b.primaryColor || '#0f2b4a';
+  document.getElementById('bAccent').value = b.accentColor || '#e85d04';
+  if (b.logo) updateLogoPreview(b.logo);
+}
+
+function saveBranding() {
+  const data = {
+    primaryColor: document.getElementById('bPrimary').value,
+    accentColor: document.getElementById('bAccent').value,
+    logo: DB.get(DB.keys.branding)?.logo || ''
+  };
+  DB.set(DB.keys.branding, data);
+  applyBranding();
+  toast('Couleurs appliquées');
+}
+
+function resetBranding() {
+  const data = { primaryColor:'#0f2b4a', accentColor:'#e85d04', logo:'' };
+  DB.set(DB.keys.branding, data);
+  document.getElementById('bPrimary').value = data.primaryColor;
+  document.getElementById('bAccent').value = data.accentColor;
+  applyBranding();
+  updateLogoPreview('');
+  toast('Couleurs réinitialisées', 'info');
+}
+
+// ── LOGO ──
+function initLogoUpload() {
+  const input = document.getElementById('logoInput');
+  if (!input) return;
+  input.addEventListener('change', async e => {
+    const file = e.target.files[0];
+    if (!file) return;
+    if (file.size > 1024 * 1024) { toast('Logo trop lourd (max 1 Mo)', 'error'); return; }
+    try {
+      const base64 = await fileToBase64(file);
+      const b = DB.get(DB.keys.branding) || DEFAULTS.branding;
+      b.logo = base64;
+      DB.set(DB.keys.branding, b);
+      updateLogoPreview(base64);
+      applyBranding();
+      toast('Logo enregistré');
+    } catch { toast('Erreur lors du chargement du logo', 'error'); }
+  });
+}
+
+function updateLogoPreview(src) {
+  const preview = document.getElementById('logoPreview');
+  const removeBtn = document.getElementById('logoRemoveBtn');
+  if (!preview) return;
+  if (src) {
+    preview.innerHTML = `<img src="${src}" style="width:100%;height:100%;object-fit:cover;border-radius:10px" alt="Logo"/>`;
+    if (removeBtn) removeBtn.style.display = '';
+  } else {
+    preview.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="var(--g400)" stroke-width="1.5" style="width:24px;height:24px"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg>`;
+    if (removeBtn) removeBtn.style.display = 'none';
+  }
+}
+
+function removeLogo() {
+  const b = DB.get(DB.keys.branding) || DEFAULTS.branding;
+  b.logo = '';
+  DB.set(DB.keys.branding, b);
+  document.getElementById('logoInput').value = '';
+  updateLogoPreview('');
+  applyBranding();
+  toast('Logo supprimé', 'info');
+}
+
+// ── ÉTABLISSEMENT ──
+function loadSettings() {
+  const s = DB.get(DB.keys.settings) || {};
+  document.getElementById('setEtab').value = s.etablissement || '';
+  document.getElementById('setVille').value = s.ville || '';
+  document.getElementById('setFiness').value = s.finess || '';
+  document.getElementById('setTel').value = s.tel || '';
+  document.getElementById('setEmail').value = s.email || '';
+  document.getElementById('setAdresse').value = s.adresse || '';
+  updatePreview();
+}
+
+function updatePreview() {
+  document.getElementById('previewNom').textContent = document.getElementById('setEtab').value || '—';
+  document.getElementById('previewVille').textContent = document.getElementById('setVille').value || '';
+  document.getElementById('previewFiness').textContent = document.getElementById('setFiness').value || '—';
+  document.getElementById('previewTel').textContent = document.getElementById('setTel').value || '—';
+  document.getElementById('previewEmail').textContent = document.getElementById('setEmail').value || '—';
+}
+
+function saveSettings() {
+  const data = {
+    etablissement: document.getElementById('setEtab').value.trim(),
+    ville: document.getElementById('setVille').value.trim(),
+    finess: document.getElementById('setFiness').value.trim(),
+    tel: document.getElementById('setTel').value.trim(),
+    email: document.getElementById('setEmail').value.trim(),
+    adresse: document.getElementById('setAdresse').value.trim(),
+    typeStructure: (DB.get(DB.keys.settings) || {}).typeStructure || 'mixte'
+  };
+  DB.set(DB.keys.settings, data);
+  updatePreview();
+  renderUserInfo();
+  toast('Paramètres enregistrés');
+}
+
+// ── CATÉGORIES ──
+function renderCats() {
+  const cats = DB.get(DB.keys.categories) || [];
+  const el = document.getElementById('catList');
+  if (!cats.length) {
+    el.innerHTML = `<div class="empty" style="padding:2rem"><p>Aucune catégorie</p></div>`;
+    return;
+  }
+  el.innerHTML = cats.map(c => `
+    <div style="display:flex;align-items:center;gap:.75rem;padding:.85rem 1.25rem;border-bottom:1px solid var(--border)">
+      <span style="width:14px;height:14px;border-radius:4px;background:${c.color};flex-shrink:0"></span>
+      <span style="flex:1;font-weight:600;font-size:.875rem">${c.name}</span>
+      <span class="badge" style="background:${c.color}22;color:${c.color}">${c.name}</span>
+      <button class="btn btn-ghost btn-sm" onclick="editCat(${c.id})">Modifier</button>
+    </div>`).join('');
+}
+
+function editCat(id) {
+  const cats = DB.get(DB.keys.categories) || [];
+  const c = cats.find(x => x.id === id);
+  if (!c) return;
+  document.getElementById('modalCatTitle').textContent = 'Modifier la catégorie';
+  document.getElementById('catId').value = id;
+  document.getElementById('catName').value = c.name;
+  document.getElementById('catColor').value = c.color;
+  document.getElementById('btnDeleteCat').style.display = '';
+  openModal('modalCat');
+}
+
+function saveCat() {
+  const name = document.getElementById('catName').value.trim();
+  if (!name) { toast('Le nom est requis', 'error'); return; }
+  const color = document.getElementById('catColor').value;
+  let cats = DB.get(DB.keys.categories) || [];
+  const id = document.getElementById('catId').value;
+  if (id) {
+    cats = cats.map(c => String(c.id) === String(id) ? { ...c, name, color } : c);
+    toast('Catégorie mise à jour');
+  } else {
+    const newId = Math.max(0, ...cats.map(c => c.id)) + 1;
+    cats.push({ id: newId, name, color });
+    toast('Catégorie ajoutée');
+  }
+  DB.set(DB.keys.categories, cats);
+  closeAllModals();
+  resetCatForm();
+  renderCats();
+}
+
+function deleteCat() {
+  const id = document.getElementById('catId').value;
+  confirmDialog('Supprimer cette catégorie ?', () => {
+    let cats = DB.get(DB.keys.categories) || [];
+    cats = cats.filter(c => String(c.id) !== String(id));
+    DB.set(DB.keys.categories, cats);
+    closeAllModals();
+    resetCatForm();
+    renderCats();
+    toast('Catégorie supprimée', 'info');
+  });
+}
+
+function resetCatForm() {
+  document.getElementById('catId').value = '';
+  document.getElementById('catName').value = '';
+  document.getElementById('catColor').value = '#3b82f6';
+  document.getElementById('modalCatTitle').textContent = 'Nouvelle catégorie';
+  document.getElementById('btnDeleteCat').style.display = 'none';
+}
+
+// ── OBJECTIFS ──
+function renderObjs() {
+  const objs = DB.get(DB.keys.objectives) || [];
+  const el = document.getElementById('objList');
+  if (!objs.length) {
+    el.innerHTML = `<div class="empty" style="padding:2rem"><p>Aucun objectif</p></div>`;
+    return;
+  }
+  el.innerHTML = objs.map(o => `
+    <div style="padding:.85rem 1.25rem;border-bottom:1px solid var(--border)">
+      <div style="display:flex;align-items:center;justify-content:space-between">
+        <span style="font-weight:700;font-size:.875rem">${o.name}</span>
+        <button class="btn btn-ghost btn-sm" onclick="editObj(${o.id})">Modifier</button>
+      </div>
+      ${o.description ? `<div style="font-size:.78rem;color:var(--muted);margin-top:2px">${o.description}</div>` : ''}
+    </div>`).join('');
+}
+
+function editObj(id) {
+  const objs = DB.get(DB.keys.objectives) || [];
+  const o = objs.find(x => x.id === id);
+  if (!o) return;
+  document.getElementById('modalObjTitle').textContent = 'Modifier l\'objectif';
+  document.getElementById('objId').value = id;
+  document.getElementById('objName').value = o.name;
+  document.getElementById('objDesc').value = o.description || '';
+  document.getElementById('btnDeleteObj').style.display = '';
+  openModal('modalObj');
+}
+
+function saveObj() {
+  const name = document.getElementById('objName').value.trim();
+  if (!name) { toast('Le nom est requis', 'error'); return; }
+  const description = document.getElementById('objDesc').value.trim();
+  let objs = DB.get(DB.keys.objectives) || [];
+  const id = document.getElementById('objId').value;
+  if (id) {
+    objs = objs.map(o => String(o.id) === String(id) ? { ...o, name, description } : o);
+    toast('Objectif mis à jour');
+  } else {
+    const newId = Math.max(0, ...objs.map(o => o.id)) + 1;
+    objs.push({ id: newId, name, description });
+    toast('Objectif ajouté');
+  }
+  DB.set(DB.keys.objectives, objs);
+  closeAllModals();
+  resetObjForm();
+  renderObjs();
+}
+
+function deleteObj() {
+  const id = document.getElementById('objId').value;
+  confirmDialog('Supprimer cet objectif ?', () => {
+    let objs = DB.get(DB.keys.objectives) || [];
+    objs = objs.filter(o => String(o.id) !== String(id));
+    DB.set(DB.keys.objectives, objs);
+    closeAllModals();
+    resetObjForm();
+    renderObjs();
+    toast('Objectif supprimé', 'info');
+  });
+}
+
+function resetObjForm() {
+  document.getElementById('objId').value = '';
+  document.getElementById('objName').value = '';
+  document.getElementById('objDesc').value = '';
+  document.getElementById('modalObjTitle').textContent = 'Nouvel objectif';
+  document.getElementById('btnDeleteObj').style.display = 'none';
+}
+
+// ── ÉDUCATEURS ──
+function renderEducateurs() {
+  const users = DB.get(DB.keys.users) || [];
+  const educateurs = users.filter(u => u.role === 'educateur');
+  const el = document.getElementById('eduList');
+  if (!el) return;
+  if (!educateurs.length) {
+    el.innerHTML = `<div class="empty" style="padding:2rem"><p>Aucun éducateur enregistré</p></div>`;
+    return;
+  }
+  el.innerHTML = educateurs.map(u => `
+    <div style="display:flex;align-items:center;gap:.75rem;padding:.85rem 1.25rem;border-bottom:1px solid var(--border)">
+      <div class="avatar sm" style="background:var(--blue)">${initials(u.prenom||'', u.nom||'') || u.username[0].toUpperCase()}</div>
+      <div style="flex:1">
+        <div style="font-weight:600;font-size:.875rem">${[u.prenom, u.nom].filter(Boolean).join(' ') || u.username}</div>
+        <div style="font-size:.75rem;color:var(--muted)">@${u.username}</div>
+      </div>
+      <span class="badge" style="background:#eff6ff;color:var(--blue)">Éducateur</span>
+      <button class="btn btn-ghost btn-sm" onclick="editEducateur(${u.id})">Modifier</button>
+    </div>`).join('');
+}
+
+function editEducateur(id) {
+  const users = DB.get(DB.keys.users) || [];
+  const u = users.find(x => x.id === id);
+  if (!u) return;
+  document.getElementById('modalEduTitle').textContent = "Modifier l'éducateur";
+  document.getElementById('eduId').value = id;
+  document.getElementById('eduPrenom').value = u.prenom || '';
+  document.getElementById('eduNom').value = u.nom || '';
+  document.getElementById('eduUsername').value = u.username;
+  document.getElementById('eduPassword').value = '';
+  document.getElementById('eduPasswordLabel').textContent = 'Nouveau mot de passe (vide = inchangé)';
+  document.getElementById('btnDeleteEdu').style.display = '';
+  openModal('modalEdu');
+}
+
+function saveEducateur() {
+  const username = document.getElementById('eduUsername').value.trim();
+  const password = document.getElementById('eduPassword').value;
+  const prenom = document.getElementById('eduPrenom').value.trim();
+  const nom = document.getElementById('eduNom').value.trim();
+  const id = document.getElementById('eduId').value;
+  if (!username) { toast("L'identifiant est requis", 'error'); return; }
+  let users = DB.get(DB.keys.users) || [];
+  if (users.find(u => u.username === username && String(u.id) !== String(id))) {
+    toast('Cet identifiant est déjà utilisé', 'error'); return;
+  }
+  if (id) {
+    if (!password && !users.find(u => String(u.id) === String(id))?.password) {
+      toast('Le mot de passe est requis', 'error'); return;
+    }
+    users = users.map(u => String(u.id) === String(id)
+      ? { ...u, prenom, nom, username, ...(password ? { password } : {}) } : u);
+    toast('Éducateur mis à jour');
+  } else {
+    if (!password) { toast('Le mot de passe est requis', 'error'); return; }
+    const newId = Math.max(0, ...users.map(u => u.id)) + 1;
+    users.push({ id: newId, prenom, nom, username, password, role: 'educateur' });
+    toast('Éducateur ajouté');
+  }
+  DB.set(DB.keys.users, users);
+  closeAllModals();
+  resetEducateurForm();
+  renderEducateurs();
+}
+
+function deleteEducateur() {
+  const id = document.getElementById('eduId').value;
+  confirmDialog('Supprimer cet éducateur ?', () => {
+    let users = DB.get(DB.keys.users) || [];
+    users = users.filter(u => String(u.id) !== String(id));
+    DB.set(DB.keys.users, users);
+    closeAllModals();
+    resetEducateurForm();
+    renderEducateurs();
+    toast('Éducateur supprimé', 'info');
+  });
+}
+
+function resetEducateurForm() {
+  document.getElementById('eduId').value = '';
+  document.getElementById('eduPrenom').value = '';
+  document.getElementById('eduNom').value = '';
+  document.getElementById('eduUsername').value = '';
+  document.getElementById('eduPassword').value = '';
+  document.getElementById('modalEduTitle').textContent = 'Nouvel éducateur';
+  document.getElementById('eduPasswordLabel').textContent = 'Mot de passe';
+  document.getElementById('btnDeleteEdu').style.display = 'none';
+}
+
+// ── COMPTE ──
+function loadUser() {
+  const session = Auth.getSession();
+  const users = DB.get(DB.keys.users) || [];
+  const adminUser = session ? users.find(u => u.id === session.userId) : null;
+  const u = adminUser || DB.get(DB.keys.user) || {};
+  document.getElementById('uPrenom').value = u.prenom || '';
+  document.getElementById('uNom').value = u.nom || '';
+  document.getElementById('uRole').value = (DB.get(DB.keys.user) || {}).role || '';
+  const name = [u.prenom, u.nom].filter(Boolean).join(' ') || 'Administrateur';
+  document.getElementById('accountName').textContent = name;
+  document.getElementById('accountRole').textContent = 'Administrateur';
+  document.getElementById('accountAvatar').textContent = initials(u.prenom||'', u.nom||'') || 'A';
+  if (adminUser) document.getElementById('uUsername').value = adminUser.username;
+}
+
+function saveUser() {
+  const prenom = document.getElementById('uPrenom').value.trim();
+  const nom = document.getElementById('uNom').value.trim();
+  const role = document.getElementById('uRole').value.trim();
+  DB.set(DB.keys.user, { prenom, nom, role });
+  const session = Auth.getSession();
+  if (session) {
+    let users = DB.get(DB.keys.users) || [];
+    users = users.map(u => u.id === session.userId ? { ...u, prenom, nom } : u);
+    DB.set(DB.keys.users, users);
+    DB.set(DB.keys.session, { ...session, prenom, nom });
+  }
+  loadUser();
+  renderUserInfo();
+  toast('Compte mis à jour');
+}
+
+function saveCredentials() {
+  const username = document.getElementById('uUsername').value.trim();
+  const password = document.getElementById('uPassword').value;
+  const confirm = document.getElementById('uPasswordConfirm').value;
+  if (!username) { toast("L'identifiant est requis", 'error'); return; }
+  if (password && password !== confirm) { toast('Les mots de passe ne correspondent pas', 'error'); return; }
+  const session = Auth.getSession();
+  let users = DB.get(DB.keys.users) || [];
+  if (users.find(u => u.username === username && u.id !== session.userId)) {
+    toast('Cet identifiant est déjà utilisé', 'error'); return;
+  }
+  users = users.map(u => u.id === session.userId ? { ...u, username, ...(password ? { password } : {}) } : u);
+  DB.set(DB.keys.users, users);
+  DB.set(DB.keys.session, { ...session, username });
+  document.getElementById('uPassword').value = '';
+  document.getElementById('uPasswordConfirm').value = '';
+  toast('Identifiants mis à jour');
+}
+
+// ── DONNÉES ──
+function exportData(type) {
+  let data = {};
+  if (type === 'residents' || type === 'all') data.residents = DB.get(DB.keys.residents) || [];
+  if (type === 'journal' || type === 'all') data.journal = DB.get(DB.keys.journal) || [];
+  if (type === 'all') {
+    data.categories = DB.get(DB.keys.categories) || [];
+    data.objectives = DB.get(DB.keys.objectives) || [];
+    data.presences = DB.get(DB.keys.presences) || {};
+    data.settings = DB.get(DB.keys.settings) || {};
+  }
+  const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `ftr-export-${type}-${today()}.json`;
+  a.click();
+  URL.revokeObjectURL(url);
+  toast('Export téléchargé');
+}
+
+function resetData(type) {
+  const messages = {
+    journal: 'Vider tout le journal de bord ? Cette action est irréversible.',
+    presences: 'Réinitialiser toutes les présences ? Cette action est irréversible.',
+    all: '⚠️ ATTENTION : Supprimer TOUTES les données (résidents, journal, présences) ? Cette action est irréversible.'
+  };
+  confirmDialog(messages[type], () => {
+    if (type === 'journal') DB.set(DB.keys.journal, []);
+    else if (type === 'presences') DB.set(DB.keys.presences, {});
+    else if (type === 'all') {
+      DB.set(DB.keys.residents, []);
+      DB.set(DB.keys.journal, []);
+      DB.set(DB.keys.presences, {});
+      DB.set(DB.keys.planning, []);
+    }
+    toast('Données réinitialisées', 'info');
+  });
+}
+
+// ── INIT ──
+document.addEventListener('DOMContentLoaded', () => {
+  document.querySelectorAll('.tab').forEach(t => {
+    t.addEventListener('click', () => activateTab(t.dataset.tab));
+  });
+
+  loadSettings();
+  loadUser();
+  loadBranding();
+  loadTypeStructure();
+  renderCats();
+  renderObjs();
+  renderEducateurs();
+  initLogoUpload();
+
+  ['setEtab','setVille','setFiness','setTel','setEmail'].forEach(id => {
+    document.getElementById(id)?.addEventListener('input', updatePreview);
+  });
+
+  document.querySelectorAll('input[name="typeStructure"]').forEach(r => {
+    r.addEventListener('change', highlightTypeSelected);
+  });
+
+  document.getElementById('modalCat').querySelector('.modal-close').addEventListener('click', resetCatForm);
+  document.getElementById('modalObj').querySelector('.modal-close').addEventListener('click', resetObjForm);
+  document.getElementById('modalEdu').querySelector('.modal-close').addEventListener('click', resetEducateurForm);
+});
