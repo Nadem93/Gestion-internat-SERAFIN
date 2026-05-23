@@ -88,6 +88,8 @@ function renderViewMode(r) {
   const type = getStructureType();
   const docs = (DB.get(DB.keys.documents)||{})[currentResidentId]||[];
   const genderLabel = r.genre==='M'?'Masculin':r.genre==='F'?'Féminin':'Autre';
+  const todayPresences = (DB.get(DB.keys.presences)||{})[today()] || {};
+  const presenceStatus = todayPresences[currentResidentId] || (r.statut === 'sorti' ? 'sorti' : r.statut);
 
   const photoEl = r.photo
     ? `<img src="${r.photo}" style="width:96px;height:96px;border-radius:50%;object-fit:cover;border:3px solid #fff;box-shadow:var(--shadow-md)" alt=""/>`
@@ -110,7 +112,7 @@ function renderViewMode(r) {
       <div style="flex:1">
         <h1 style="font-size:1.8rem;font-weight:800;color:#fff;margin:0;text-shadow:0 1px 3px rgba(0,0,0,.15)">${escHtml(r.prenom||'')} ${escHtml(r.nom||'')}</h1>
         <div style="display:flex;gap:.5rem;margin-top:.6rem;flex-wrap:wrap">
-          ${statusBadge(r.statut)}
+          ${statusBadge(presenceStatus)}
           ${r.genre ? `<span class="badge" style="background:rgba(255,255,255,.2);color:#fff">${genderLabel}</span>` : ''}
           ${r.dob ? `<span class="badge" style="background:rgba(255,255,255,.2);color:#fff">${age(r.dob)} ans</span>` : ''}
         </div>
