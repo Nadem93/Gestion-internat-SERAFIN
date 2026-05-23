@@ -47,11 +47,12 @@
 
       <!-- STATS -->
       <div class="grid grid-auto" style="margin-bottom:1.5rem" id="statsGrid">
-        <div class="stat-card">
-          <div class="stat-card-top"><span class="stat-label">Résidents</span><div class="stat-icon blue"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></div></div>
-          <div class="stat-num" id="statResidents">0</div>
-          <div class="stat-change">Résidents actifs</div>
-        </div>
+        <a href="planning.html" class="stat-card" id="statEventCard" style="cursor:pointer;text-decoration:none;color:inherit" title="Voir le planning">
+          <div class="stat-card-top"><span class="stat-label">Événements à venir</span><div class="stat-icon" style="background:#fef3f2;color:#ef4444"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></div></div>
+          <div id="statEventList" style="width:100%">
+            <div style="font-size:.82rem;font-weight:700;color:var(--g800);margin:.25rem 0 .1rem">Aucun événement</div>
+          </div>
+        </a>
         <div class="stat-card" id="presenceStatCard">
           <div class="stat-card-top"><span class="stat-label">Présents aujourd'hui</span><div class="stat-icon green" id="presenceStatIcon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg></div></div>
           <div class="stat-num" id="statPresents">0</div>
@@ -314,11 +315,36 @@
 
   function renderDashboard() {
     const s = getStats();
-    document.getElementById('statResidents').textContent = s.totalResidents;
+    // Événements à venir (≤ 2h, hors véhicules)
+    const planning = DB.get(DB.keys.planning) || [];
+    const now = new Date();
+    const todayStr = now.toISOString().slice(0,10);
+    const eventList = document.getElementById('statEventList');
+    const upcomingEvents = planning
+      .filter(e => e.type !== 'vehicule')
+      .filter(e => {
+        const start = new Date(e.date + 'T' + (e.time || '00:00'));
+        const end = e.timeEnd ? new Date(e.date + 'T' + e.timeEnd) : new Date(start.getTime() + 3600000);
+        const diffStart = start.getTime() - now.getTime();
+        const diffEnd = end.getTime() - now.getTime();
+        return (diffStart > 0 && diffStart <= 7200000) || (diffStart <= 0 && diffEnd > 0);
+      })
+      .sort((a,b) => (a.date + 'T' + (a.time||'00:00')).localeCompare(b.date + 'T' + (b.time||'00:00')));
+    if (upcomingEvents.length) {
+      eventList.innerHTML = upcomingEvents.slice(0, 5).map(e => {
+        const creneau = e.time ? (e.timeEnd ? `${e.time.slice(0,5)}→${e.timeEnd.slice(0,5)}` : e.time.slice(0,5)) : '';
+        const nom = e.residentName || e.titre || '?';
+        return `<div style="display:flex;align-items:center;gap:.5rem;padding:3px 0;font-size:.78rem;border-bottom:1px solid var(--border)">
+          <span style="font-weight:600;flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${escHtml(nom)}</span>
+          <span style="color:var(--muted);font-size:.7rem">${creneau}</span>
+        </div>`;
+      }).join('');
+    } else {
+      eventList.innerHTML = '<div style="font-size:.78rem;color:var(--muted)">Aucun événement dans les 2h</div>';
+    }
     document.getElementById('statPresents').textContent = s.presentsToday;
     // Alert if presences not fully completed for today
     const allResidents = (DB.get(DB.keys.residents)||[]).filter(r => r.statut !== 'sorti');
-    const todayStr = new Date().toISOString().slice(0,10);
     const todayPresences = (DB.get(DB.keys.presences)||{})[todayStr] || {};
     const markedCount = allResidents.filter(r => todayPresences[r.id]).length;
     const alertEl = document.getElementById('presenceAlert');
@@ -349,9 +375,6 @@
     ppeDetail.textContent = ppeActifs ? `${ppeList.filter(p=>p.statut==='actif').length} avenant${ppeActifs>1?'s':''} en cours` : 'Aucun avenant actif';
 
     // Réservations véhicules (imminentes ou en cours)
-    const planning = DB.get(DB.keys.planning) || [];
-    const now = new Date();
-    const today = now.toISOString().slice(0,10);
     const vehList = document.getElementById('statVehiculeList');
     const vehiculeResas = planning
       .filter(e => e.type === 'vehicule')
@@ -381,7 +404,7 @@
     const avenantInfo = document.getElementById('statAvenantInfo');
     const avenantDetail = document.getElementById('statAvenantDetail');
     const nextAvenants = planning
-      .filter(e => e.type === 'avenant' && (e.date > today || (e.date === today && e.time >= now.toTimeString().slice(0,5))))
+      .filter(e => e.type === 'avenant' && (e.date > todayStr || (e.date === todayStr && e.time >= now.toTimeString().slice(0,5))))
       .sort((a,b) => a.date.localeCompare(b.date) || (a.time||'').localeCompare(b.time||''));
     const avenants7j = nextAvenants.filter(e => {
       const d = new Date(e.date + 'T' + (e.time || '00:00'));
