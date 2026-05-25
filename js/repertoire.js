@@ -1,7 +1,14 @@
 let editingContactId = null;
+const CONTACT_COLORS = ['#0891b2','#059669','#d97706','#dc2626','#7c3aed','#0284c7','#16a34a','#e11d48','#6366f1','#0ea5e9','#84cc16','#ec4899','#14b8a6','#f97316','#8b5cf6'];
 
 function getContacts() { return DB.get(DB.keys.repertoire) || []; }
 function setContacts(c) { DB.set(DB.keys.repertoire, c); }
+
+function contactColor(org) {
+  let h = 0;
+  for (let i = 0; i < (org||'').length; i++) h = (h * 31 + org.charCodeAt(i)) | 0;
+  return CONTACT_COLORS[Math.abs(h) % CONTACT_COLORS.length];
+}
 
 function renderContacts() {
   const all = getContacts().sort((a,b) => a.organisme.localeCompare(b.organisme));
@@ -24,29 +31,25 @@ function renderContacts() {
     container.innerHTML = '<div class="empty"><h3>'+(q?'Aucun résultat':'Aucun contact')+'</h3><p>'+(q?'Aucun contact ne correspond à votre recherche.':'Ajoutez votre premier contact partenaire.')+'</p>'+(q?'': '<button class="btn btn-accent" onclick="openAddContact()">+ Nouveau contact</button>')+'</div>';
     return;
   }
-  let html = '<div style="display:flex;flex-direction:column;gap:.75rem">';
-  for (const c of contacts) {
-    html += `
-      <div class="card" style="cursor:pointer" onclick="openEditContact('${c.id}')">
-        <div class="card-body">
-          <div style="display:flex;align-items:flex-start;gap:1rem">
-            <div style="width:42px;height:42px;border-radius:50%;background:var(--b50);display:flex;align-items:center;justify-content:center;flex-shrink:0;color:var(--blue);font-weight:700;font-size:1rem">${initialsOrg(c.organisme)}</div>
-            <div style="flex:1;min-width:0">
-              <div style="font-weight:700;font-size:.9rem">${escapeHtml(c.organisme)}</div>
-              <div style="font-weight:500;font-size:.82rem;color:var(--g700);margin-top:1px">${escapeHtml(c.nom)}${c.fonction ? ' · '+escapeHtml(c.fonction) : ''}</div>
-              <div style="display:flex;flex-wrap:wrap;gap:.5rem;margin-top:.5rem;font-size:.8rem">
-                ${c.tel ? `<span style="display:flex;align-items:center;gap:.25rem"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:13px;height:13px;color:var(--muted)"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>${escapeHtml(c.tel)}</span>` : ''}
-                ${c.email ? `<span style="display:flex;align-items:center;gap:.25rem"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:13px;height:13px;color:var(--muted)"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>${escapeHtml(c.email)}</span>` : ''}
-              </div>
-              ${c.adresse ? `<div style="font-size:.78rem;color:var(--muted);margin-top:.35rem">${escapeHtml(c.adresse)}</div>` : ''}
-              ${c.notes ? `<div style="font-size:.78rem;color:var(--muted);margin-top:.25rem;font-style:italic">${escapeHtml(c.notes)}</div>` : ''}
-            </div>
-          </div>
+  container.innerHTML = `<div class="grid grid-5" style="gap:.75rem">${contacts.map(c => {
+    const color = contactColor(c.organisme);
+    const init = initialsOrg(c.organisme);
+    return `<div class="res-card" style="border-color:${color};background:${color}08" onclick="openEditContact('${c.id}')">
+      <div class="res-card-cover" style="background:${color}"></div>
+      <div class="res-card-body">
+        <div class="res-card-photo" style="background:${color};display:flex;align-items:center;justify-content:center;font-weight:800;font-size:1rem;color:#fff">${init}</div>
+        <div class="res-card-name" style="font-size:.82rem">${escapeHtml(c.organisme)}</div>
+        <div class="res-card-meta">${escapeHtml(c.nom)}${c.fonction ? ' · '+escapeHtml(c.fonction) : ''}</div>
+        <div style="display:flex;gap:.35rem;flex-wrap:wrap;justify-content:center;margin-top:.25rem">
+          ${c.tel ? `<span style="font-size:.65rem;color:var(--muted);display:flex;align-items:center;gap:.2rem">📞 ${escapeHtml(c.tel)}</span>` : ''}
+          ${c.email ? `<span style="font-size:.65rem;color:var(--muted);display:flex;align-items:center;gap:.2rem">✉️ ${escapeHtml(c.email)}</span>` : ''}
         </div>
-      </div>`;
-  }
-  html += '</div>';
-  container.innerHTML = html;
+      </div>
+      <div class="res-card-footer" style="justify-content:center">
+        <span style="font-size:.65rem;color:var(--muted)">${c.adresse ? escapeHtml(c.adresse).slice(0,30)+(c.adresse.length>30?'…':'') : '—'}</span>
+      </div>
+    </div>`;
+  }).join('')}</div>`;
 }
 
 function initialsOrg(name) {

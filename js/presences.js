@@ -85,7 +85,7 @@ function renderPresenceTable() {
         return `<tr style="border-bottom:1px solid var(--border)">
           <td style="padding:.85rem 1.25rem">
             <div style="display:flex;align-items:center;gap:.75rem">
-              <div class="avatar sm" style="background:${r.color||'var(--blue)'}">${initials(r.prenom,r.nom)}</div>
+              <div class="avatar sm" style="width:36px;height:36px;font-size:.75rem;background:${r.color||'var(--blue)'}">${initials(r.prenom,r.nom)}</div>
               <div>
                 <div style="font-weight:600">${escHtml(r.prenom||'')} ${escHtml(r.nom||'')}</div>
                 <div style="font-size:.72rem;color:var(--muted)">${r.dob ? age(r.dob) : ''}</div>
@@ -97,11 +97,11 @@ function renderPresenceTable() {
             <span style="display:inline-block;padding:.3rem .75rem;border-radius:var(--r-full);font-size:.8rem;${statusStyle[s]}">${statusLabel[s]}</span>
           </td>
           <td style="padding:.85rem 1rem">
-            <div style="display:flex;gap:.4rem">
-              <button class="btn btn-sm" style="background:#ecfdf5;color:#047857;border:1px solid #a7f3d0" onclick="setPresence('${r.id}','present')">Présent</button>
-              <button class="btn btn-sm" style="background:#fef2f2;color:#b91c1c;border:1px solid #fecaca" onclick="setPresence('${r.id}','absent')">Absent</button>
-              <button class="btn btn-sm" style="background:#fffbeb;color:#92400e;border:1px solid #fde68a" onclick="setPresence('${r.id}','sortie')">Sortie</button>
-              <button class="btn btn-ghost btn-sm" onclick="setPresence('${r.id}','unknown')">—</button>
+            <div style="display:flex;gap:.35rem;align-items:center">
+              <button onclick="setPresence('${r.id}','present')" style="width:28px;height:28px;border-radius:50%;border:2px solid #047857;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:.65rem;font-weight:700;transition:all .15s;background:${s==='present'?'#047857':'transparent'};color:${s==='present'?'#fff':'#047857'}">${s==='present'?'✓':'P'}</button>
+              <button onclick="setPresence('${r.id}','absent')" style="width:28px;height:28px;border-radius:50%;border:2px solid #b91c1c;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:.65rem;font-weight:700;transition:all .15s;background:${s==='absent'?'#b91c1c':'transparent'};color:${s==='absent'?'#fff':'#b91c1c'}">${s==='absent'?'✓':'A'}</button>
+              <button onclick="setPresence('${r.id}','sortie')" style="width:28px;height:28px;border-radius:50%;border:2px solid #92400e;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:.65rem;font-weight:700;transition:all .15s;background:${s==='sortie'?'#92400e':'transparent'};color:${s==='sortie'?'#fff':'#92400e'}">${s==='sortie'?'✓':'S'}</button>
+              <button onclick="setPresence('${r.id}','unknown')" style="width:20px;height:20px;border-radius:50%;border:1px solid var(--g300);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:.5rem;color:var(--g300);background:transparent;transition:all .15s">✕</button>
             </div>
           </td>
         </tr>`;
@@ -112,7 +112,7 @@ function renderPresenceTable() {
 
 function updateDateLabel() {
   const d = new Date(getDateStr() + 'T00:00:00');
-  document.getElementById('presenceDateLabel').textContent = d.toLocaleDateString('fr-FR', { weekday:'long', day:'numeric', month:'long', year:'numeric' });
+  document.getElementById('presenceDateLabel').textContent = d.toLocaleDateString('fr-FR', { day:'2-digit', month:'2-digit', year:'numeric' });
 }
 
 function openExportModal() {

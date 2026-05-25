@@ -206,7 +206,7 @@ function renderResidents() {
   }
 
   if (currentView === 'grid') {
-    container.innerHTML = `<div class="grid grid-4" style="gap:1rem">${list.map(residentCard).join('')}</div>`;
+    container.innerHTML = `<div class="grid grid-5" style="gap:.85rem">${list.map(residentCard).join('')}</div>`;
   } else {
     container.innerHTML = `<div class="table-wrap"><table><thead><tr><th>Résident</th><th>Âge / Naissance</th><th>Entrée</th><th>Chambre</th><th>Statut</th><th>Objectifs</th><th>Actions</th></tr></thead><tbody>${list.map(residentRow).join('')}</tbody></table></div>`;
   }
@@ -221,15 +221,15 @@ function statusBadge(s) {
 function residentCard(r) {
   const coverColor = r.color || 'var(--primary)';
   const photoEl = r.photo
-    ? `<img src="${r.photo}" class="res-card-photo" alt="${escHtml(r.prenom||'')} ${escHtml(r.nom||'')}"/>`
-    : `<div class="res-card-photo" style="background:${coverColor};display:flex;align-items:center;justify-content:center;font-weight:800;font-size:1.2rem;color:#fff">${initials(r.prenom,r.nom)}</div>`;
+    ? `<img src="${r.photo}" class="res-card-photo" style="width:80px;height:80px" alt="${escHtml(r.prenom||'')} ${escHtml(r.nom||'')}"/>`
+    : `<div class="res-card-photo" style="width:80px;height:80px;background:${coverColor};display:flex;align-items:center;justify-content:center;font-weight:800;font-size:1.4rem;color:#fff">${initials(r.prenom,r.nom)}</div>`;
 
   const docCount = ((DB.get(DB.keys.documents)||{})[r.id]||[]).length;
   const session = Auth.getSession();
   const canEdit = session && (session.role === 'admin' || session.role === 'moderator' || canEditResidents(session.userId));
   const todayPresences = (DB.get(DB.keys.presences)||{})[today()] || {};
   const presenceStatus = todayPresences[r.id] || (r.statut === 'sorti' ? 'sorti' : r.statut);
-  return `<div class="res-card" onclick="window.location.href='resident.html?id=${r.id}'">
+  return `<div class="res-card" style="border-color:${coverColor};background:${coverColor}08" onclick="window.location.href='resident.html?id=${r.id}'">
     <div class="res-card-cover" style="background:${coverColor}"></div>
     <div class="res-card-body">
       ${photoEl}
@@ -240,13 +240,7 @@ function residentCard(r) {
         ${docCount?`<span class="badge" style="background:#f0fdf4;color:#16a34a;border:1px solid #bbf7d0">📎 ${docCount}</span>`:''}
       </div>
     </div>
-    <div class="res-card-footer">
-      <span style="font-size:.72rem;color:var(--muted)">${r.entree ? 'Entré le '+formatDate(r.entree) : ''}</span>
-      <div style="display:flex;gap:.25rem">
-        <button class="btn btn-ghost btn-sm" style="font-size:.7rem;padding:.15rem .45rem" onclick="event.stopPropagation();window.location.href='dashboard-resident.html?id=${r.id}'" title="Dashboard résident">📊</button>
-        ${canEdit ? `<button class="btn btn-ghost btn-sm" style="font-size:.7rem;padding:.15rem .45rem" onclick="event.stopPropagation();quickEditResident('${r.id}')">✎ Modifier</button>` : ''}
-      </div>
-    </div>
+    <div class="res-card-footer"><span style="font-size:.7rem;color:var(--muted)">Entré le ${r.entree ? formatDate(r.entree) : '—'}</span></div>
   </div>`;
 }
 
@@ -267,7 +261,7 @@ function residentRow(r) {
     <td><div style="display:flex;gap:.3rem;flex-wrap:wrap">${resObjs.map(o=>`<span class="badge badge-gray">${escHtml(o)}</span>`).join('')||'—'}</div></td>
     <td><div class="table-actions">
       <button class="btn btn-ghost btn-sm" onclick="window.location.href='resident.html?id=${r.id}'">Voir</button>
-      <button class="btn btn-ghost btn-sm" onclick="window.location.href='dashboard-resident.html?id=${r.id}'" title="Dashboard">📊</button>
+      <button class="btn btn-ghost btn-sm" onclick="window.location.href='resident.html?id=${r.id}'" title="Dashboard">📊</button>
       ${canEdit ? `<button class="btn btn-ghost btn-sm" onclick="quickEditResident('${r.id}')">Modifier</button>` : ''}
     </div></td>
   </tr>`;

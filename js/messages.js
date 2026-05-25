@@ -5,6 +5,7 @@ function getUsers() { return DB.get(DB.keys.users) || []; }
 
 let currentConvId = null;
 let composeSelected = [];
+let composeTargetConv = null;
 
 // ── HELPERS ──
 function convId(userIds) {
@@ -106,9 +107,21 @@ function selectConv(id) {
 }
 
 // ── COMPOSE ──
-function openCompose() {
+function openCompose(convId) {
   composeSelected = [];
-  document.getElementById('composeOverlay').style.display = 'flex';
+  composeTargetConv = convId || null;
+  const overlay = document.getElementById('composeOverlay');
+  const title = document.querySelector('#composeOverlay h3');
+  const btn = document.getElementById('composeStartBtn');
+  if (convId) {
+    title.textContent = 'Ajouter des participants';
+    btn.textContent = 'Ajouter';
+  } else {
+    title.textContent = 'Nouveau message';
+    btn.textContent = 'Démarrer';
+  }
+  overlay.style.display = 'flex';
+  document.getElementById('composeBackdrop').style.display = 'block';
   document.getElementById('composeSearch').value = '';
   renderComposeUsers();
   setTimeout(() => document.getElementById('composeSearch')?.focus(), 100);
@@ -116,11 +129,18 @@ function openCompose() {
 
 function closeCompose() {
   document.getElementById('composeOverlay').style.display = 'none';
+  document.getElementById('composeBackdrop').style.display = 'none';
+  composeTargetConv = null;
 }
 
 function renderComposeUsers() {
   const session = Auth.getSession();
-  const users = getUsers().filter(u => String(u.id) !== String(session.userId));
+  let users = getUsers().filter(u => String(u.id) !== String(session.userId));
+  // If adding to existing conversation, exclude current participants
+  if (composeTargetConv) {
+    const existing = getConvParticipants(composeTargetConv).map(String);
+    users = users.filter(u => !existing.includes(String(u.id)));
+  }
   const q = (document.getElementById('composeSearch')?.value || '').trim().toLowerCase();
 
   const filtered = q
@@ -131,12 +151,12 @@ function renderComposeUsers() {
     : users;
 
   let html = filtered.map(u => {
-    const sel = composeSelected.includes(String(u.id));
+    const sel = composeSelected[0] === String(u.id);
     const initials = ((u.prenom||'')[0]||'') + ((u.nom||'')[0]||'');
     const name = `${u.prenom||''} ${u.nom||''}`.trim() || u.username;
     const role = u.fonction || (u.role==='admin' ? 'Administrateur' : 'Utilisateur');
     return `<div class="chat-overlay-user" onclick="toggleComposeUser('${u.id}')">
-      <div class="ck ${sel?'checked':''}"></div>
+      <div style="width:20px;height:20px;border-radius:50%;border:2px solid ${sel?'var(--blue)':'#c7c7cc'};display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all .1s;background:${sel?'var(--blue)':'transparent'}">${sel?'<div style="width:8px;height:8px;border-radius:50%;background:#fff"></div>':''}</div>
       <div class="avatar" style="background:${u.role==='admin'?'#5856d6':'#007aff'}">${initials||'?'}</div>
       <div class="chat-overlay-user-info">
         <div class="chat-overlay-user-name">${escHtml(name)}</div>
@@ -154,21 +174,48 @@ function renderComposeUsers() {
 
 function toggleComposeUser(id) {
   id = String(id);
-  const idx = composeSelected.indexOf(id);
-  if (idx === -1) composeSelected.push(id);
-  else composeSelected.splice(idx, 1);
+  if (composeSelected[0] === id) return;
+  composeSelected = [id];
   renderComposeUsers();
 }
 
 function startComposeConv() {
   if (!composeSelected.length) return;
   const session = Auth.getSession();
+  if (composeTargetConv) {
+    addUsersToConv(composeTargetConv, composeSelected);
+    closeCompose();
+    renderConvs();
+    renderChat();
+    return;
+  }
   const allIds = [String(session.userId), ...composeSelected];
   currentConvId = getOrCreateConv(allIds);
   closeCompose();
   renderConvs();
   renderChat();
   document.getElementById('chatInput').focus();
+}
+
+function addUsersToConv(convId, newUserIds) {
+  const convs = DB.get('ftr_conversations') || {};
+  const conv = convs[convId];
+  if (!conv) return;
+  const oldUserIds = conv.userIds.map(String);
+  const allIds = [...new Set([...oldUserIds, ...newUserIds.map(String)])];
+  const newConvId = convId(allIds);
+  if (newConvId === convId) return; // no change
+  // Create new conversation entry
+  convs[newConvId] = { id: newConvId, userIds: allIds, createdAt: conv.createdAt };
+  // Update all messages to new convId
+  const msgs = DB.get(DB.keys.messages) || [];
+  msgs.forEach(m => { if (m.convId === convId) m.convId = newConvId; });
+  DB.set(DB.keys.messages, msgs);
+  // Remove old conversation
+  delete convs[convId];
+  DB.set('ftr_conversations', convs);
+  currentConvId = newConvId;
+  toast('Participant ajouté');
 }
 
 // ── RENDER CHAT ──
@@ -183,6 +230,8 @@ function renderChat() {
 
   if (!currentConvId) {
     headerEl.style.display = 'none';
+    const addBtn = document.getElementById('addParticipantBtn');
+    if (addBtn) addBtn.style.display = 'none';
     document.getElementById('chatInput').disabled = true;
     document.getElementById('sendBtn').disabled = true;
     msgsEl.innerHTML = `<div class="chat-empty">
@@ -199,6 +248,9 @@ function renderChat() {
 
   const participants = getConvParticipants(currentConvId);
   const otherIds = participants.filter(id => String(id) !== String(session.userId));
+  // Show add-participant button
+  const addBtn = document.getElementById('addParticipantBtn');
+  if (addBtn) addBtn.style.display = '';
   const users = getUsers();
 
   let name, avatar, color, status;
@@ -229,7 +281,8 @@ function renderChat() {
   headerName.textContent = name;
   headerStatus.textContent = status;
 
-  const msgs = getConvMessages(currentConvId);
+  const allMsgs = getMessages();
+  const msgs = allMsgs.filter(m => m.convId === currentConvId).sort((a,b) => new Date(a.date) - new Date(b.date));
   if (!msgs.length) {
     msgsEl.innerHTML = `<div class="chat-empty"><p style="color:var(--muted)">Aucun message</p></div>`;
     updateConvCount();
@@ -239,7 +292,7 @@ function renderChat() {
   let currentDate = '';
   let html = '';
   for (const m of msgs) {
-    const msgDate = new Date(m.date).toLocaleDateString('fr-FR', { day:'numeric', month:'long', year:'numeric' });
+    const msgDate = new Date(m.date).toLocaleDateString('fr-FR', { day:'2-digit', month:'2-digit', year:'numeric' });
     if (msgDate !== currentDate) {
       currentDate = msgDate;
       html += `<div class="chat-date-sep">${currentDate}</div>`;
@@ -249,6 +302,21 @@ function renderChat() {
     const authorName = author ? `${author.prenom||''} ${author.nom||''}`.trim() || author.username : 'Inconnu';
     const time = new Date(m.date).toLocaleTimeString('fr-FR', { hour:'2-digit', minute:'2-digit' });
 
+    // Readers (excluding author)
+    const readers = (m.readBy || []).filter(rid => String(rid) !== String(m.from));
+    const readerAvatars = readers.length > 0 ? `<div style="display:flex;gap:2px;margin-top:4px;justify-content:${isOwn?'flex-end':'flex-start'}">
+      ${readers.map(rid => {
+        const ru = users.find(x => String(x.id) === String(rid));
+        const rInit = ((ru?.prenom||'')[0]||'') + ((ru?.nom||'')[0]||'') || '?';
+        const rColor = ru?.fonction ? (() => {
+          const fc = DB.get(DB.keys.fonctionColors) || [];
+          const f = fc.find(x => ru.fonction.toLowerCase().includes(x.fonction.toLowerCase()));
+          return f ? f.color : '#8e8e93';
+        })() : '#8e8e93';
+        return `<div style="width:16px;height:16px;border-radius:50%;background:${rColor};color:#fff;display:flex;align-items:center;justify-content:center;font-size:.45rem;font-weight:700;border:1.5px solid ${isOwn?'#007aff':'#e5e5ea'}" title="${escHtml(ru?.['prenom']||'') + ' ' + escHtml(ru?.['nom']||'')}">${rInit}</div>`;
+      }).join('')}
+    </div>` : '';
+
     html += `<div class="chat-row ${isOwn ? 'own' : 'other'}">
       <div class="chat-bubble">
         ${!isOwn && otherIds.length > 1 ? `<div class="chat-bubble-author">${escHtml(authorName)}</div>` : ''}
@@ -256,6 +324,7 @@ function renderChat() {
           <span>${escHtml(m.body)}</span>
           <span class="chat-bubble-time">${time}</span>
         </div>
+        ${readerAvatars}
       </div>
     </div>`;
 
@@ -264,9 +333,15 @@ function renderChat() {
       m.readBy.push(session.userId);
     }
   }
-  setMessages(getMessages());
+  setMessages(allMsgs);
+  renderConvs();
   msgsEl.innerHTML = html;
   msgsEl.scrollTop = msgsEl.scrollHeight;
+  // Store unread count for accueil
+  const sessionId = session?.userId;
+  const allM = getMessages();
+  const unreadTotal = allM.filter(m => String(m.from) !== String(sessionId) && !(m.readBy || []).map(String).includes(String(sessionId))).length;
+  localStorage.setItem('ftr_notif_msg_unread_' + sessionId, unreadTotal);
   updateConvCount();
 }
 
@@ -275,6 +350,7 @@ function updateConvCount() {
   const allMsgs = getMessages();
   const unread = allMsgs.filter(m => m.from !== session.userId && !m.readBy?.includes(session.userId)).length;
   document.getElementById('convCount').textContent = unread ? `${unread} non lu${unread>1?'s':''}` : '';
+  localStorage.setItem('ftr_notif_msg_unread_' + session.userId, unread);
 }
 
 function sendChatMsg() {
@@ -324,7 +400,7 @@ function formatConvTime(date) {
     return d.toLocaleTimeString('fr-FR', { hour:'2-digit', minute:'2-digit' });
   }
   if (diff < 172800000) return 'Hier';
-  return d.toLocaleDateString('fr-FR', { day:'numeric', month:'short' });
+  return d.toLocaleDateString('fr-FR', { day:'2-digit', month:'2-digit' });
 }
 
 // ── AI Assist Message ──
@@ -396,6 +472,17 @@ document.addEventListener('DOMContentLoaded', () => {
   if (chatInput) {
     chatInput.addEventListener('input', () => autoResizeTextarea(chatInput));
   }
+  // Migrate old messages: ensure readBy exists on all messages
+  const session = Auth.getSession();
+  let allMsgs = getMessages();
+  let changed = false;
+  allMsgs.forEach(m => {
+    if (!Array.isArray(m.readBy)) {
+      m.readBy = [];
+      changed = true;
+    }
+  });
+  if (changed) setMessages(allMsgs);
   renderConvs();
   renderChat();
 });

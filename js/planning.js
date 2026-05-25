@@ -58,7 +58,7 @@ function renderWeek() {
         ${days.map(d => {
           const dayEvents = events.filter(e => eventOnDay(e, dateStr(d)) && (e.heure||e.time) && parseInt(e.heure||e.time) === h);
           return `<div style="border-left:1px solid var(--border);border-top:1px solid var(--g100);padding:2px;position:relative;cursor:pointer" onclick="quickAddEvent('${dateStr(d)}','${h}:00')">
-            ${dayEvents.map(ev => `<div class="cal-event" style="background:${escHtml(ev.color)||TYPE_COLORS[ev.type]||'#3b82f6'}" onclick="event.stopPropagation();editEvent('${ev.id}')" title="${ev.residentName?escHtml(ev.residentName)+' — ':''}${escHtml(ev.titre)}">${ev.residentName?'<span style="font-weight:400;opacity:.85">'+escHtml(ev.residentName)+'</span> ':''}${escHtml(ev.titre)}</div>`).join('')}
+            ${dayEvents.map(ev => `<div class="cal-event" style="background:${escHtml(ev.color)||TYPE_COLORS[ev.type]||'#3b82f6'}" onclick="event.stopPropagation();editEvent('${ev.id}')" title="${ev.residentName?escHtml(ev.residentName)+' — ':''}${escHtml(ev.titre)}${ev.vehicule?' — 🚗 '+escHtml(ev.vehicule):''}">${ev.vehicule?'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:11px;height:11px;vertical-align:middle;margin-right:2px"><path d="M5 17h14M5 17a2 2 0 0 1-2-2V9a2 2 0 0 1 2-2h1l2-3h8l2 3h1a2 2 0 0 1 2 2v6a2 2 0 0 1-2 2M5 17a2 2 0 1 0 4 0M19 17a2 2 0 1 0-4 0"/></svg>':''}${ev.residentName?'<span style="font-weight:400;opacity:.85">'+escHtml(ev.residentName)+'</span> ':''}${escHtml(ev.titre)}</div>`).join('')}
           </div>`;
         }).join('')}
       </div>`).join('')}
@@ -90,7 +90,7 @@ function renderMonth() {
         const dayEvs = events.filter(e => eventOnDay(e, dateStr(d)));
         return `<div style="min-height:90px;padding:.4rem;border:1px solid var(--border);${isTod?'background:#eff6ff':''}" onclick="quickAddEvent('${dateStr(d)}','')">
           <div style="font-size:.8rem;font-weight:700;${isTod?'background:var(--blue);color:#fff;width:22px;height:22px;border-radius:50%;display:flex;align-items:center;justify-content:center;margin-bottom:3px':'color:var(--text);margin-bottom:3px'}">${d.getDate()}</div>
-          ${dayEvs.slice(0,3).map(ev=>`<div style="background:${escHtml(ev.color)||TYPE_COLORS[ev.type]||'#3b82f6'};color:#fff;border-radius:3px;padding:1px 5px;font-size:.68rem;font-weight:600;cursor:pointer;margin-bottom:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis" onclick="event.stopPropagation();editEvent('${ev.id}')">${ev.residentName?escHtml(ev.residentName)+' ':' '}${escHtml(ev.titre)}</div>`).join('')}
+          ${dayEvs.slice(0,3).map(ev=>`<div style="background:${escHtml(ev.color)||TYPE_COLORS[ev.type]||'#3b82f6'};color:#fff;border-radius:3px;padding:1px 5px;font-size:.68rem;font-weight:600;cursor:pointer;margin-bottom:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis" onclick="event.stopPropagation();editEvent('${ev.id}')">${ev.vehicule?'🚗 ':''}${ev.residentName?escHtml(ev.residentName)+' ':' '}${escHtml(ev.titre)}</div>`).join('')}
           ${dayEvs.length>3?`<div style="font-size:.68rem;color:var(--muted)">+${dayEvs.length-3} autres</div>`:''}
         </div>`;
       }).join('')}
@@ -111,7 +111,7 @@ function renderListView() {
     return;
   }
   tbody.innerHTML = events.map(ev => `<tr>
-    <td><span style="display:inline-flex;align-items:center;gap:.4rem"><span style="width:10px;height:10px;border-radius:50%;background:${escHtml(ev.color)||TYPE_COLORS[ev.type]||'#3b82f6'};flex-shrink:0"></span><strong>${ev.residentName?escHtml(ev.residentName)+' — ':''}${escHtml(ev.titre)}</strong></span></td>
+    <td><span style="display:inline-flex;align-items:center;gap:.4rem"><span style="width:10px;height:10px;border-radius:50%;background:${escHtml(ev.color)||TYPE_COLORS[ev.type]||'#3b82f6'};flex-shrink:0"></span><strong>${ev.vehicule?'🚗 ':''}${ev.residentName?escHtml(ev.residentName)+' — ':''}${escHtml(ev.titre)}</strong></span></td>
     <td>${escHtml(ev.residentName)||'Tous'}</td>
     <td>${ev.date ? formatDate(ev.date) : '—'}</td>
     <td>${ev.heure||ev.time||'—'}</td>
@@ -140,7 +140,16 @@ function quickAddEvent(date, heure) {
   document.getElementById('btnDeleteEvent').style.display = 'none';
   document.getElementById('modalEventTitle').textContent = 'Nouvel événement';
   document.getElementById('eventId').value = '';
+  resetVehiculeFields();
   openModal('modalEvent');
+}
+
+function resetVehiculeFields() {
+  const cb = document.getElementById('evVehiculeCheck');
+  if (cb) { cb.checked = false; document.getElementById('evVehiculeFields').style.display = 'none'; }
+  const veh = document.getElementById('evVehicule'); if (veh) veh.value = '';
+  const dest = document.getElementById('evDestination'); if (dest) dest.value = '';
+  const mot = document.getElementById('evMotif'); if (mot) mot.value = '';
 }
 
 function editEvent(id) {
@@ -158,6 +167,14 @@ function editEvent(id) {
   document.getElementById('evColor').value = ev.color || '#3b82f6';
   document.getElementById('evDesc').value = ev.desc || '';
   document.getElementById('btnDeleteEvent').style.display = '';
+  const cb = document.getElementById('evVehiculeCheck');
+  const hasVeh = ev.vehicule;
+  if (cb) cb.checked = !!hasVeh;
+  const vf = document.getElementById('evVehiculeFields');
+  if (vf) vf.style.display = hasVeh ? 'flex' : 'none';
+  const veh = document.getElementById('evVehicule'); if (veh) veh.value = ev.vehicule || '';
+  const dest = document.getElementById('evDestination'); if (dest) dest.value = ev.destination || '';
+  const mot = document.getElementById('evMotif'); if (mot) mot.value = ev.motif || '';
   openModal('modalEvent');
 }
 
@@ -179,6 +196,22 @@ function saveEvent() {
     color: document.getElementById('evColor').value,
     desc: document.getElementById('evDesc').value.trim()
   };
+  const vehCb = document.getElementById('evVehiculeCheck');
+  if (vehCb && vehCb.checked) {
+    const vehicule = document.getElementById('evVehicule').value.trim();
+    const destination = document.getElementById('evDestination').value.trim();
+    if (!vehicule || !destination) {
+      toast('Veuillez remplir le véhicule et la destination', 'error');
+      return;
+    }
+    data.vehicule = vehicule;
+    data.destination = destination;
+    data.motif = document.getElementById('evMotif').value.trim();
+  } else {
+    delete data.vehicule;
+    delete data.destination;
+    delete data.motif;
+  }
   let events = DB.get(DB.keys.planning) || [];
   const id = document.getElementById('eventId').value;
   if (id) { events = events.map(e => e.id === id ? {...e,...data} : e); toast('Événement mis à jour'); }
@@ -208,9 +241,17 @@ function populateResidentSelect() {
   });
 }
 
+function populateVehiculeList() {
+  const list = document.getElementById('evVehiculeList');
+  if (!list) return;
+  const vehicules = DB.get(DB.keys.vehicules) || [];
+  list.innerHTML = vehicules.map(v => `<option value="${escHtml(v)}"/>`).join('');
+}
+
 document.addEventListener('DOMContentLoaded', () => {
   document.getElementById('evDate').value = today();
   populateResidentSelect();
+  populateVehiculeList();
   render();
   document.getElementById('prevBtn').onclick = () => navigate(-1);
   document.getElementById('nextBtn').onclick = () => navigate(1);

@@ -226,8 +226,8 @@ function closeAllModals() {
 // ── SIDEBAR ACTIVE ──
 function setActiveNav() {
   const path = location.pathname.split('/').pop() || 'dashboard.html';
-  document.querySelectorAll('.nav-item[data-page]').forEach(a => {
-    a.classList.toggle('active', a.dataset.page === path);
+  document.querySelectorAll('.menu-popup-item').forEach(a => {
+    a.classList.toggle('active', a.getAttribute('href') === path);
   });
 }
 
@@ -247,11 +247,11 @@ function shortName(fullName) {
 function today() { return new Date().toISOString().slice(0,10); }
 function formatDate(d) {
   if (!d) return '—';
-  return new Date(d).toLocaleDateString('fr-FR', { weekday:'long', day:'2-digit', month:'long', year:'numeric' });
+  return new Date(d).toLocaleDateString('fr-FR', { day:'2-digit', month:'2-digit', year:'numeric' });
 }
 function formatDateTime(d) {
   if (!d) return '—';
-  return new Date(d).toLocaleDateString('fr-FR', { day:'2-digit', month:'short', year:'numeric', hour:'2-digit', minute:'2-digit' });
+  return new Date(d).toLocaleDateString('fr-FR', { day:'2-digit', month:'2-digit', year:'numeric', hour:'2-digit', minute:'2-digit' });
 }
 function age(dob) {
   if (!dob) return '—';
@@ -272,18 +272,143 @@ function confirmDialog(msg, cb) {
   if (confirm(msg)) cb();
 }
 
-// ── MOBILE SIDEBAR TOGGLE ──
-function initSidebar() {
-  const btn = document.getElementById('sidebarToggle');
-  const sidebar = document.querySelector('.sidebar');
-  if (btn && sidebar) {
-    btn.addEventListener('click', () => sidebar.classList.toggle('open'));
-    document.addEventListener('click', e => {
-      if (sidebar.classList.contains('open') && !sidebar.contains(e.target) && !btn.contains(e.target)) {
-        sidebar.classList.remove('open');
-      }
-    });
+// ── RENDER USER INFO ──
+function renderUserInfo() {
+  const session = Auth.getSession();
+  const settings = DB.get(DB.keys.settings) || {};
+  const nameEl = document.getElementById('headerUserName');
+  const avEl = document.getElementById('headerUserAvatar');
+  const name = session ? [session.prenom, session.nom].filter(Boolean).join(' ') || session.username : 'Utilisateur';
+  if (nameEl) nameEl.textContent = name;
+  if (avEl) avEl.textContent = session ? (initials(session.prenom || '', session.nom || '') || session.username?.[0]?.toUpperCase() || '?') : '?';
+}
+
+// ── MENU 9 POINTS ──
+function initMenuPopup() {
+  const header = document.querySelector('.header');
+  if (!header) return;
+
+  // Get reference to the title wrapper before inserting the button
+  const titleWrap = header.firstElementChild;
+
+  // Add 9-dots button as first element in header (stays on left)
+  // Skip the 9-dots button on the accueil page (modules already displayed)
+  const isAccueil = location.pathname.endsWith('accueil.html');
+  if (!isAccueil && !document.getElementById('menuDotsBtn')) {
+    // Home button (redirects to accueil)
+    const homeBtn = document.createElement('a');
+    homeBtn.id = 'homeBtn';
+    homeBtn.className = 'menu-dots-btn';
+    homeBtn.href = 'accueil.html';
+    homeBtn.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12l9-9 9 9"/><path d="M5 10v10a1 1 0 0 0 1 1h3a1 1 0 0 0 1-1v-4a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v4a1 1 0 0 0 1 1h3a1 1 0 0 0 1-1V10"/></svg>';
+    header.insertBefore(homeBtn, header.firstChild);
+
+    // 9-dots button next to home
+    const dotsBtn = document.createElement('button');
+    dotsBtn.id = 'menuDotsBtn';
+    dotsBtn.className = 'menu-dots-btn';
+    dotsBtn.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="6" cy="6" r="1.5"/><circle cx="12" cy="6" r="1.5"/><circle cx="18" cy="6" r="1.5"/><circle cx="6" cy="12" r="1.5"/><circle cx="12" cy="12" r="1.5"/><circle cx="18" cy="12" r="1.5"/><circle cx="6" cy="18" r="1.5"/><circle cx="12" cy="18" r="1.5"/><circle cx="18" cy="18" r="1.5"/></svg>';
+    header.insertBefore(dotsBtn, homeBtn.nextSibling);
   }
+
+  // French clock display (all pages)
+  if (!document.getElementById('headerClock')) {
+    const clock = document.createElement('span');
+    clock.id = 'headerClock';
+    clock.style.cssText = 'font-size:1.1rem;font-weight:700;color:var(--g700);margin-left:.75rem;font-variant-numeric:tabular-nums;letter-spacing:.02em';
+    function updateClock() {
+      clock.textContent = new Date().toLocaleTimeString('fr-FR', { hour:'2-digit', minute:'2-digit' });
+    }
+    updateClock();
+    setInterval(updateClock, 1000);
+    const ref = document.getElementById('menuDotsBtn') || document.querySelector('.header-right');
+    if (ref) header.insertBefore(clock, ref.nextSibling);
+    else header.appendChild(clock);
+  }
+
+  // Centered site brand
+  if (!document.getElementById('headerBrand')) {
+    const brand = document.createElement('div');
+    brand.id = 'headerBrand';
+    brand.textContent = 'INTERNALIS';
+    brand.style.cssText = 'position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);font-family:\'Playfair Display\',serif;font-size:1.1rem;font-weight:900;color:#1e40af;letter-spacing:.16em;text-transform:uppercase;pointer-events:none';
+    header.appendChild(brand);
+  }
+
+  // Add user avatar to header-right
+  const hr = header.querySelector('.header-right');
+  if (hr) {
+    if (!document.getElementById('headerUserBox')) {
+      const session = Auth.getSession();
+      const name = session ? [session.prenom, session.nom].filter(Boolean).join(' ') || session.username : 'Utilisateur';
+      const initial = session ? (initials(session.prenom || '', session.nom || '') || session.username?.[0]?.toUpperCase() || '?') : '?';
+      const userBox = document.createElement('div');
+      userBox.id = 'headerUserBox';
+      userBox.style.cssText = 'display:flex;align-items:center;gap:.5rem;margin-left:1rem';
+      userBox.innerHTML = `<span id="headerUserName" style="font-size:.78rem;font-weight:600;color:var(--g700)">${name}</span>
+        <div id="headerUserAvatar" style="width:32px;height:32px;border-radius:50%;background:var(--accent);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:.75rem">${initial}</div>`;
+      hr.appendChild(userBox);
+    }
+  }
+
+  // Create popup if not exists (skip on accueil page)
+  if (!isAccueil && !document.getElementById('menuPopup')) {
+    const popup = document.createElement('div');
+    popup.id = 'menuPopup';
+    popup.className = 'menu-popup';
+    popup.innerHTML = `<div class="menu-popup-backdrop" id="menuPopupBackdrop"></div>
+      <div class="menu-popup-body" id="menuPopupBody"></div>`;
+    document.body.appendChild(popup);
+
+    const modules = [
+      { page:'dashboard.html', color:'#4f46e5', icon:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>', label:'Tableau de bord' },
+      { page:'residents.html', color:'#0891b2', icon:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>', label:'Résidents' },
+      { page:'journal.html', color:'#059669', icon:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>', label:'Journal de bord' },
+      { page:'ppe.html', color:'#dc2626', icon:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>', label:'Avenants' },
+      { page:'planning.html', color:'#d97706', icon:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>', label:'Planning' },
+      { page:'presences.html', color:'#16a34a', icon:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>', label:'Présences' },
+      { page:'vehicules.html', color:'#6366f1', icon:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 16H9m10 0h3v-3.15a1 1 0 0 0-.84-.99L16 11l-2.7-3.6a1 1 0 0 0-.8-.4H5.5a1 1 0 0 0-.8.4L2 11v5h2m10 1.5a1.5 1.5 0 0 1-3 0m3 0a1.5 1.5 0 0 0-3 0m3 0h3m-3 0H9m6-6V7a1 1 0 0 0-1-1h-3a1 1 0 0 0-1 1v3M6 17.5a1.5 1.5 0 0 1-3 0m3 0a1.5 1.5 0 0 0-3 0"/></svg>', label:'Véhicules' },
+      { page:'incidents.html', color:'#e11d48', icon:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>', label:'Incidents' },
+      { page:'messages.html', color:'#0284c7', icon:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>', label:'Messages' },
+      { page:'repertoire.html', color:'#7c3aed', icon:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>', label:'Répertoire' },
+      { page:'admin.html', color:'#78716c', icon:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.07 4.93l-1.41 1.41M4.93 4.93l1.41 1.41M12 2v2M12 20v2M2 12h2M20 12h2M19.07 19.07l-1.41-1.41M4.93 19.07l1.41-1.41"/></svg>', label:'Administration', admin:true }
+    ];
+
+    const body = document.getElementById('menuPopupBody');
+    const isAdmin = Auth.isAdmin();
+    body.innerHTML = modules.map(m => {
+      if (m.admin && !isAdmin) return '';
+      return `<a href="${m.page}" class="menu-popup-item">
+        <span class="menu-popup-icon" style="background:${m.color}20;color:${m.color}">${m.icon}</span>
+        <span>${m.label}</span>
+      </a>`;
+    }).join('');
+
+    document.getElementById('menuDotsBtn').onclick = () => {
+      popup.classList.add('open');
+      positionPopup();
+    };
+    document.getElementById('menuPopupBackdrop').onclick = () => popup.classList.remove('open');
+  }
+}
+
+function positionPopup() {
+  const dotsBtn = document.getElementById('menuDotsBtn');
+  const popup = document.getElementById('menuPopup');
+  const body = document.getElementById('menuPopupBody');
+  if (!dotsBtn || !popup || !body) return;
+  const rect = dotsBtn.getBoundingClientRect();
+  const gap = 8;
+  let top = rect.bottom + gap;
+  let left = rect.right - body.offsetWidth;
+  if (left < 8) left = 8;
+  if (top + body.offsetHeight > window.innerHeight) {
+    top = rect.top - gap - body.offsetHeight;
+  }
+  body.style.position = 'fixed';
+  body.style.top = top + 'px';
+  body.style.left = left + 'px';
+  body.style.marginRight = '0';
 }
 
 // ── CLOSE MODAL ON OVERLAY CLICK ──
@@ -296,20 +421,6 @@ function initModals() {
   });
 }
 
-// ── RENDER USER INFO IN SIDEBAR ──
-function renderUserInfo() {
-  const session = Auth.getSession();
-  const settings = DB.get(DB.keys.settings) || {};
-  const nameEl = document.getElementById('sidebarUserName');
-  const roleEl = document.getElementById('sidebarUserRole');
-  const avEl = document.getElementById('sidebarAvatar');
-  const etabEl = document.getElementById('sidebarEtab');
-  const name = session ? [session.prenom, session.nom].filter(Boolean).join(' ') || session.username : 'Utilisateur';
-  if (nameEl) nameEl.textContent = name;
-  if (roleEl) roleEl.textContent = session?.role === 'admin' ? 'Administrateur' : 'Éducateur';
-  if (avEl) avEl.textContent = session ? (initials(session.prenom || '', session.nom || '') || session.username?.[0]?.toUpperCase() || '?') : '?';
-  if (etabEl) etabEl.textContent = settings.etablissement || 'Mon Établissement';
-}
 
 // ── STATS FOR DASHBOARD ──
 function getStats() {
@@ -485,7 +596,7 @@ document.addEventListener('DOMContentLoaded', () => {
   initDefaults();
   applyBranding();
   setActiveNav();
-  initSidebar();
+  initMenuPopup();
   initModals();
   renderUserInfo();
   if (!Auth.isAdmin()) {

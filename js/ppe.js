@@ -188,7 +188,7 @@ function renderSectionCard(p, domaine) {
           </div>
         </div>`).join('')}
       </div>` : ''}
-      ${s.objectifs.length ? `<button class="btn btn-ghost btn-sm" style="align-self:flex-start" onclick="addSectionObj('${p.id}','${domaine.id}')">+ Ajouter une ligne</button>` : ''}
+      <button class="btn btn-ghost btn-sm" style="align-self:flex-start" onclick="addSectionObj('${p.id}','${domaine.id}')">+ Ajouter une ligne</button>
       <div style="margin-top:.25rem">
         <label style="font-size:.7rem;color:var(--muted);font-weight:600">Expression et souhaits du résident</label>
         <div style="display:flex;gap:.3rem;margin-bottom:.25rem">
@@ -314,9 +314,12 @@ function addSectionObj(ppeId, domId) {
   const p = list.find(x => x.id === ppeId);
   if (!p) return;
   if (!p.sections[domId]) p.sections[domId] = emptySection();
+  if (!p.sections[domId].objectifs) p.sections[domId].objectifs = [];
   p.sections[domId].objectifs.push({ objectif:'', moyens:'', echeance:'', evaluation:'' });
   savePpe(list);
   renderAvenantFull(p);
+  const bodyEl = document.getElementById('sectionBody_'+ppeId+'_'+domId);
+  if (bodyEl) bodyEl.style.display = '';
 }
 
 function updateSectionObjField(ppeId, domId, idx, field, value) {
@@ -478,28 +481,30 @@ function renderAvenant() {
     return;
   }
 
-  container.innerHTML = list.map(p => {
-    const totalObj = Object.values(p.sections||{}).reduce((a, s) => a + (s.objectifs?.length||0), 0);
-    return `<div class="ppe-card">
-      <div class="top">
-        <div class="info">
-          <h3>Avenant · ${escHtml(p.residentName)}</h3>
-          <div class="meta">
-            <span>📅 Rédaction : ${p.dateRedaction||'—'} · Rév. : ${p.dateRevision||'—'}</span>
-            <span>✍️ ${escHtml(p.createdBy)}</span>
-          </div>
+  const residents = DB.get(DB.keys.residents) || [];
+  container.innerHTML = `<div class="grid grid-5" style="gap:.75rem">${list.map(p => {
+    const r = residents.find(x => x.id === p.residentId);
+    const coverColor = r?.color || (p.statut === 'actif' ? '#16a34a' : p.statut === 'termine' ? '#ef4444' : '#94a3b8');
+    const photoEl = r?.photo
+      ? `<img src="${r.photo}" class="res-card-photo" alt="${escHtml(r.prenom||'')} ${escHtml(r.nom||'')}"/>`
+      : `<div class="res-card-photo" style="background:${coverColor};display:flex;align-items:center;justify-content:center;font-weight:800;font-size:1.2rem;color:#fff">${initials(r?.prenom||'', r?.nom||'') || (p.residentName||'?')[0].toUpperCase()}</div>`;
+    const ageStr = r?.dob ? (() => { const a = Math.floor((Date.now()-new Date(r.dob).getTime())/31557600000); return a+' ans'; })() : '';
+    return `<div class="res-card" style="border-color:${coverColor};background:${coverColor}08" onclick="openAvenant('${p.id}')">
+      <div class="res-card-cover" style="background:${coverColor}"></div>
+      <div class="res-card-body">
+        ${photoEl}
+        <div class="res-card-name">${escHtml(p.residentName)}</div>
+        <div class="res-card-meta">${ageStr}${r?.chambre ? ' · Ch. '+escHtml(r.chambre) : ''}${p.referent ? ' · Réf. '+escHtml(p.referent) : ''}</div>
+        <div style="display:flex;gap:.35rem;flex-wrap:wrap;justify-content:center;margin-top:.25rem">
+          <span class="badge-ppe ${p.statut}">${STATUT_PPE_LABEL[p.statut]||p.statut}</span>
+          <span class="badge badge-blue" style="font-size:.65rem">📅 ${formatDate(p.dateRedaction)}</span>
         </div>
-        <span class="badge-ppe ${p.statut}">${STATUT_PPE_LABEL[p.statut]||p.statut}</span>
       </div>
-      <div style="font-size:.8rem;color:var(--muted);margin:.25rem 0">${totalObj} objectifs · 9 domaines</div>
-      <div style="display:flex;gap:.4rem;flex-wrap:wrap;margin-top:.25rem">
-        <button class="btn btn-primary btn-sm" onclick="openAvenant('${p.id}')">Ouvrir</button>
-        <button class="btn btn-ghost btn-sm" onclick="editAvenant('${p.id}')">Modifier infos</button>
-        <button class="btn btn-ghost btn-sm" onclick="changeAvenantStatut('${p.id}')">${p.statut==='brouillon'?'Activer':p.statut==='actif'?'Terminer':'—'}</button>
-        <button class="btn btn-ghost btn-sm" onclick="deleteAvenant('${p.id}')" style="color:#dc2626">Supprimer</button>
+      <div class="res-card-footer" style="justify-content:center">
+        <span style="font-size:.7rem;color:var(--muted)">Avenant · ${formatDate(p.dateRedaction)}</span>
       </div>
     </div>`;
-  }).join('');
+  }).join('')}</div>`;
 }
 
 function editAvenant(id) {
@@ -558,9 +563,25 @@ function resetAvenantModal() {
 
 document.addEventListener('DOMContentLoaded', () => {
   initPpe();
+  // Track visit for notifications
+  const session = Auth.getSession();
+  if (session) localStorage.setItem('ftr_last_visit_ppe_' + session.userId, Date.now());
   document.getElementById('modalAvenant')?.addEventListener('open', resetAvenantModal);
   ['searchAvenant','filterResidentAvenant','filterStatutAvenant'].forEach(id => {
     const el = document.getElementById(id);
     if (el) el.addEventListener('input', renderAvenant);
   });
+  // Open specific avenant from URL param
+  const params = new URLSearchParams(window.location.search);
+  const avenantId = params.get('id');
+  if (avenantId) {
+    const ppe = getPpe();
+    const target = ppe.find(p => p.id === avenantId);
+    if (target) {
+      const resFilter = document.getElementById('filterResidentAvenant');
+      if (resFilter) resFilter.value = target.residentId || '';
+      renderAvenant();
+      setTimeout(() => openAvenant(avenantId), 300);
+    }
+  }
 });

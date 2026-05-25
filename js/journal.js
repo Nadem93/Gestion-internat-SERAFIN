@@ -86,9 +86,10 @@ function renderReplies(e) {
 
 function selectEntry(id) {
   selectedEntryId = id;
-  const entries = DB.get(DB.keys.journal) || [];
-  const e = entries.find(x => x.id === id);
-  if (!e) return;
+  let entries = DB.get(DB.keys.journal) || [];
+  const eIdx = entries.findIndex(x => x.id === id);
+  if (eIdx === -1) return;
+  const e = entries[eIdx];
   const cats = DB.get(DB.keys.categories) || [];
   const objs = DB.get(DB.keys.objectives) || [];
   const cat = cats.find(c => String(c.id) === String(e.categorie));
@@ -96,6 +97,37 @@ function selectEntry(id) {
   const vis = { equipe: 'Équipe uniquement', tous: 'Tous', confidentiel: 'Confidentiel' };
   const session = Auth.getSession();
   const userName = session ? [session.prenom, session.nom].filter(Boolean).join(' ') || session.username : 'Utilisateur';
+
+  // Mark as read
+  if (session && (!e.readBy || !e.readBy.includes(session.userId))) {
+    if (!e.readBy) e.readBy = [];
+    e.readBy.push(session.userId);
+    entries[eIdx] = e;
+    DB.set(DB.keys.journal, entries);
+  }
+
+  // Build reader avatars
+  const users = DB.get(DB.keys.users) || [];
+  const readerHtml = (e.readBy || []).length > 0 ? `
+    <div style="margin-top:1rem;padding-top:.75rem;border-top:1px solid var(--border)">
+      <div style="font-size:.68rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);margin-bottom:.5rem">Vu par</div>
+      <div style="display:flex;flex-wrap:wrap;gap:.5rem">
+        ${(e.readBy || []).map(uid => {
+          const u = users.find(x => String(x.id) === String(uid));
+          const name = u ? [u.prenom||'', u.nom||''].filter(Boolean).join(' ') || u.username : 'Inconnu';
+          const initials = ((u?.prenom||'')[0]||'') + ((u?.nom||'')[0]||'') || '?';
+          const color = u?.fonction ? (() => {
+            const list = DB.get(DB.keys.fonctionColors) || [];
+            const f = list.find(x => u.fonction.toLowerCase().includes(x.fonction.toLowerCase()));
+            return f ? f.color : 'var(--accent)';
+          })() : 'var(--accent)';
+          return `<div style="display:flex;align-items:center;gap:5px;background:var(--g50);border-radius:var(--r-full);padding:3px 10px 3px 3px;border:1px solid var(--border)">
+            <div style="width:22px;height:22px;border-radius:50%;background:${color};color:#fff;display:flex;align-items:center;justify-content:center;font-size:.55rem;font-weight:700;flex-shrink:0">${initials}</div>
+            <span style="font-size:.72rem;font-weight:600;color:var(--g700)">${escHtml(name)}</span>
+          </div>`;
+        }).join('')}
+      </div>
+    </div>` : '';
 
   document.getElementById('entryDetail').innerHTML = `
     <div class="entry-detail fade-in">
@@ -115,6 +147,7 @@ function selectEntry(id) {
       </div>
       <div class="divider"></div>
       <p style="font-size:.9rem;line-height:1.8;white-space:pre-wrap;color:var(--text)">${escHtml(e.contenu)||''}</p>
+      ${readerHtml}
       ${renderReplies(e)}
       <div style="margin-top:1rem;padding-top:1rem;border-top:1px solid var(--border)">
         <div style="display:flex;gap:.6rem">
@@ -203,6 +236,7 @@ function saveEntry() {
   } else {
     data.id = genId();
     data.replies = [];
+    data.readBy = [session?.userId];
     data.createdAt = new Date().toISOString();
     entries.push(data);
     toast('Entrée ajoutée');

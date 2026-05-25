@@ -617,7 +617,7 @@ function renderLoginHistory() {
   }
   tbody.innerHTML = log.slice(0, 200).map(e => {
     const d = new Date(e.date);
-    const dateStr = d.toLocaleDateString('fr-FR', { day:'numeric', month:'short', year:'numeric' });
+    const dateStr = d.toLocaleDateString('fr-FR', { day:'2-digit', month:'2-digit', year:'numeric' });
     const timeStr = d.toLocaleTimeString('fr-FR', { hour:'2-digit', minute:'2-digit' });
     const actionLabel = e.action === 'login' ? 'Connexion' : e.action === 'logout' ? 'Déconnexion' : e.action;
     return `<tr style="border-bottom:1px solid var(--border)">
