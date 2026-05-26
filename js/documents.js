@@ -46,9 +46,11 @@ function renderDocuments() {
   const list = getAllDocuments();
   const search = (document.getElementById('docSearchInput')?.value || '').toLowerCase();
   const filterRes = document.getElementById('docFilterResident')?.value || '';
+  const filterCat = document.getElementById('docFilterCategory')?.value || '';
 
   let filtered = list;
   if (filterRes) filtered = filtered.filter(d => d.residentId === filterRes);
+  if (filterCat) filtered = filtered.filter(d => d.category === filterCat);
   if (search) filtered = filtered.filter(d => (d.name||'').toLowerCase().includes(search) || (d.residentName||'').toLowerCase().includes(search));
 
   if (!filtered.length) {
@@ -208,6 +210,7 @@ function initDocumentsPage() {
   initDocuments();
   document.getElementById('docSearchInput')?.addEventListener('input', renderDocuments);
   document.getElementById('docFilterResident')?.addEventListener('change', renderDocuments);
+  document.getElementById('docFilterCategory')?.addEventListener('change', renderDocuments);
   const params = new URLSearchParams(window.location.search);
   const residentId = params.get('residentId');
   if (residentId) {
