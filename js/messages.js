@@ -318,7 +318,7 @@ function renderChat() {
     </div>` : '';
 
     const isUnread = !isOwn && !m.readBy?.includes(session.userId);
-    const vuMark = isOwn && readers.length > 0 ? '<span style="font-size:.6rem;margin-left:4px;color:var(--blue);font-weight:600">vu</span>' : '';
+    const vuMark = isOwn && readers.length > 0 ? '<span style="font-size:.65rem;margin-left:3px;color:var(--blue)">✓</span>' : '';
 
     html += `<div class="chat-row ${isOwn ? 'own' : 'other'}">
       <div class="chat-bubble">
