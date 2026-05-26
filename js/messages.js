@@ -318,13 +318,14 @@ function renderChat() {
     </div>` : '';
 
     const isUnread = !isOwn && !m.readBy?.includes(session.userId);
+    const vuMark = isOwn && readers.length > 0 ? '<span style="font-size:.65rem;margin-left:3px;color:var(--blue)">✓</span>' : '';
 
     html += `<div class="chat-row ${isOwn ? 'own' : 'other'}">
-      <div class="chat-bubble" style="${isUnread ? 'background:#faecd0;border:2px solid #f5a623;font-weight:600' : ''}">${isUnread ? '<span style="font-size:.55rem;text-transform:uppercase;color:#f5a623;font-weight:800;letter-spacing:.04em;display:block;margin-bottom:2px">Nouveau</span>' : ''}
+      <div class="chat-bubble">
         ${!isOwn && otherIds.length > 1 ? `<div class="chat-bubble-author">${escHtml(authorName)}</div>` : ''}
         <div style="display:flex;justify-content:space-between;align-items:flex-end;gap:6px">
           <span>${escHtml(m.body)}</span>
-          <span class="chat-bubble-time">${time}</span>
+          <span class="chat-bubble-time">${time}${vuMark}</span>
         </div>
         ${readerAvatars}
       </div>
