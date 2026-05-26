@@ -38,8 +38,6 @@ function getEntries() {
 function renderEntries() {
   const list = getEntries();
   const el = document.getElementById('entriesList');
-  const countEl = document.getElementById('journalCount');
-  countEl.textContent = `${list.length} entrée${list.length > 1 ? 's' : ''}`;
   const cats = DB.get(DB.keys.categories) || [];
   const journalResidents = DB.get(DB.keys.residents) || [];
   if (!list.length) {

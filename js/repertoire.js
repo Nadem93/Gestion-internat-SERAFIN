@@ -32,19 +32,16 @@ function renderContacts() {
     return;
   }
   container.innerHTML = `<div class="grid grid-5" style="gap:.75rem">${contacts.map(c => {
-    return `<div class="res-card" style="border:1px solid #cbd5e1;background:#fff;box-shadow:0 4px 16px rgba(0,0,0,.1),0 2px 4px rgba(0,0,0,.08)" onclick="openEditContact('${c.id}')">
-      <div class="res-card-cover" style="background:#64748b;opacity:.5"></div>
-      <div class="res-card-body">
-        <div class="res-card-name" style="font-size:.82rem">${escapeHtml(c.organisme)}</div>
-        <div class="res-card-meta">${escapeHtml(c.nom)}${c.fonction ? ' · '+escapeHtml(c.fonction) : ''}</div>
-        <div style="display:flex;gap:.35rem;flex-wrap:wrap;justify-content:center;margin-top:.25rem">
-          ${c.tel ? `<span style="font-size:.65rem;color:var(--muted);display:flex;align-items:center;gap:.2rem">📞 ${escapeHtml(c.tel)}</span>` : ''}
-          ${c.email ? `<span style="font-size:.65rem;color:var(--muted);display:flex;align-items:center;gap:.2rem">✉️ ${escapeHtml(c.email)}</span>` : ''}
-        </div>
+    const col = contactColor(c.organisme);
+    const initiale = (c.organisme||'?')[0].toUpperCase();
+    return `<div style="cursor:pointer;background:#fff;border:1px solid #cbd5e1;border-radius:16px;padding:1.5rem 1.25rem;text-align:center;transition:box-shadow .2s,transform .2s;display:flex;flex-direction:column;align-items:center;gap:.5rem" onmouseenter="this.style.boxShadow='0 4px 12px rgba(0,0,0,.1)';this.style.transform='translateY(-2px)'" onmouseleave="this.style.boxShadow='none';this.style.transform='none'" onclick="openEditContact('${c.id}')">
+      <div style="font-weight:700;font-size:.95rem;color:${col};border:2px solid ${col}66;border-radius:8px;padding:.2rem .75rem;display:inline-block">${escapeHtml(c.organisme)}</div>
+      <div style="font-size:.82rem;color:var(--muted)">${escapeHtml(c.nom)}${c.fonction ? ' · '+escapeHtml(c.fonction) : ''}</div>
+      <div style="font-size:.75rem;color:var(--muted);display:flex;align-items:center;justify-content:center;gap:.5rem;flex-wrap:wrap">
+        ${c.tel ? `<span>📞 ${escapeHtml(c.tel)}</span>` : ''}
+        ${c.email ? `<span>✉️ ${escapeHtml(c.email)}</span>` : ''}
       </div>
-      <div class="res-card-footer" style="justify-content:center">
-        <span style="font-size:.65rem;color:var(--muted)">${c.adresse ? escapeHtml(c.adresse).slice(0,30)+(c.adresse.length>30?'…':'') : '—'}</span>
-      </div>
+      ${c.adresse ? `<div style="font-size:.7rem;color:#94a3b8">${escapeHtml(c.adresse).slice(0,40)+(c.adresse.length>40?'…':'')}</div>` : ''}
     </div>`;
   }).join('')}</div>`;
 }

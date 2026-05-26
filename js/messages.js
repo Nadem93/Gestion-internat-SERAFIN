@@ -317,8 +317,10 @@ function renderChat() {
       }).join('')}
     </div>` : '';
 
+    const isUnread = !isOwn && !m.readBy?.includes(session.userId);
+
     html += `<div class="chat-row ${isOwn ? 'own' : 'other'}">
-      <div class="chat-bubble">
+      <div class="chat-bubble" style="${isUnread ? 'background:#faecd0;border:2px solid #f5a623;font-weight:600' : ''}">${isUnread ? '<span style="font-size:.55rem;text-transform:uppercase;color:#f5a623;font-weight:800;letter-spacing:.04em;display:block;margin-bottom:2px">Nouveau</span>' : ''}
         ${!isOwn && otherIds.length > 1 ? `<div class="chat-bubble-author">${escHtml(authorName)}</div>` : ''}
         <div style="display:flex;justify-content:space-between;align-items:flex-end;gap:6px">
           <span>${escHtml(m.body)}</span>
@@ -328,7 +330,7 @@ function renderChat() {
       </div>
     </div>`;
 
-    if (!isOwn && !m.readBy?.includes(session.userId)) {
+    if (isUnread) {
       if (!m.readBy) m.readBy = [];
       m.readBy.push(session.userId);
     }
