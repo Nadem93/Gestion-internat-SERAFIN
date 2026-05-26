@@ -1,122 +1,236 @@
-<main class="content">
-  <div class="tabs">
-    <button class="tab active" data-tab="etablissement">Établissement</button>
-    <button class="tab" data-tab="personnalisation">Personnalisation</button>
-    <button class="tab" data-tab="categories">Catégories</button>
-    <button class="tab" data-tab="objectifs">Objectifs</button>
-    <button class="tab" data-tab="fonctions">Fonctions</button>
-    <button class="tab" data-tab="educateurs">Utilisateurs</button>
-    <button class="tab" data-tab="compte">Mon compte</button>
-    <button class="tab" data-tab="donnees">Données</button>
+<style>
+  :root{--av:#7C6FCD;--av-l:#F0EEFF;--av-d:#5D50BD}
+  .admin-tabs{display:flex;gap:.35rem;flex-wrap:wrap;margin-bottom:1.5rem;padding-bottom:1rem;border-bottom:1px solid var(--border)}
+  .admin-tab{padding:.55rem 1rem;border-radius:10px;cursor:pointer;font-size:.78rem;font-weight:600;color:var(--muted);background:transparent;border:none;transition:all .15s ease;white-space:nowrap}
+  .admin-tab:hover{background:var(--g100);color:var(--text)}
+  .admin-tab.active{background:var(--av-l);color:var(--av);font-weight:700}
+  .admin-panel{display:none}
+  .admin-panel.active{display:block;animation:fadeUp .22s ease}
+  @keyframes fadeUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+  .panel-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:1.35rem}
+  .panel-title{font-size:1.05rem;font-weight:800;color:var(--text)}
+  .panel-sub{font-size:.75rem;color:var(--muted);margin-top:.2rem}
+  .admin-content .card{border-radius:18px;border:1px solid rgba(0,0,0,.05);box-shadow:0 2px 16px rgba(0,0,0,.04)}
+  .admin-content .card-header{border-radius:18px 18px 0 0;padding:1rem 1.35rem}
+  .btn-violet{background:var(--av);color:#fff;border:none}
+  .btn-violet:hover{background:var(--av-d);color:#fff}
+  .admin-content input:focus,.admin-content textarea:focus,.admin-content select:focus{border-color:var(--av);box-shadow:0 0 0 3px rgba(124,111,205,.15);outline:none}
+  .rights-item{display:flex;align-items:center;gap:.65rem;padding:.5rem 0;font-size:.83rem;border-bottom:1px solid var(--g100)}
+  .rights-item:last-child{border-bottom:none}
+  .rights-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+  .danger-zone{border:1.5px solid #fecaca!important}
+  .danger-zone .card-header{background:#fef2f2}
+  .type-radio-card{display:flex;align-items:flex-start;gap:.85rem;padding:1rem 1.1rem;border:1.5px solid var(--border);border-radius:12px;cursor:pointer;transition:all .15s ease;margin-bottom:.6rem}
+  .type-radio-card:hover{border-color:var(--av)}
+  .type-radio-card.selected{border-color:var(--av);background:var(--av-l)}
+  .type-radio-card input[type="radio"]{accent-color:var(--av);margin-top:3px}
+  .color-row{display:flex;align-items:center;gap:.75rem}
+  .admin-stats-row{display:grid;grid-template-columns:repeat(4,1fr);gap:1.1rem;margin-bottom:1.5rem}
+  .adm-stat{background:#fff;border-radius:16px;padding:1.1rem 1.25rem;display:flex;align-items:center;gap:.9rem;box-shadow:0 2px 16px rgba(0,0,0,.04);border:1px solid rgba(0,0,0,.05);transition:transform .2s ease,box-shadow .2s ease}
+  .adm-stat:hover{transform:translateY(-2px);box-shadow:0 6px 24px rgba(0,0,0,.08)}
+  .adm-stat-ring{width:50px;height:50px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:1.3rem;flex-shrink:0}
+  .adm-stat-ring.violet{background:var(--av-l)}
+  .adm-stat-ring.green{background:#ecfdf5}
+  .adm-stat-ring.orange{background:#fff7ed}
+  .adm-stat-ring.blue{background:#eff6ff}
+  .adm-stat-num{font-size:1.4rem;font-weight:800;color:var(--text);line-height:1}
+  .adm-stat-lbl{font-size:.7rem;color:var(--muted);font-weight:500;margin-top:.15rem}
+</style>
+
+<div class="admin-content">
+  <!-- Tabs -->
+  <div class="admin-tabs">
+    <button class="admin-tab active" data-tab="etablissement" onclick="adminNavSPA(this)">Établissement</button>
+    <button class="admin-tab" data-tab="personnalisation" onclick="adminNavSPA(this)">Personnalisation</button>
+    <button class="admin-tab" data-tab="categories" onclick="adminNavSPA(this)">Catégories</button>
+    <button class="admin-tab" data-tab="objectifs" onclick="adminNavSPA(this)">Objectifs</button>
+    <button class="admin-tab" data-tab="fonctions" onclick="adminNavSPA(this)">Fonctions</button>
+    <button class="admin-tab" data-tab="educateurs" onclick="adminNavSPA(this)">Utilisateurs</button>
+    <button class="admin-tab" data-tab="compte" onclick="adminNavSPA(this)">Mon compte</button>
+    <button class="admin-tab" data-tab="donnees" onclick="adminNavSPA(this)">Données</button>
   </div>
 
-  <div id="tab-etablissement" class="fade-in">
+  <!-- Stats -->
+  <div class="admin-stats-row">
+    <div class="adm-stat"><div class="adm-stat-ring violet">👥</div><div><div class="adm-stat-num" id="aStat1">—</div><div class="adm-stat-lbl">Résidents actifs</div></div></div>
+    <div class="adm-stat"><div class="adm-stat-ring green">✅</div><div><div class="adm-stat-num" id="aStat2">—</div><div class="adm-stat-lbl">Présents aujourd'hui</div></div></div>
+    <div class="adm-stat"><div class="adm-stat-ring orange">📓</div><div><div class="adm-stat-num" id="aStat3">—</div><div class="adm-stat-lbl">Entrées journal</div></div></div>
+    <div class="adm-stat"><div class="adm-stat-ring blue">🔑</div><div><div class="adm-stat-num" id="aStat4">—</div><div class="adm-stat-lbl">Comptes utilisateurs</div></div></div>
+  </div>
+
+  <!-- ═══ ÉTABLISSEMENT ═══ -->
+  <div id="tab-etablissement" class="admin-panel active">
+    <div class="panel-header"><div><div class="panel-title">Informations de l'établissement</div><div class="panel-sub">Renseignez les informations officielles de votre structure</div></div></div>
     <div class="grid grid-2" style="gap:1.5rem;align-items:start">
-      <div class="card-glass">
-        <div class="card-header" style="display:flex;align-items:center;gap:.6rem"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:18px;height:18px;flex-shrink:0"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg><span class="card-title">Informations de l'établissement</span></div>
-        <div class="card-body" style="display:flex;flex-direction:column;gap:1rem">
-          <div class="form-group"><label>Nom de l'établissement</label><input type="text" id="setEtab" placeholder="Ex : Foyer d'Hébergement Les Trois Rivières"/></div>
-          <div class="form-row"><div class="form-group"><label>Ville</label><input type="text" id="setVille" placeholder="Ville"/></div><div class="form-group"><label>Numéro FINESS</label><input type="text" id="setFiness" placeholder="Ex : 750123456"/></div></div>
-          <div class="form-row"><div class="form-group"><label>Téléphone</label><input type="tel" id="setTel" placeholder="01 23 45 67 89"/></div><div class="form-group"><label>Email</label><input type="email" id="setEmail" placeholder="contact@foyer.fr"/></div></div>
-          <div class="form-group"><label>Adresse</label><textarea id="setAdresse" rows="2" placeholder="Adresse complète…"></textarea></div>
-          <div class="divider" style="margin:.5rem 0"></div>
-          <div class="form-group"><label>Clé API Mistral (IA)</label><div style="display:flex;gap:.5rem"><input type="password" id="setAiKey" placeholder="Entrez votre clé API Mistral" style="flex:1"/><button class="btn btn-ghost btn-sm" onclick="const e=document.getElementById('setAiKey');e.type=e.type==='password'?'text':'password'">👁</button></div><span style="font-size:.72rem;color:var(--muted)">Optionnelle. Active l'assistant IA pour la rédaction des bilans. <a href="https://console.mistral.ai" target="_blank">Obtenir une clé</a></span></div>
-          <div class="divider" style="margin:.5rem 0"></div>
-          <details style="font-size:.85rem"><summary style="cursor:pointer;font-weight:600;padding:.25rem 0">Instructions IA personnalisées</summary><div style="margin-top:.75rem;display:flex;flex-direction:column;gap:1rem"><p style="font-size:.78rem;color:var(--muted)">Personnalisez les instructions système envoyées à l'IA pour chaque module et action. Laissez vide pour utiliser les instructions par défaut.</p><div id="aiPromptsContainer"></div></div></details>
-          <button class="btn btn-primary" onclick="saveSettings()">Enregistrer</button>
+      <div class="card"><div class="card-header"><span class="card-title">Données de l'établissement</span></div><div class="card-body" style="display:flex;flex-direction:column;gap:1rem">
+        <div class="form-group"><label>Nom de l'établissement</label><input type="text" id="setEtab" placeholder="Ex : Foyer d'Hébergement Les Trois Rivières"/></div>
+        <div class="form-row"><div class="form-group"><label>Ville</label><input type="text" id="setVille" placeholder="Ville"/></div><div class="form-group"><label>N° FINESS</label><input type="text" id="setFiness" placeholder="Ex : 750123456"/></div></div>
+        <div class="form-row"><div class="form-group"><label>Téléphone</label><input type="tel" id="setTel" placeholder="01 23 45 67 89"/></div><div class="form-group"><label>Email</label><input type="email" id="setEmail" placeholder="contact@foyer.fr"/></div></div>
+        <div class="form-group"><label>Adresse</label><textarea id="setAdresse" rows="2" placeholder="Adresse complète…"></textarea></div>
+        <div class="divider" style="margin:.5rem 0"></div>
+        <div class="form-group"><label>Clé API Mistral (IA)</label><div style="display:flex;gap:.5rem"><input type="password" id="setAiKey" placeholder="Entrez votre clé API Mistral" style="flex:1"/><button class="btn btn-ghost btn-sm" onclick="const e=document.getElementById('setAiKey');e.type=e.type==='password'?'text':'password'">👁</button></div><span style="font-size:.72rem;color:var(--muted)">Optionnelle. Active l'assistant IA. <a href="https://console.mistral.ai" target="_blank" style="color:var(--av)">Obtenir une clé →</a></span></div>
+        <div class="divider" style="margin:.5rem 0"></div>
+        <details style="font-size:.85rem"><summary style="cursor:pointer;font-weight:600;padding:.25rem 0;color:var(--av)">⚙ Instructions IA personnalisées</summary><div style="margin-top:.75rem;display:flex;flex-direction:column;gap:1rem"><p style="font-size:.78rem;color:var(--muted)">Personnalisez les instructions système envoyées à l'IA pour chaque module. Laissez vide pour les valeurs par défaut.</p><div id="aiPromptsContainer"></div></div></details>
+        <button class="btn btn-violet" onclick="saveSettings()" style="margin-top:.25rem">Enregistrer les paramètres</button>
+      </div></div>
+      <div class="card"><div class="card-header"><span class="card-title">Aperçu de la fiche</span></div><div class="card-body">
+        <div style="display:flex;align-items:center;gap:1rem;margin-bottom:1.5rem;padding:1rem;background:var(--av-l);border-radius:12px"><div class="logo-icon" style="width:52px;height:52px;border-radius:12px;font-size:.9rem;background:var(--av);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:800">FTR</div><div><div style="font-weight:800;font-size:1rem" id="previewNom">—</div><div style="font-size:.78rem;color:var(--av)" id="previewVille"></div></div></div>
+        <div style="display:flex;flex-direction:column;gap:.65rem;font-size:.875rem">
+          <div style="display:flex;gap:.5rem;align-items:center"><span style="color:var(--muted);min-width:90px;font-size:.75rem">FINESS</span><span id="previewFiness" style="font-weight:700;color:var(--text)">—</span></div>
+          <div style="display:flex;gap:.5rem;align-items:center"><span style="color:var(--muted);min-width:90px;font-size:.75rem">Téléphone</span><span id="previewTel" style="font-weight:700;color:var(--text)">—</span></div>
+          <div style="display:flex;gap:.5rem;align-items:center"><span style="color:var(--muted);min-width:90px;font-size:.75rem">Email</span><span id="previewEmail" style="font-weight:700;color:var(--text)">—</span></div>
         </div>
-      </div>
-      <div class="card-glass">
-        <div class="card-header" style="display:flex;align-items:center;gap:.6rem"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:18px;height:18px;flex-shrink:0"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg><span class="card-title">Aperçu</span></div>
-        <div class="card-body">
-          <div style="display:flex;align-items:center;gap:1rem;margin-bottom:1.5rem"><div class="logo-icon" style="width:56px;height:56px;border-radius:14px;font-size:1.1rem;background:var(--accent)">FTR</div><div><div style="font-weight:800;font-size:1.1rem" id="previewNom">—</div><div style="font-size:.8rem;color:var(--muted)" id="previewVille"></div></div></div>
-          <div style="display:flex;flex-direction:column;gap:.6rem;font-size:.875rem">
-            <div style="display:flex;gap:.5rem"><span style="color:var(--muted);min-width:80px">FINESS</span><span id="previewFiness" style="font-weight:600">—</span></div>
-            <div style="display:flex;gap:.5rem"><span style="color:var(--muted);min-width:80px">Téléphone</span><span id="previewTel" style="font-weight:600">—</span></div>
-            <div style="display:flex;gap:.5rem"><span style="color:var(--muted);min-width:80px">Email</span><span id="previewEmail" style="font-weight:600">—</span></div>
-          </div>
-        </div>
-      </div>
+      </div></div>
     </div>
   </div>
 
-  <div id="tab-personnalisation" style="display:none" class="fade-in">
+  <!-- ═══ PERSONNALISATION ═══ -->
+  <div id="tab-personnalisation" class="admin-panel" style="display:none">
+    <div class="panel-header"><div><div class="panel-title">Personnalisation</div><div class="panel-sub">Type de structure, couleurs et logo de la plateforme</div></div></div>
     <div class="grid grid-2" style="gap:1.5rem;align-items:start">
-      <div class="card-glass">
-        <div class="card-header" style="display:flex;align-items:center;gap:.6rem"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:18px;height:18px;flex-shrink:0"><polygon points="12 2 2 7 12 12 22 7 12 2"/><polyline points="2 17 12 22 22 17"/><polyline points="2 12 12 17 22 12"/></svg><span class="card-title">Type de structure</span></div>
-        <div class="card-body" style="display:flex;flex-direction:column;gap:1rem">
-          <p style="font-size:.875rem;color:var(--muted)">Le type de structure adapte les champs de la fiche résident selon votre public accompagné.</p>
-          <div style="display:flex;flex-direction:column;gap:.75rem">
-            <label style="display:flex;align-items:flex-start;gap:.75rem;padding:1rem;border:1.5px solid var(--border);border-radius:var(--r);cursor:pointer;transition:border-color var(--t)" id="typeAdultes"><input type="radio" name="typeStructure" value="adultes" style="margin-top:3px;accent-color:var(--blue)"/><div><div style="font-weight:700;font-size:.9rem">👤 Hébergement adultes</div><div style="font-size:.78rem;color:var(--muted);margin-top:2px">CHRS, CADA, résidences sociales, maisons relais… Affiche les champs situation professionnelle, ressources, situation administrative.</div></div></label>
-            <label style="display:flex;align-items:flex-start;gap:.75rem;padding:1rem;border:1.5px solid var(--border);border-radius:var(--r);cursor:pointer;transition:border-color var(--t)" id="typeEnfants"><input type="radio" name="typeStructure" value="enfants" style="margin-top:3px;accent-color:var(--blue)"/><div><div style="font-weight:700;font-size:.9rem">🧒 Hébergement enfants / jeunes</div><div style="font-size:.78rem;color:var(--muted);margin-top:2px">MECS, foyers de l'enfance, villages d'enfants… Affiche les champs tuteur légal, scolarité, organisme ASE/PJJ.</div></div></label>
-            <label style="display:flex;align-items:flex-start;gap:.75rem;padding:1rem;border:1.5px solid var(--border);border-radius:var(--r);cursor:pointer;transition:border-color var(--t)" id="typeMixte"><input type="radio" name="typeStructure" value="mixte" style="margin-top:3px;accent-color:var(--blue)"/><div><div style="font-weight:700;font-size:.9rem">👥 Structure mixte</div><div style="font-size:.78rem;color:var(--muted);margin-top:2px">Accueil adultes et enfants. Tous les champs sont affichés dans la fiche résident.</div></div></label>
-          </div>
-          <button class="btn btn-primary" onclick="saveTypeStructure()">Enregistrer le type</button>
-        </div>
-      </div>
+      <div class="card"><div class="card-header"><span class="card-title">Type de structure</span></div><div class="card-body" style="display:flex;flex-direction:column;gap:.75rem">
+        <p style="font-size:.875rem;color:var(--muted)">Adapte les champs de la fiche résident selon votre public accompagné.</p>
+        <label class="type-radio-card" id="typeAdultes"><input type="radio" name="typeStructure" value="adultes"/><div><div style="font-weight:700;font-size:.9rem">👤 Hébergement adultes</div><div style="font-size:.76rem;color:var(--muted);margin-top:3px">CHRS, CADA, résidences sociales, maisons relais…</div></div></label>
+        <label class="type-radio-card" id="typeEnfants"><input type="radio" name="typeStructure" value="enfants"/><div><div style="font-weight:700;font-size:.9rem">🧒 Hébergement enfants / jeunes</div><div style="font-size:.76rem;color:var(--muted);margin-top:3px">MECS, foyers de l'enfance, villages d'enfants…</div></div></label>
+        <label class="type-radio-card" id="typeMixte"><input type="radio" name="typeStructure" value="mixte"/><div><div style="font-weight:700;font-size:.9rem">👥 Structure mixte</div><div style="font-size:.76rem;color:var(--muted);margin-top:3px">Accueil adultes et enfants — tous les champs affichés.</div></div></label>
+        <button class="btn btn-violet" onclick="saveTypeStructure()">Enregistrer le type</button>
+      </div></div>
       <div style="display:flex;flex-direction:column;gap:1.5rem">
-        <div class="card-glass"><div class="card-header" style="display:flex;align-items:center;gap:.6rem"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:18px;height:18px;flex-shrink:0"><line x1="4" y1="21" x2="4" y2="14"/><line x1="4" y1="10" x2="4" y2="3"/><line x1="12" y1="21" x2="12" y2="12"/><line x1="12" y1="8" x2="12" y2="3"/><line x1="20" y1="21" x2="20" y2="16"/><line x1="20" y1="12" x2="20" y2="3"/><line x1="1" y1="14" x2="7" y2="14"/><line x1="9" y1="8" x2="15" y2="8"/><line x1="17" y1="16" x2="23" y2="16"/></svg><span class="card-title">Couleurs de la plateforme</span></div><div class="card-body" style="display:flex;flex-direction:column;gap:1rem"><div class="form-group"><label>Couleur principale (sidebar)</label><div class="color-row"><input type="color" id="bPrimary" value="#0f2b4a" style="width:48px;height:38px"/><span style="font-size:.8rem;color:var(--muted)">Utilisée pour la barre latérale et les éléments principaux</span></div></div><div class="form-group"><label>Couleur d'accentuation</label><div class="color-row"><input type="color" id="bAccent" value="#e85d04" style="width:48px;height:38px"/><span style="font-size:.8rem;color:var(--muted)">Utilisée pour les boutons d'action et les badges</span></div></div><div style="display:flex;gap:.5rem"><button class="btn btn-primary" onclick="saveBranding()">Appliquer</button><button class="btn btn-outline" onclick="resetBranding()">Réinitialiser</button></div></div></div>
-        <div class="card-glass"><div class="card-header" style="display:flex;align-items:center;gap:.6rem"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:18px;height:18px;flex-shrink:0"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg><span class="card-title">Logo de l'établissement</span></div><div class="card-body" style="display:flex;flex-direction:column;gap:1rem"><div class="photo-upload-zone" id="logoZone" onclick="document.getElementById('logoInput').click()"><div id="logoPreview" style="width:56px;height:56px;border-radius:12px;background:var(--g100);display:flex;align-items:center;justify-content:center;flex-shrink:0;overflow:hidden"><svg viewBox="0 0 24 24" fill="none" stroke="var(--g400)" stroke-width="1.5" style="width:24px;height:24px"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg></div><div class="photo-upload-info"><strong>Logo de votre structure</strong><span>PNG ou JPG carré recommandé — max 1 Mo</span><button type="button" class="photo-remove" id="logoRemoveBtn" style="display:none" onclick="event.stopPropagation();removeLogo()">✕ Supprimer</button></div></div><input type="file" id="logoInput" class="photo-upload-input" accept="image/png,image/jpeg,image/svg+xml"/></div></div>
+        <div class="card"><div class="card-header"><span class="card-title">Couleurs de la plateforme</span></div><div class="card-body" style="display:flex;flex-direction:column;gap:1rem">
+          <div class="form-group"><label>Couleur principale (sidebar)</label><div class="color-row"><input type="color" id="bPrimary" value="#0f2b4a" style="width:48px;height:38px;border-radius:8px;cursor:pointer"/><span style="font-size:.8rem;color:var(--muted)">Sidebar et éléments principaux</span></div></div>
+          <div class="form-group"><label>Couleur d'accentuation</label><div class="color-row"><input type="color" id="bAccent" value="#e85d04" style="width:48px;height:38px;border-radius:8px;cursor:pointer"/><span style="font-size:.8rem;color:var(--muted)">Boutons d'action et badges</span></div></div>
+          <div style="display:flex;gap:.5rem"><button class="btn btn-violet" onclick="saveBranding()">Appliquer</button><button class="btn btn-outline" onclick="resetBranding()">Réinitialiser</button></div>
+        </div></div>
+        <div class="card"><div class="card-header"><span class="card-title">Logo de l'établissement</span></div><div class="card-body">
+          <div class="photo-upload-zone" id="logoZone" onclick="document.getElementById('logoInput').click()"><div id="logoPreview" style="width:56px;height:56px;border-radius:12px;background:var(--g100);display:flex;align-items:center;justify-content:center;flex-shrink:0;overflow:hidden"><svg viewBox="0 0 24 24" fill="none" stroke="var(--g400)" stroke-width="1.5" style="width:24px;height:24px"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg></div><div class="photo-upload-info"><strong>Logo de votre structure</strong><span>PNG ou JPG carré — max 1 Mo</span><button type="button" class="photo-remove" id="logoRemoveBtn" style="display:none" onclick="event.stopPropagation();removeLogo()">✕ Supprimer</button></div></div>
+          <input type="file" id="logoInput" class="photo-upload-input" accept="image/png,image/jpeg,image/svg+xml"/>
+        </div></div>
       </div>
     </div>
   </div>
 
-  <div id="tab-categories" style="display:none" class="fade-in">
+  <!-- ═══ CATÉGORIES ═══ -->
+  <div id="tab-categories" class="admin-panel" style="display:none">
+    <div class="panel-header"><div><div class="panel-title">Catégories du journal</div><div class="panel-sub">Classifiez les entrées du journal de bord</div></div><button class="btn btn-violet btn-sm" onclick="openModal('modalCat')">+ Ajouter</button></div>
     <div class="grid grid-2" style="gap:1.5rem;align-items:start">
-      <div class="card-glass"><div class="card-header" style="display:flex;align-items:center;gap:.6rem"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:18px;height:18px;flex-shrink:0"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/></svg><span class="card-title">Catégories du journal</span><button class="btn btn-accent btn-sm" style="margin-left:auto" onclick="openModal('modalCat')">+ Ajouter</button></div><div class="card-body" style="padding:0"><div id="catList"></div></div></div>
-      <div class="card-glass"><div class="card-header" style="display:flex;align-items:center;gap:.6rem"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:18px;height:18px;flex-shrink:0"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg><span class="card-title">À propos des catégories</span></div><div class="card-body"><p style="font-size:.875rem;color:var(--muted);line-height:1.7">Les catégories permettent de classifier les entrées du journal de bord. Chaque entrée peut être associée à une catégorie pour faciliter le filtrage et l'analyse.</p><div class="alert alert-info" style="margin-top:1rem"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg> Supprimer une catégorie n'affecte pas les entrées existantes.</div></div></div>
+      <div class="card"><div class="card-body" style="padding:0"><div id="catList"></div></div></div>
+      <div class="card"><div class="card-header"><span class="card-title">À propos</span></div><div class="card-body"><p style="font-size:.875rem;color:var(--muted);line-height:1.7">Les catégories permettent de classifier les entrées du journal. Chaque entrée peut être associée à une catégorie pour faciliter le filtrage et l'analyse.</p><div class="alert alert-info" style="margin-top:1rem"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg> Supprimer une catégorie n'affecte pas les entrées existantes.</div></div></div>
     </div>
   </div>
 
-  <div id="tab-objectifs" style="display:none" class="fade-in">
+  <!-- ═══ OBJECTIFS ═══ -->
+  <div id="tab-objectifs" class="admin-panel" style="display:none">
+    <div class="panel-header"><div><div class="panel-title">Objectifs personnalisés</div><div class="panel-sub">Structurez l'accompagnement des résidents</div></div><button class="btn btn-violet btn-sm" onclick="openModal('modalObj')">+ Ajouter</button></div>
     <div class="grid grid-2" style="gap:1.5rem;align-items:start">
-      <div class="card-glass"><div class="card-header" style="display:flex;align-items:center;gap:.6rem"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:18px;height:18px;flex-shrink:0"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg><span class="card-title">Objectifs personnalisés</span><button class="btn btn-accent btn-sm" style="margin-left:auto" onclick="openModal('modalObj')">+ Ajouter</button></div><div class="card-body" style="padding:0"><div id="objList"></div></div></div>
-      <div class="card-glass"><div class="card-header" style="display:flex;align-items:center;gap:.6rem"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:18px;height:18px;flex-shrink:0"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg><span class="card-title">À propos des objectifs</span></div><div class="card-body"><p style="font-size:.875rem;color:var(--muted);line-height:1.7">Les objectifs sont assignés aux résidents pour structurer leur accompagnement. Vous pouvez créer des objectifs personnalisés adaptés à votre établissement.</p><div class="alert alert-info" style="margin-top:1rem"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg> Les objectifs supprimés restent assignés aux résidents existants.</div></div></div>
+      <div class="card"><div class="card-body" style="padding:0"><div id="objList"></div></div></div>
+      <div class="card"><div class="card-header"><span class="card-title">À propos</span></div><div class="card-body"><p style="font-size:.875rem;color:var(--muted);line-height:1.7">Les objectifs sont assignés aux résidents pour structurer leur accompagnement. Créez des objectifs adaptés à votre établissement.</p><div class="alert alert-info" style="margin-top:1rem"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg> Les objectifs supprimés restent assignés aux résidents existants.</div></div></div>
     </div>
   </div>
 
-  <div id="tab-fonctions" style="display:none" class="fade-in">
+  <!-- ═══ FONCTIONS ═══ -->
+  <div id="tab-fonctions" class="admin-panel" style="display:none">
+    <div class="panel-header"><div><div class="panel-title">Fonctions &amp; permissions</div><div class="panel-sub">Associez couleurs et droits à chaque rôle</div></div><button class="btn btn-violet btn-sm" onclick="openModal('modalFonction')">+ Ajouter</button></div>
     <div class="grid grid-2" style="gap:1.5rem;align-items:start">
-      <div class="card-glass"><div class="card-header" style="display:flex;align-items:center;gap:.6rem"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:18px;height:18px;flex-shrink:0"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg><span class="card-title">Fonctions et couleurs</span><button class="btn btn-accent btn-sm" style="margin-left:auto" onclick="openModal('modalFonction')">+ Ajouter</button></div><div class="card-body" style="padding:0"><div id="fonctionList"></div></div></div>
-      <div class="card-glass"><div class="card-header" style="display:flex;align-items:center;gap:.6rem"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:18px;height:18px;flex-shrink:0"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg><span class="card-title">À propos des fonctions</span></div><div class="card-body"><p style="font-size:.875rem;color:var(--muted);line-height:1.7">Associez une couleur à chaque fonction d'utilisateur. Cette couleur sera utilisée comme fond du badge du rédacteur dans le journal de bord et le tableau de bord.</p><div style="margin-top:1rem;display:flex;flex-direction:column;gap:.5rem;font-size:.825rem"><div style="display:flex;align-items:center;gap:.5rem"><span style="display:inline-block;width:12px;height:12px;border-radius:3px;background:#3b82f6"></span> Éducateur</div><div style="display:flex;align-items:center;gap:.5rem"><span style="display:inline-block;width:12px;height:12px;border-radius:3px;background:#8b5cf6"></span> Psychologue</div><div style="display:flex;align-items:center;gap:.5rem"><span style="display:inline-block;width:12px;height:12px;border-radius:3px;background:#ef4444"></span> Infirmier</div><div style="display:flex;align-items:center;gap:.5rem"><span style="display:inline-block;width:12px;height:12px;border-radius:3px;background:#10b981"></span> Social</div></div><div class="alert alert-info" style="margin-top:1rem"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg> La correspondance se fait par mot-clé : si la fonction d'un utilisateur contient le nom, la couleur s'applique automatiquement.</div></div></div>
+      <div class="card"><div class="card-body" style="padding:0"><div id="fonctionList"></div></div></div>
+      <div class="card"><div class="card-header"><span class="card-title">À propos</span></div><div class="card-body"><p style="font-size:.875rem;color:var(--muted);line-height:1.7">Chaque fonction peut avoir une couleur distincte dans le journal et des permissions spécifiques sur la plateforme.</p><div style="margin-top:1rem;display:flex;flex-direction:column;gap:.4rem"><div class="rights-item"><span class="rights-dot" style="background:#3b82f6"></span>Éducateur</div><div class="rights-item"><span class="rights-dot" style="background:#8b5cf6"></span>Psychologue</div><div class="rights-item"><span class="rights-dot" style="background:#ef4444"></span>Infirmier</div><div class="rights-item"><span class="rights-dot" style="background:#10b981"></span>Social</div><div class="rights-item"><span class="rights-dot" style="background:#f59e0b"></span>Chef de service</div></div><div class="alert alert-info" style="margin-top:1rem"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg> La correspondance se fait par mot-clé dans la fonction de l'utilisateur.</div></div></div>
     </div>
   </div>
 
-  <div id="tab-educateurs" style="display:none" class="fade-in">
+  <!-- ═══ UTILISATEURS ═══ -->
+  <div id="tab-educateurs" class="admin-panel" style="display:none">
+    <div class="panel-header"><div><div class="panel-title">Comptes utilisateurs</div><div class="panel-sub">Gérez les accès à la plateforme</div></div><button class="btn btn-violet btn-sm" onclick="resetEducateurForm();openModal('modalEdu')">+ Ajouter</button></div>
     <div class="grid grid-2" style="gap:1.5rem;align-items:start">
-      <div class="card-glass"><div class="card-header" style="display:flex;align-items:center;gap:.6rem"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:18px;height:18px;flex-shrink:0"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="8.5" cy="7" r="4"/><line x1="20" y1="8" x2="20" y2="14"/><line x1="23" y1="11" x2="17" y2="11"/></svg><span class="card-title">Comptes utilisateurs</span><button class="btn btn-accent btn-sm" style="margin-left:auto" onclick="resetEducateurForm();openModal('modalEdu')">+ Ajouter</button></div><div class="card-body" style="padding:0"><div id="eduList"></div></div></div>
-      <div class="card-glass"><div class="card-header" style="display:flex;align-items:center;gap:.6rem"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:18px;height:18px;flex-shrink:0"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg><span class="card-title">Droits d'accès</span></div><div class="card-body" style="display:flex;flex-direction:column;gap:.75rem"><div style="font-size:.875rem;color:var(--muted);line-height:1.7">Les utilisateurs accèdent au tableau de bord, aux fiches résidents (lecture), au journal de bord, aux présences et au planning. Ils ne peuvent pas modifier les résidents ni accéder à l'administration.</div><div style="display:flex;flex-direction:column;gap:.5rem;margin-top:.25rem"><div style="display:flex;align-items:center;gap:.6rem;font-size:.825rem"><span style="color:#16a34a;font-size:1rem">✓</span> Tableau de bord</div><div style="display:flex;align-items:center;gap:.6rem;font-size:.825rem"><span style="color:#16a34a;font-size:1rem">✓</span> Consultation des résidents</div><div style="display:flex;align-items:center;gap:.6rem;font-size:.825rem"><span style="color:#16a34a;font-size:1rem">✓</span> Journal de bord</div><div style="display:flex;align-items:center;gap:.6rem;font-size:.825rem"><span style="color:#16a34a;font-size:1rem">✓</span> Présences &amp; Planning</div><div style="display:flex;align-items:center;gap:.6rem;font-size:.825rem"><span style="color:#dc2626;font-size:1rem">✕</span> Ajout / modification de résidents</div><div style="display:flex;align-items:center;gap:.6rem;font-size:.825rem"><span style="color:#dc2626;font-size:1rem">✕</span> Administration de la plateforme</div></div><div class="alert alert-info" style="margin-top:.5rem"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg> Identifiants admin par défaut&nbsp;: <strong>admin</strong> / <strong>admin123</strong>. Modifiez-les dans <em>Mon compte</em>.</div></div></div>
+      <div class="card"><div class="card-body" style="padding:0"><div id="eduList"></div></div></div>
+      <div class="card"><div class="card-header"><span class="card-title">Droits d'accès</span></div><div class="card-body" style="display:flex;flex-direction:column;gap:.5rem">
+        <p style="font-size:.82rem;color:var(--muted);line-height:1.6;margin-bottom:.5rem">Les utilisateurs peuvent accéder au tableau de bord, aux fiches résidents (lecture), au journal et aux présences.</p>
+        <div class="rights-item"><span class="rights-dot" style="background:#16a34a"></span>Tableau de bord</div>
+        <div class="rights-item"><span class="rights-dot" style="background:#16a34a"></span>Consultation des résidents</div>
+        <div class="rights-item"><span class="rights-dot" style="background:#16a34a"></span>Journal de bord</div>
+        <div class="rights-item"><span class="rights-dot" style="background:#16a34a"></span>Présences &amp; Planning</div>
+        <div class="rights-item"><span class="rights-dot" style="background:#dc2626"></span>Ajout / modification résidents</div>
+        <div class="rights-item"><span class="rights-dot" style="background:#dc2626"></span>Administration plateforme</div>
+        <div class="alert alert-info" style="margin-top:.75rem"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg> Admin par défaut : <strong>admin</strong> / <strong>admin123</strong></div>
+      </div></div>
     </div>
   </div>
 
-  <div id="tab-compte" style="display:none" class="fade-in">
-    <div style="display:flex;flex-direction:column;gap:1.5rem;max-width:500px">
-      <div class="card-glass"><div class="card-header" style="display:flex;align-items:center;gap:.6rem"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:18px;height:18px;flex-shrink:0"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg><span class="card-title">Informations du compte</span></div><div class="card-body" style="display:flex;flex-direction:column;gap:1rem"><div style="display:flex;align-items:center;gap:1rem;margin-bottom:.5rem"><div class="avatar lg" id="accountAvatar" style="background:var(--accent)">A</div><div><div style="font-weight:700" id="accountName">Administrateur</div><div style="font-size:.8rem;color:var(--muted)" id="accountRole">Admin</div></div></div><div class="form-row"><div class="form-group"><label>Prénom</label><input type="text" id="uPrenom" placeholder="Votre prénom"/></div><div class="form-group"><label>Nom</label><input type="text" id="uNom" placeholder="Votre nom"/></div></div><div class="form-group"><label>Rôle / Poste</label><input type="text" id="uRole" placeholder="Ex : Chef de service…"/></div><button class="btn btn-primary" onclick="saveUser()">Enregistrer</button></div></div>
-      <div class="card-glass"><div class="card-header" style="display:flex;align-items:center;gap:.6rem"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:18px;height:18px;flex-shrink:0"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg><span class="card-title">Identifiants de connexion</span></div><div class="card-body" style="display:flex;flex-direction:column;gap:1rem"><div class="form-group"><label>Identifiant</label><input type="text" id="uUsername" placeholder="Votre identifiant de connexion" autocomplete="off"/></div><div class="form-group"><label>Nouveau mot de passe</label><input type="password" id="uPassword" placeholder="Laisser vide pour ne pas changer" autocomplete="new-password"/></div><div class="form-group"><label>Confirmer le mot de passe</label><input type="password" id="uPasswordConfirm" placeholder="Confirmer le nouveau mot de passe" autocomplete="new-password"/></div><button class="btn btn-primary" onclick="saveCredentials()">Mettre à jour les identifiants</button></div></div>
+  <!-- ═══ MON COMPTE ═══ -->
+  <div id="tab-compte" class="admin-panel" style="display:none">
+    <div class="panel-header"><div><div class="panel-title">Mon compte</div><div class="panel-sub">Informations personnelles et identifiants de connexion</div></div></div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;align-items:start;max-width:860px">
+      <div class="card"><div class="card-header"><span class="card-title">Informations</span></div><div class="card-body" style="display:flex;flex-direction:column;gap:1rem">
+        <div style="display:flex;align-items:center;gap:1rem;padding:.85rem;background:var(--av-l);border-radius:12px"><div class="avatar lg" id="accountAvatar" style="background:var(--av);width:48px;height:48px;font-size:1.1rem">A</div><div><div style="font-weight:700;font-size:.95rem" id="accountName">Administrateur</div><div style="font-size:.76rem;color:var(--av);font-weight:600" id="accountRole">Admin</div></div></div>
+        <div class="form-row"><div class="form-group"><label>Prénom</label><input type="text" id="uPrenom" placeholder="Votre prénom"/></div><div class="form-group"><label>Nom</label><input type="text" id="uNom" placeholder="Votre nom"/></div></div>
+        <div class="form-group"><label>Rôle / Poste</label><input type="text" id="uRole" placeholder="Ex : Chef de service…"/></div>
+        <button class="btn btn-violet" onclick="saveUser()">Enregistrer</button>
+      </div></div>
+      <div class="card"><div class="card-header"><span class="card-title">Identifiants</span></div><div class="card-body" style="display:flex;flex-direction:column;gap:1rem">
+        <div class="form-group"><label>Identifiant de connexion</label><input type="text" id="uUsername" placeholder="Identifiant" autocomplete="off"/></div>
+        <div class="form-group"><label>Nouveau mot de passe</label><input type="password" id="uPassword" placeholder="Laisser vide pour ne pas changer" autocomplete="new-password"/></div>
+        <div class="form-group"><label>Confirmer le mot de passe</label><input type="password" id="uPasswordConfirm" placeholder="Confirmer le mot de passe" autocomplete="new-password"/></div>
+        <button class="btn btn-violet" onclick="saveCredentials()">Mettre à jour</button>
+      </div></div>
     </div>
   </div>
 
-  <div id="tab-donnees" style="display:none" class="fade-in">
+  <!-- ═══ DONNÉES ═══ -->
+  <div id="tab-donnees" class="admin-panel" style="display:none">
+    <div class="panel-header"><div><div class="panel-title">Données &amp; historique</div><div class="panel-sub">Export, réinitialisation et journal des connexions</div></div></div>
     <div class="grid grid-2" style="gap:1.5rem;align-items:start">
-      <div class="card-glass"><div class="card-header" style="display:flex;align-items:center;gap:.6rem"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:18px;height:18px;flex-shrink:0"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg><span class="card-title">Export des données</span></div><div class="card-body" style="display:flex;flex-direction:column;gap:.75rem"><p style="font-size:.875rem;color:var(--muted)">Exportez vos données au format JSON pour sauvegarde ou migration.</p><button class="btn btn-outline" onclick="exportData('residents')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:16px;height:16px"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg> Exporter les résidents</button><button class="btn btn-outline" onclick="exportData('journal')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:16px;height:16px"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg> Exporter le journal</button><button class="btn btn-outline" onclick="exportData('all')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:16px;height:16px"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg> Tout exporter</button></div></div>
-      <div class="card-glass" style="border-color:#fecaca"><div class="card-header" style="display:flex;align-items:center;gap:.6rem;background:#fef2f2"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:18px;height:18px;flex-shrink:0;color:var(--red)"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg><span class="card-title" style="color:var(--red)">Zone dangereuse</span></div><div class="card-body" style="display:flex;flex-direction:column;gap:.75rem"><p style="font-size:.875rem;color:var(--muted)">Ces actions sont irréversibles. Procédez avec précaution.</p><button class="btn btn-outline" style="border-color:#fecaca;color:var(--red)" onclick="resetData('journal')">Vider le journal de bord</button><button class="btn btn-outline" style="border-color:#fecaca;color:var(--red)" onclick="resetData('presences')">Réinitialiser les présences</button><button class="btn btn-danger" onclick="resetData('all')">Réinitialiser toutes les données</button></div></div>
+      <div class="card"><div class="card-header"><span class="card-title">Export des données</span></div><div class="card-body" style="display:flex;flex-direction:column;gap:.75rem">
+        <p style="font-size:.875rem;color:var(--muted)">Exportez vos données au format JSON pour sauvegarde ou migration.</p>
+        <button class="btn btn-outline" onclick="exportData('residents')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:15px;height:15px"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg> Exporter les résidents</button>
+        <button class="btn btn-outline" onclick="exportData('journal')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:15px;height:15px"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg> Exporter le journal</button>
+        <button class="btn btn-violet" onclick="exportData('all')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:15px;height:15px"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg> Tout exporter</button>
+      </div></div>
+      <div class="card danger-zone"><div class="card-header"><span class="card-title" style="color:var(--red)">⚠ Zone dangereuse</span></div><div class="card-body" style="display:flex;flex-direction:column;gap:.75rem">
+        <p style="font-size:.875rem;color:var(--muted)">Ces actions sont irréversibles. Procédez avec précaution.</p>
+        <button class="btn btn-outline" style="border-color:#fecaca;color:var(--red)" onclick="resetData('journal')">Vider le journal de bord</button>
+        <button class="btn btn-outline" style="border-color:#fecaca;color:var(--red)" onclick="resetData('presences')">Réinitialiser les présences</button>
+        <button class="btn btn-danger" onclick="resetData('all')">Réinitialiser toutes les données</button>
+      </div></div>
     </div>
-    <div class="card-glass" style="margin-top:1.5rem"><div class="card-header" style="display:flex;align-items:center;gap:.6rem"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:18px;height:18px;flex-shrink:0"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg><span class="card-title">Historique des connexions</span><button class="btn btn-ghost btn-sm" onclick="renderLoginHistory()" style="margin-left:auto" title="Rafraîchir">↻</button></div><div class="card-body" style="padding:0;overflow-x:auto"><table style="width:100%;border-collapse:collapse;font-size:.82rem"><thead style="background:var(--g50)"><tr><th style="padding:.6rem 1rem;text-align:left;font-size:.7rem;font-weight:700;color:var(--muted);text-transform:uppercase;white-space:nowrap">Date</th><th style="padding:.6rem 1rem;text-align:left;font-size:.7rem;font-weight:700;color:var(--muted);text-transform:uppercase;white-space:nowrap">Utilisateur</th><th style="padding:.6rem 1rem;text-align:left;font-size:.7rem;font-weight:700;color:var(--muted);text-transform:uppercase;white-space:nowrap">Action</th><th style="padding:.6rem 1rem;text-align:left;font-size:.7rem;font-weight:700;color:var(--muted);text-transform:uppercase;white-space:nowrap">Rôle</th></tr></thead><tbody id="loginHistoryBody"></tbody></table></div></div>
+    <div class="card" style="margin-top:1.5rem">
+      <div class="card-header"><span class="card-title">Historique des connexions</span><button class="btn btn-ghost btn-sm" onclick="renderLoginHistory()" style="margin-left:auto">↻ Rafraîchir</button></div>
+      <div class="card-body" style="padding:0;overflow-x:auto">
+        <table style="width:100%;border-collapse:collapse;font-size:.82rem">
+          <thead style="background:var(--g50)"><tr>
+            <th style="padding:.65rem 1.25rem;text-align:left;font-size:.68rem;font-weight:700;color:var(--muted);text-transform:uppercase;white-space:nowrap">Date</th>
+            <th style="padding:.65rem 1.25rem;text-align:left;font-size:.68rem;font-weight:700;color:var(--muted);text-transform:uppercase">Utilisateur</th>
+            <th style="padding:.65rem 1.25rem;text-align:left;font-size:.68rem;font-weight:700;color:var(--muted);text-transform:uppercase">Action</th>
+            <th style="padding:.65rem 1.25rem;text-align:left;font-size:.68rem;font-weight:700;color:var(--muted);text-transform:uppercase">Rôle</th>
+          </tr></thead>
+          <tbody id="loginHistoryBody"></tbody>
+        </table>
+      </div>
+    </div>
   </div>
-</main>
-
-<div class="modal-overlay" id="modalFonction">
-  <div class="modal"><div class="modal-header"><span class="modal-title" id="modalFonctionTitle">Nouvelle fonction</span><button class="modal-close"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button></div><div class="modal-body"><input type="hidden" id="fonctionId"/><div class="form-group"><label class="required">Nom de la fonction</label><input type="text" id="fonctionName" placeholder="Ex : Éducateur, Psychologue…"/></div><div class="form-group"><label>Couleur du badge</label><div style="display:flex;align-items:center;gap:.75rem"><input type="color" id="fonctionColor" value="#3b82f6" style="width:48px"/><span style="font-size:.8rem;color:var(--muted)">Couleur d'affichage dans le journal</span></div></div><div class="form-group"><label>Permissions</label><div id="fonctionPermissions" style="display:flex;flex-direction:column;gap:.5rem"></div></div></div><div class="modal-footer"><button class="btn btn-outline" onclick="closeAllModals()">Annuler</button><button class="btn btn-danger btn-sm" id="btnDeleteFonction" style="margin-right:auto;display:none" onclick="deleteFonction()">Supprimer</button><button class="btn btn-primary" onclick="saveFonction()">Enregistrer</button></div></div>
 </div>
 
-<div class="modal-overlay" id="modalCat">
-  <div class="modal"><div class="modal-header"><span class="modal-title" id="modalCatTitle">Nouvelle catégorie</span><button class="modal-close"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button></div><div class="modal-body"><input type="hidden" id="catId"/><div class="form-group"><label class="required">Nom</label><input type="text" id="catName" placeholder="Nom de la catégorie"/></div><div class="form-group"><label>Couleur</label><div style="display:flex;align-items:center;gap:.75rem"><input type="color" id="catColor" value="#3b82f6" style="width:48px"/><span style="font-size:.8rem;color:var(--muted)">Couleur d'affichage dans le journal</span></div></div></div><div class="modal-footer"><button class="btn btn-outline" onclick="closeAllModals()">Annuler</button><button class="btn btn-danger btn-sm" id="btnDeleteCat" style="margin-right:auto;display:none" onclick="deleteCat()">Supprimer</button><button class="btn btn-primary" onclick="saveCat()">Enregistrer</button></div></div>
-</div>
+<script>
+/* ── SPA ADMIN NAV ── */
+function adminNavSPA(btn) {
+  const name = btn.dataset.tab;
+  document.querySelectorAll('.admin-tab').forEach(i => i.classList.toggle('active', i === btn));
+  ['etablissement','personnalisation','categories','objectifs','fonctions','educateurs','compte','donnees'].forEach(n => {
+    const el = document.getElementById('tab-' + n);
+    if (el) { el.style.display = n === name ? '' : 'none'; if (n === name) el.classList.add('active'); else el.classList.remove('active'); }
+  });
+  document.getElementById('pageTitle').textContent = 'Administration';
+  const labels = {etablissement:'Établissement',personnalisation:'Personnalisation',categories:'Catégories',objectifs:'Objectifs',fonctions:'Fonctions',educateurs:'Utilisateurs',compte:'Mon compte',donnees:'Données'};
+  const sub = document.getElementById('pageSub');
+  if (sub) sub.textContent = labels[name] || name;
+}
 
-<div class="modal-overlay" id="modalObj">
-  <div class="modal"><div class="modal-header"><span class="modal-title" id="modalObjTitle">Nouvel objectif</span><button class="modal-close"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button></div><div class="modal-body"><input type="hidden" id="objId"/><div class="form-group"><label class="required">Nom</label><input type="text" id="objName" placeholder="Nom de l'objectif"/></div><div class="form-group"><label>Description</label><textarea id="objDesc" rows="3" placeholder="Description de l'objectif…"></textarea></div></div><div class="modal-footer"><button class="btn btn-outline" onclick="closeAllModals()">Annuler</button><button class="btn btn-danger btn-sm" id="btnDeleteObj" style="margin-right:auto;display:none" onclick="deleteObj()">Supprimer</button><button class="btn btn-primary" onclick="saveObj()">Enregistrer</button></div></div>
-</div>
+function refreshAdminStats() {
+  const r = (DB.get(DB.keys.residents)||[]).filter(x => x.statut !== 'sorti');
+  const j = DB.get(DB.keys.journal)||[];
+  const t = today();
+  const p = (DB.get(DB.keys.presences)||{})[t]||{};
+  const pc = Object.values(p).filter(v => v === 'present').length;
+  const u = DB.get(DB.keys.users)||[];
+  ['aStat1','aStat2','aStat3','aStat4'].forEach(id => { const el=document.getElementById(id); if(id==='aStat1') el.textContent=r.length; else if(id==='aStat2') el.textContent=pc; else if(id==='aStat3') el.textContent=j.filter(e=>e.date&&e.date.startsWith(t)).length; else el.textContent=u.length; });
+}
 
-<div class="modal-overlay" id="modalEdu">
-  <div class="modal"><div class="modal-header"><span class="modal-title" id="modalEduTitle">Nouvel utilisateur</span><button class="modal-close"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button></div><div class="modal-body" style="display:flex;flex-direction:column;gap:1rem"><input type="hidden" id="eduId"/><div class="form-row"><div class="form-group"><label>Prénom</label><input type="text" id="eduPrenom" placeholder="Prénom"/></div><div class="form-group"><label>Nom</label><input type="text" id="eduNom" placeholder="Nom"/></div></div><div class="form-group"><label>Fonction</label><input type="text" id="eduFonction" placeholder="Ex : Éducateur spécialisé, Psychologue…"/></div><div class="form-group"><label class="required">Identifiant de connexion</label><input type="text" id="eduUsername" placeholder="Ex : j.dupont" autocomplete="off"/></div><div class="form-group"><label class="required" id="eduPasswordLabel">Mot de passe</label><input type="password" id="eduPassword" placeholder="Mot de passe" autocomplete="new-password"/></div></div><div class="modal-footer"><button class="btn btn-outline" onclick="closeAllModals()">Annuler</button><button class="btn btn-danger btn-sm" id="btnDeleteEdu" style="margin-right:auto;display:none" onclick="deleteEducateur()">Supprimer</button><button class="btn btn-primary" onclick="saveEducateur()">Enregistrer</button></div></div>
-</div>
+refreshAdminStats();
+</script>
