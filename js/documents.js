@@ -69,16 +69,16 @@ function renderDocuments() {
     <tbody>${filtered.map((d, i) => {
     const overdue = d.dueDate && d.dueDate < today() && !d.done;
     return `<tr style="border-bottom:1px solid var(--border);background:${i%2===0?'var(--g50)':'var(--g100)'};transition:background .1s" onmouseover="this.style.background='var(--g200)'" onmouseout="this.style.background='${i%2===0?'var(--g50)':'var(--g100)'}'">
-        <td style="padding:.6rem .75rem">
+        <td style="padding:.35rem .75rem">
           <div style="display:flex;align-items:center;gap:.5rem">
             <span style="font-size:1.2rem">${docTypeIcon(d.mimeType)}</span>
             <span style="font-weight:600;color:${overdue?'#ef4444':'inherit'}">${escHtml(d.name)}</span>
           </div>
         </td>
-        <td style="padding:.6rem .75rem;color:var(--muted)">${escHtml(d.residentName)}</td>
-        <td style="padding:.6rem .75rem;color:var(--muted)">${d.docDate ? formatDate(d.docDate) : '—'}</td>
-        <td style="padding:.6rem .75rem;color:${overdue?'#ef4444':'var(--muted)'};font-weight:${overdue?'600':'400'}">${d.dueDate ? formatDate(d.dueDate)+(overdue ? ' ⚠️' : '') : '—'}</td>
-        <td style="padding:.6rem .75rem;text-align:center;white-space:nowrap">
+        <td style="padding:.35rem .75rem;color:var(--muted)">${escHtml(d.residentName)}</td>
+        <td style="padding:.35rem .75rem;color:var(--muted)">${d.docDate ? formatDate(d.docDate) : '—'}</td>
+        <td style="padding:.35rem .75rem;color:${overdue?'#ef4444':'var(--muted)'};font-weight:${overdue?'600':'400'}">${d.dueDate ? formatDate(d.dueDate)+(overdue ? ' ⚠️' : '') : '—'}</td>
+        <td style="padding:.35rem .75rem;text-align:center;white-space:nowrap">
           <button class="btn-dl" onclick="downloadDoc('${d.id}','${d.residentId}')" title="Télécharger"><svg class="dl-svg" width="28" height="28" viewBox="0 0 40 40"><path class="dl-arrow" d="m20 4 v14 m-5 -5 l5 5 5 -5"></path><path class="dl-base" d="m10 28 v4 h 20 v-4"></path></svg></button>
         </td>
       </tr>`;
