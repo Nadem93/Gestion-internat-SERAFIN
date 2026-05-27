@@ -392,18 +392,6 @@
         </div>
       </div>
 
-      <!-- Avenants récents + Journal récent -->
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:1.25rem;margin-bottom:1.25rem">
-        <div class="card">
-          <div class="card-header"><span class="card-title">📋 Avenants récents</span></div>
-          <div class="card-body" style="padding:0" id="avenantsRecentsList"></div>
-        </div>
-        <div class="card">
-          <div class="card-header"><span class="card-title">📓 Journal de bord</span></div>
-          <div class="card-body" style="padding:0" id="journalRecentsList"></div>
-        </div>
-      </div>
-
       <!-- Catégories journal -->
       <div class="card">
         <div class="card-header">
@@ -928,12 +916,6 @@ function refreshAllStats() {
   // ── Connexions récentes ──
   renderRecentLogins();
 
-  // ── Avenants récents ──
-  renderAvenantsRecents(ppe);
-
-  // ── Journal récent ──
-  renderJournalRecents(journal);
-
   // ── Catégories journal ──
   const activeFreq = document.querySelector('.btn-freq.active')?.dataset?.freq || 'semaine';
   renderJournalCatBars(journal, activeFreq);
@@ -1069,55 +1051,6 @@ function renderRecentLogins() {
         <div style="font-size:.65rem;color:var(--muted)">${dateStr} ${timeStr}</div>
       </div>
     </div>`;
-  }).join('');
-}
-
-/* Avenants récents */
-function renderAvenantsRecents(list) {
-  const el = document.getElementById('avenantsRecentsList');
-  if (!el) return;
-  const recents = list.filter(p => p.statut === 'actif').reverse().slice(0, 8);
-  if (!recents.length) {
-    el.innerHTML = '<div style="padding:1.5rem;text-align:center;color:var(--muted);font-size:.82rem">Aucun avenant actif</div>';
-    return;
-  }
-  el.innerHTML = recents.map(p => {
-    const d = new Date(p.createdAt);
-    const dateStr = d.toLocaleDateString('fr-FR', { day:'2-digit', month:'short' });
-    const nom = escHtml(p.residentName || p.nom || p.resident || '—');
-    return '<div style="display:flex;align-items:center;gap:.6rem;padding:.55rem 1.25rem;border-bottom:1px solid var(--g50)">' +
-      '<span style="font-size:.8rem">📄</span>' +
-      '<div style="flex:1;min-width:0">' +
-        '<div style="font-weight:600;font-size:.78rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">' + nom + '</div>' +
-        '<div style="font-size:.68rem;color:var(--muted)">' + dateStr + '</div>' +
-      '</div>' +
-      '<span style="font-size:.6rem;padding:1px 7px;border-radius:var(--r-full);background:#10b98118;color:#10b981;font-weight:600">actif</span>' +
-    '</div>';
-  }).join('');
-}
-
-/* Journal récent */
-function renderJournalRecents(list) {
-  const el = document.getElementById('journalRecentsList');
-  if (!el) return;
-  const recents = list.slice().reverse().slice(0, 8);
-  if (!recents.length) {
-    el.innerHTML = '<div style="padding:1.5rem;text-align:center;color:var(--muted);font-size:.82rem">Aucune entrée récente</div>';
-    return;
-  }
-  el.innerHTML = recents.map(e => {
-    const d = new Date(e.date);
-    const dateStr = d.toLocaleDateString('fr-FR', { day:'2-digit', month:'short' });
-    const contenu = escHtml((e.contenu || e.description || '').slice(0, 80));
-    const nom = escHtml(e.resident || e.prenom && e.prenom + ' ' + (e.nom || '') || '');
-    return '<div style="display:flex;align-items:center;gap:.6rem;padding:.55rem 1.25rem;border-bottom:1px solid var(--g50)">' +
-      '<span style="font-size:.8rem">📝</span>' +
-      '<div style="flex:1;min-width:0">' +
-        (nom ? '<div style="font-weight:600;font-size:.78rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">' + nom + '</div>' : '') +
-        '<div style="font-size:.72rem;color:var(--text);display:-webkit-box;-webkit-line-clamp:1;-webkit-box-orient:vertical;overflow:hidden">' + contenu + '</div>' +
-        '<div style="font-size:.65rem;color:var(--muted)">' + dateStr + '</div>' +
-      '</div>' +
-    '</div>';
   }).join('');
 }
 
