@@ -1,37 +1,10 @@
 // ── TABS ──
 function activateTab(name) {
   document.querySelectorAll('.tab').forEach(t => t.classList.toggle('active', t.dataset.tab === name));
-  ['etablissement','personnalisation','categories','objectifs','fonctions','educateurs','compte','donnees'].forEach(n => {
+  ['etablissement','categories','objectifs','fonctions','educateurs','compte','donnees'].forEach(n => {
     const el = document.getElementById('tab-'+n);
     if (el) el.style.display = n === name ? '' : 'none';
   });
-}
-
-// ── TYPE DE STRUCTURE ──
-function loadTypeStructure() {
-  const s = DB.get(DB.keys.settings) || {};
-  const type = s.typeStructure || 'mixte';
-  const radio = document.querySelector(`input[name="typeStructure"][value="${type}"]`);
-  if (radio) radio.checked = true;
-  highlightTypeSelected();
-}
-
-function highlightTypeSelected() {
-  document.querySelectorAll('input[name="typeStructure"]').forEach(r => {
-    const label = r.closest('label');
-    if (!label) return;
-    label.style.borderColor = r.checked ? 'var(--blue)' : 'var(--border)';
-    label.style.background = r.checked ? '#eff6ff' : '';
-  });
-}
-
-function saveTypeStructure() {
-  const radio = document.querySelector('input[name="typeStructure"]:checked');
-  if (!radio) return;
-  const s = DB.get(DB.keys.settings) || {};
-  s.typeStructure = radio.value;
-  DB.set(DB.keys.settings, s);
-  toast(`Type de structure enregistré : ${radio.value}`);
 }
 
 // ── BRANDING ──
@@ -115,6 +88,7 @@ function loadSettings() {
   document.getElementById('setTel').value = s.tel || '';
   document.getElementById('setEmail').value = s.email || '';
   document.getElementById('setAdresse').value = s.adresse || '';
+  document.getElementById('setCapacite').value = s.capacite || '';
   document.getElementById('setAiKey').value = getAiKey();
   renderAiPrompts();
   updatePreview();
@@ -126,6 +100,8 @@ function updatePreview() {
   document.getElementById('previewFiness').textContent = document.getElementById('setFiness').value || '—';
   document.getElementById('previewTel').textContent = document.getElementById('setTel').value || '—';
   document.getElementById('previewEmail').textContent = document.getElementById('setEmail').value || '—';
+  const adr = document.getElementById('previewAdresse');
+  if (adr) adr.textContent = document.getElementById('setAdresse').value || '—';
 }
 
 function saveSettings() {
@@ -136,7 +112,7 @@ function saveSettings() {
     tel: document.getElementById('setTel').value.trim(),
     email: document.getElementById('setEmail').value.trim(),
     adresse: document.getElementById('setAdresse').value.trim(),
-    typeStructure: (DB.get(DB.keys.settings) || {}).typeStructure || 'mixte'
+    capacite: parseInt(document.getElementById('setCapacite').value) || 0
   };
   DB.set(DB.keys.settings, data);
   const aiKey = document.getElementById('setAiKey').value.trim();
@@ -630,30 +606,23 @@ function renderLoginHistory() {
 }
 
 // ── INIT ──
-function initAdmin() {
-  document.querySelectorAll('.tab').forEach(t => {
-    t.addEventListener('click', () => activateTab(t.dataset.tab));
-  });
+document.addEventListener('DOMContentLoaded', () => {
   loadSettings();
   loadUser();
   loadBranding();
-  loadTypeStructure();
   renderCats();
   renderObjs();
   renderFonctions();
   renderEducateurs();
   initLogoUpload();
   renderLoginHistory();
+
   ['setEtab','setVille','setFiness','setTel','setEmail'].forEach(id => {
     document.getElementById(id)?.addEventListener('input', updatePreview);
   });
-  document.querySelectorAll('input[name="typeStructure"]').forEach(r => {
-    r.addEventListener('change', highlightTypeSelected);
-  });
+
   document.getElementById('modalCat').querySelector('.modal-close').addEventListener('click', resetCatForm);
   document.getElementById('modalObj').querySelector('.modal-close').addEventListener('click', resetObjForm);
   document.getElementById('modalFonction')?.querySelector('.modal-close')?.addEventListener('click', resetFonctionForm);
   document.getElementById('modalEdu').querySelector('.modal-close').addEventListener('click', resetEducateurForm);
-}
-document.addEventListener('DOMContentLoaded', initAdmin);
-if (typeof registerPageInit === 'function') registerPageInit('admin', initAdmin);
+});

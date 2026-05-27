@@ -35,7 +35,7 @@ const DEFAULTS = {
     { id:5, name:'Lien familial', description:'Maintien et soutien du lien familial' },
     { id:6, name:'Logement', description:'Préparation à un logement autonome' }
   ],
-  settings: { etablissement:'Foyer d\'Hébergement Les Trois Rivières', ville:'', tel:'', email:'', capacite:'', typeStructure:'mixte' },
+  settings: { etablissement:'Foyer d\'Hébergement Les Trois Rivières', ville:'', tel:'', email:'', capacite:'' },
   branding: { primaryColor:'#0f2b4a', accentColor:'#e85d04', logo:'' },
   users: [{ id:1, prenom:'Admin', nom:'', username:'admin', password:'admin123', role:'admin' }],
   vehicules: ['Renault Kangoo', 'Citroën Berlingo', 'Peugeot Partner', 'Volkswagen Caddy'],
@@ -140,12 +140,10 @@ const Auth = {
   }
 };
 
-// ── STRUCTURE TYPE ──
-function getStructureType() {
-  return (DB.get(DB.keys.settings) || {}).typeStructure || 'mixte';
-}
-function isAdult() { const t = getStructureType(); return t === 'adultes' || t === 'mixte'; }
-function isChild() { const t = getStructureType(); return t === 'enfants' || t === 'mixte'; }
+// ── STRUCTURE TYPE (toujours adulte) ──
+function getStructureType() { return 'adultes'; }
+function isAdult() { return true; }
+function isChild() { return false; }
 
 // ── PHOTO HELPERS ──
 function fileToBase64(file) {

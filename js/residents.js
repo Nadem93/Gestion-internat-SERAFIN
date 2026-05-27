@@ -188,6 +188,7 @@ function getResidents() {
   let list = DB.get(DB.keys.residents) || [];
   if (q) list = list.filter(r => `${r.prenom} ${r.nom}`.toLowerCase().includes(q));
   if (objectif) list = list.filter(r => (r.objectifs || []).includes(String(objectif)));
+  list.sort((a, b) => (a.statut === 'sorti' ? 1 : 0) - (b.statut === 'sorti' ? 1 : 0));
   return list;
 }
 

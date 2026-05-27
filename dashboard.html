@@ -189,20 +189,7 @@
         <div class="form-group"><label>Ville</label><input type="text" id="wVille" placeholder="Ville"/></div>
         <div class="form-group"><label>N° FINESS</label><input type="text" id="wFiness" placeholder="750123456"/></div>
       </div>
-      <div style="display:flex;flex-direction:column;gap:.6rem;margin-top:.25rem">
-        <label style="display:flex;align-items:flex-start;gap:.75rem;padding:.85rem 1rem;border:1.5px solid var(--border);border-radius:var(--r);cursor:pointer" id="wTypeAdultes">
-          <input type="radio" name="wType" value="adultes" style="margin-top:2px;accent-color:var(--blue)"/>
-          <div><div style="font-weight:700;font-size:.875rem">👤 Adultes</div><div style="font-size:.75rem;color:var(--muted)">CHRS, CADA, résidences sociales, maisons relais…</div></div>
-        </label>
-        <label style="display:flex;align-items:flex-start;gap:.75rem;padding:.85rem 1rem;border:1.5px solid var(--border);border-radius:var(--r);cursor:pointer" id="wTypeEnfants">
-          <input type="radio" name="wType" value="enfants" style="margin-top:2px;accent-color:var(--blue)"/>
-          <div><div style="font-weight:700;font-size:.875rem">🧒 Enfants / Jeunes</div><div style="font-size:.75rem;color:var(--muted)">MECS, foyers de l'enfance, villages d'enfants…</div></div>
-        </label>
-        <label style="display:flex;align-items:flex-start;gap:.75rem;padding:.85rem 1rem;border:1.5px solid var(--border);border-radius:var(--r);cursor:pointer" id="wTypeMixte">
-          <input type="radio" name="wType" value="mixte" style="margin-top:2px;accent-color:var(--blue)" checked/>
-          <div><div style="font-weight:700;font-size:.875rem">👥 Mixte</div><div style="font-size:.75rem;color:var(--muted)">Accueil adultes et enfants</div></div>
-        </label>
-      </div>
+
     </div>
 
     <!-- Step 1: Personnalisation -->
@@ -293,12 +280,10 @@
       if (password !== confirm) { toast('Les mots de passe ne correspondent pas', 'error'); return; }
 
       // Save structure
-      const type = document.querySelector('input[name="wType"]:checked')?.value || 'mixte';
       const settings = {
         etablissement: document.getElementById('wEtab').value.trim(),
         ville: document.getElementById('wVille').value.trim(),
         finess: document.getElementById('wFiness').value.trim(),
-        typeStructure: type,
         tel:'', email:'', adresse:''
       };
       DB.set(DB.keys.settings, settings);
