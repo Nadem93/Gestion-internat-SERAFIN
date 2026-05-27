@@ -653,10 +653,10 @@ tbody tr:hover{background:var(--g50)}
 /* ── FLOAT ACTION BUTTONS (INTERVENTIONS / VÉHICULE) ── */
 .accueil-fab-stack{
   position:fixed;top:5.5rem;right:1rem;z-index:100;
-  display:flex;flex-direction:column;gap:.5rem;
+  display:flex;flex-direction:column;gap:.75rem;
 }
 .accueil-fab{
-  width:44px;height:44px;border-radius:var(--r);
+  width:52px;height:52px;border-radius:14px;
   color:#fff;
   display:flex;align-items:center;justify-content:center;
   cursor:pointer;box-shadow:0 4px 16px rgba(0,0,0,.25);
@@ -665,7 +665,7 @@ tbody tr:hover{background:var(--g50)}
 }
 .accueil-fab:hover{transform:scale(1.1)}
 .accueil-fab:active{transform:scale(.95)}
-.accueil-fab svg{width:20px;height:20px}
+.accueil-fab svg{width:24px;height:24px}
 .accueil-fab .notif-badge{
   top:-4px;right:-4px;min-width:22px;height:22px;
   font-size:11px;border-width:2.5px;
