@@ -20,7 +20,7 @@ p{color:#64748b;margin-bottom:2rem;line-height:1.6}
 .status .ok{color:#16a34a;font-weight:600}
 .status .info{color:#3b82f6}
 .status .sep{border-top:1px dashed #e2e8f0;margin:.6rem 0}
-.stat-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:2rem}
+.stat-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:12px;margin-bottom:2rem}
 .stat-item{background:#f8fafc;border-radius:12px;padding:.8rem .4rem;border:1px solid #e2e8f0}
 .stat-num{font-size:1.4rem;font-weight:800;color:#0f2b4a}
 .stat-label{font-size:.65rem;color:#64748b;text-transform:uppercase;letter-spacing:.03em}
@@ -37,7 +37,8 @@ p{color:#64748b;margin-bottom:2rem;line-height:1.6}
     <div class="stat-item"><div class="stat-num">100</div><div class="stat-label">RÉSIDENTS</div></div>
     <div class="stat-item"><div class="stat-num">200+</div><div class="stat-label">JOURNAL</div></div>
     <div class="stat-item"><div class="stat-num">60+</div><div class="stat-label">PLANNING</div></div>
-    <div class="stat-item"><div class="stat-num">15+</div><div class="stat-label">AVENANTS</div></div>
+    <div class="stat-item"><div class="stat-num">15</div><div class="stat-label">INTERVENTIONS</div></div>
+    <div class="stat-item"><div class="stat-num">16</div><div class="stat-label">AVENANTS</div></div>
   </div>
 
   <button class="btn" id="genBtn" onclick="generateDemo()">
@@ -271,15 +272,19 @@ function generateDemo() {
     const res = resList[i % resList.length];
     const d = new Date(now.getTime() - rand(0, 365) * 86400000);
     const author = pick(journalAuthors);
+    const type = Math.random() < .65 ? 'observation' : 'transmission';
+    const contenu = pick(journalTemplates);
+    const visibilite = Math.random() < .1 ? 'confidentiel' : Math.random() < .2 ? 'tous' : 'equipe';
     journal.push({
       id: 'dj-' + (i + 1),
+      type,
       residentId: res.id,
       resident: res.prenom + ' ' + res.nom,
       residentColor: res.color,
       categorie: rand(1, 8),
       date: d.toISOString(),
-      contenu: pick(journalTemplates),
-      visibilite: 'equipe',
+      contenu,
+      visibilite,
       objectif: '',
       author: author.name,
       authorId: author.id,
@@ -628,6 +633,40 @@ function generateDemo() {
   });
   localStorage.setItem('ftr_incidents', JSON.stringify(incList));
   log('<span class="ok">✅ ' + incList.length + ' incidents créés</span>');
+
+  // ── INTERVENTIONS (15) ──
+  const intervs = [
+    { lieu:'Chambre 101 — Lavabo', desc:'Lavabo bouché, se vide très lentement.', urgence:'basse' },
+    { lieu:'Chambre 103 — Radiateur', desc:'Radiateur ne chauffe plus depuis hier.', urgence:'haute' },
+    { lieu:'Chambre 107 — Salle de bain', desc:'Ampoule du plafonnier grillée.', urgence:'basse' },
+    { lieu:'Salle commune — Prises', desc:'Deux prises électriques ne fonctionnent plus.', urgence:'moyenne' },
+    { lieu:'Chambre 204 — Volet', desc:'Volet roulant bloqué à mi-hauteur.', urgence:'moyenne' },
+    { lieu:'Chambre 112 — Évier', desc:'Fuite d eau sous l évier. Flaque au sol.', urgence:'haute' },
+    { lieu:'Couloir 1er — Porte', desc:'Porte coupe-feu ne se ferme plus correctement.', urgence:'haute' },
+    { lieu:'Bureau — Prise', desc:'Prise de l ordinateur du bureau hors service.', urgence:'moyenne' },
+    { lieu:'Chambre 108 — Lumière', desc:'Interrupteur qui claque et étincelle.', urgence:'haute' },
+    { lieu:'Réfectoire — Frigo', desc:'Réfrigérateur ne fait plus de froid.', urgence:'haute' },
+    { lieu:'Cuisine — Mitigeur', desc:'Mitigeur de l évier qui fuit.', urgence:'moyenne' },
+    { lieu:'WC garçons — Chasse', desc:'Chasse d eau ne se vide plus.', urgence:'moyenne' },
+    { lieu:'Portail électrique', desc:'Portail grince et bloque en milieu de course.', urgence:'basse' },
+    { lieu:'Buanderie — Machine', desc:'Machine à laver bruyante en essorage.', urgence:'moyenne' },
+    { lieu:'Chambre 120 — Prise', desc:'Prise murale près du lit desserrée.', urgence:'basse' }
+  ];
+
+  const intervsList = intervs.map((inc, i) => {
+    const d = new Date(now.getTime() - rand(0, 30) * 86400000);
+    const statut = Math.random() < .4 ? 'traitee' : 'ouverte';
+    return {
+      id: Date.now() + i,
+      lieu: inc.lieu,
+      desc: inc.desc,
+      urgence: inc.urgence,
+      date: d.toISOString(),
+      statut
+    };
+  });
+  localStorage.setItem('ftr_interventions', JSON.stringify(intervsList));
+  log('<span class="ok">✅ ' + intervsList.length + ' interventions créées</span>');
 
   // ── FIN ──
   log('<div class="sep"></div>');

@@ -25,74 +25,165 @@ function populateSelects() {
 function renderEntryForm() {
   const residents = (DB.get(DB.keys.residents) || []).filter(r => r.statut !== 'sorti');
   const cats = DB.get(DB.keys.categories) || [];
-  const objs = DB.get(DB.keys.objectives) || [];
+  const currentCat = document.getElementById('iCategorie')?.value || '';
+  const currentRes = (document.getElementById('iResident')?.value || '').split(',').filter(Boolean);
+  const currentDate = document.getElementById('iDate')?.value || new Date().toISOString().slice(0,16);
+  const currentContenu = document.getElementById('iContenu')?.value || '';
+  const currentObjectif = document.getElementById('iObjectif')?.value || '';
+  const currentVis = document.querySelector('input[name="iVisibilite"]:checked')?.value || 'equipe';
+
+  function pillStyle(isActive, color) {
+    return isActive ? `style="--pill-bg:${color || 'var(--accent)'}22;--pill-color:${color || 'var(--accent)'};--pill-border:${color || 'var(--accent)'}"` : '';
+  }
+
   const html = `
-    <div class="entry-detail" style="padding:1.5rem">
-      <div style="font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--accent);margin-bottom:1.25rem">Nouvelle entrée</div>
-      <div class="form-group"><label class="required">Résident concerné</label>
-        <select id="iResident" class="form-control"><option value="">— Sélectionner —</option>
-          ${residents.map(r => `<option value="${r.id}">${escHtml(r.prenom||'')} ${escHtml(r.nom||'')}</option>`).join('')}
-        </select>
-      </div>
-      <div class="form-row">
-        <div class="form-group"><label class="required">Catégorie</label>
-          <select id="iCategorie" class="form-control"><option value="">— Sélectionner —</option>
-            ${cats.map(c => `<option value="${c.id}">${escHtml(c.name)}</option>`).join('')}
-          </select>
-        </div>
-        <div class="form-group"><label>Objectif lié</label>
-          <select id="iObjectif" class="form-control"><option value="">— Aucun —</option>
-            ${objs.map(o => `<option value="${o.id}">${escHtml(o.name)}</option>`).join('')}
-          </select>
+    <div class="entry-form-design">
+      <input type="hidden" id="iCategorie" value="${currentCat}"/>
+      <input type="hidden" id="iResident" value="${currentRes.join(',')}"/>
+      <input type="hidden" id="iObjectif" value="${currentObjectif}"/>
+      <input type="hidden" id="iPeriode" value=""/>
+      <div class="form-step">
+        <div class="step-h"><span class="step-n">1</span><span class="step-t">Catégorie</span></div>
+        <div class="step-b">
+          <div class="pill-group">
+            ${cats.length ? cats.map(c => {
+              const isActive = currentCat === c.id;
+              return `<div class="pill cat-pill${isActive?' active':''}" data-id="${c.id}" ${pillStyle(isActive, c.color)} onclick="selectCatPill('${c.id}')">${escHtml(c.name)}</div>`;
+            }).join('') : '<span class="pill-empty">Aucune catégorie — définissez-en dans Admin</span>'}
+          </div>
         </div>
       </div>
-      <div class="form-group"><label>Date et heure</label><input type="datetime-local" id="iDate" class="form-control" value="${new Date().toISOString().slice(0,16)}"/></div>
-      <div class="form-group"><label class="required">Contenu</label>
-        <div style="display:flex;gap:.3rem;margin-bottom:.25rem">
-          <button class="btn btn-ghost btn-sm" style="font-size:.65rem;padding:1px 6px" onclick="aiAssistJournalInline('redaction')">✍ Rédiger</button>
-          <button class="btn btn-ghost btn-sm" style="font-size:.65rem;padding:1px 6px" onclick="aiAssistJournalInline('correction')">✓ Corriger</button>
-          <button class="btn btn-ghost btn-sm" style="font-size:.65rem;padding:1px 6px" onclick="aiAssistJournalInline('reformulation')">🏛 Reformuler</button>
+      <div class="form-step">
+        <div class="step-h"><span class="step-n">2</span><span class="step-t">Résident(s) concerné(s)</span></div>
+        <div class="step-b">
+          <div style="position:relative;margin-bottom:.5rem">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="position:absolute;left:10px;top:50%;transform:translateY(-50%);width:14px;height:14px;color:var(--muted);pointer-events:none"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+            <input type="text" id="residentSearch" placeholder="Rechercher un résident…" oninput="filterResidentPills()" style="width:100%;padding:.45rem .45rem .45rem 32px;border:1.5px solid var(--border);border-radius:var(--r-full);font-size:.78rem;outline:none;background:var(--g50);color:var(--text);transition:border-color var(--t)"/>
+          </div>
+          <div class="pill-group" style="flex-wrap:wrap;max-height:170px;overflow-y:auto" id="residentPillGroup">
+            ${residents.map(r => {
+              const name = `${r.prenom || ''} ${r.nom || ''}`.trim();
+              const isActive = currentRes.includes(r.id);
+              return `<div class="pill resident-pill${isActive?' active':''}" data-id="${r.id}" ${pillStyle(isActive, r.color)} onclick="selectResidentPill('${r.id}')">${escHtml(name)}</div>`;
+            }).join('')}
+          </div>
+          ${currentRes.length > 0 ? `<div style="font-size:.72rem;color:var(--muted);margin-top:.5rem">${currentRes.length} résident${currentRes.length>1?'s':''} sélectionné${currentRes.length>1?'s':''}</div>` : ''}
         </div>
-        <textarea id="iContenu" class="form-control" rows="5" placeholder="Décrivez l'événement…"></textarea>
       </div>
-      <div class="form-group">
-        <label>Visibilité</label>
-        <div style="display:flex;gap:1rem">
-          <label class="checkbox-wrap"><input type="radio" name="iVisibilite" value="equipe" checked/> Équipe uniquement</label>
-          <label class="checkbox-wrap"><input type="radio" name="iVisibilite" value="tous"/> Tous</label>
-          <label class="checkbox-wrap"><input type="radio" name="iVisibilite" value="confidentiel"/> Confidentiel</label>
+      <div class="form-step">
+        <div class="step-h"><span class="step-n">3</span><span class="step-t">Contenu</span></div>
+        <div class="step-b">
+          <input type="datetime-local" id="iDate" class="form-control" value="${currentDate}" style="max-width:280px;margin-bottom:.5rem"/>
+          <div class="ai-bar">
+            <button class="btn btn-ghost btn-sm" onclick="aiAssistJournalInline('redaction')">✍ Rédiger</button>
+            <button class="btn btn-ghost btn-sm" onclick="aiAssistJournalInline('correction')">✓ Corriger</button>
+            <button class="btn btn-ghost btn-sm" onclick="aiAssistJournalInline('reformulation')">🏛 Reformuler</button>
+          </div>
+          <textarea id="iContenu" class="form-control" rows="5" placeholder="Décrivez l'événement, l'observation ou l'intervention…">${escHtml(currentContenu)}</textarea>
         </div>
       </div>
-      <button class="btn btn-primary" onclick="saveInlineEntry()" style="margin-top:.5rem">Enregistrer</button>
+      <div class="form-step">
+        <div class="step-h"><span class="step-n">4</span><span class="step-t">Visibilité</span></div>
+        <div class="step-b">
+          <div class="pill-group">
+            <div class="pill vis-pill${currentVis==='equipe'?' active':''}" data-vis="equipe" onclick="selectVisPill('equipe')">Équipe uniquement</div>
+            <div class="pill vis-pill${currentVis==='tous'?' active':''}" data-vis="tous" onclick="selectVisPill('tous')">Tous</div>
+            <div class="pill vis-pill${currentVis==='confidentiel'?' active':''}" data-vis="confidentiel" onclick="selectVisPill('confidentiel')">Confidentiel</div>
+          </div>
+          <div class="vis-radios">
+            <input type="radio" name="iVisibilite" value="equipe" ${currentVis==='equipe'?'checked':''}/>
+            <input type="radio" name="iVisibilite" value="tous" ${currentVis==='tous'?'checked':''}/>
+            <input type="radio" name="iVisibilite" value="confidentiel" ${currentVis==='confidentiel'?'checked':''}/>
+          </div>
+        </div>
+      </div>
+      <button class="btn btn-primary" onclick="saveInlineEntry()" style="margin-top:1rem">Enregistrer l'entrée</button>
     </div>`;
   document.getElementById('entryDetail').innerHTML = html;
+}
+
+function selectCatPill(id) {
+  const hid = document.getElementById('iCategorie');
+  hid.value = hid.value === id ? '' : id;
+  document.querySelectorAll('.cat-pill').forEach(el => {
+    const on = el.dataset.id === hid.value;
+    el.classList.toggle('active', on);
+    if (on) { const c = (DB.get(DB.keys.categories)||[]).find(x=>String(x.id)===String(hid.value)); if(c){el.style.setProperty('--pill-bg',c.color+'22');el.style.setProperty('--pill-color',c.color);el.style.setProperty('--pill-border',c.color)} }
+    else { el.style.removeProperty('--pill-bg');el.style.removeProperty('--pill-color');el.style.removeProperty('--pill-border') }
+  });
+}
+
+function selectResidentPill(id) {
+  const hid = document.getElementById('iResident');
+  let ids = hid.value ? hid.value.split(',').filter(Boolean) : [];
+  const idx = ids.indexOf(id);
+  if (idx >= 0) ids.splice(idx, 1);
+  else ids.push(id);
+  hid.value = ids.join(',');
+  document.querySelectorAll('.resident-pill').forEach(el => {
+    const on = ids.includes(el.dataset.id);
+    el.classList.toggle('active', on);
+    if (on) { const r = (DB.get(DB.keys.residents)||[]).find(x=>x.id===el.dataset.id); if(r){el.style.setProperty('--pill-bg',(r.color||'var(--blue)')+'22');el.style.setProperty('--pill-color',r.color||'var(--blue)');el.style.setProperty('--pill-border',r.color||'var(--blue)')} }
+    else { el.style.removeProperty('--pill-bg');el.style.removeProperty('--pill-color');el.style.removeProperty('--pill-border') }
+  });
+  updateResidentCount(ids.length);
+}
+
+function updateResidentCount(count) {
+  const step = document.querySelectorAll('.entry-form-design > .form-step')[1];
+  if (!step) return;
+  const body = step.querySelector('.step-b');
+  let el = body.querySelector('.resident-count');
+  if (count > 0) {
+    if (!el) { el = document.createElement('div'); el.className = 'resident-count'; el.style.cssText = 'font-size:.72rem;color:var(--muted);margin-top:.5rem'; body.appendChild(el); }
+    el.textContent = count + ' résident' + (count>1?'s':'') + ' sélectionné' + (count>1?'s':'');
+  } else {
+    if (el) el.remove();
+  }
+}
+
+function filterResidentPills() {
+  const q = (document.getElementById('residentSearch')?.value || '').toLowerCase();
+  document.querySelectorAll('.resident-pill').forEach(el => {
+    el.style.display = !q || el.textContent.toLowerCase().includes(q) ? '' : 'none';
+  });
+}
+
+function selectVisPill(vis) {
+  const radio = document.querySelector('input[name="iVisibilite"][value="'+vis+'"]');
+  if (radio) radio.checked = true;
+  document.querySelectorAll('.vis-pill').forEach(el => el.classList.toggle('active', el.dataset.vis === vis));
 }
 
 function saveInlineEntry() {
   const session = Auth.getSession();
   const userName = session ? [session.prenom, session.nom].filter(Boolean).join(' ') || session.username : 'Utilisateur';
-  const residentId = document.getElementById('iResident').value;
+  const residentIds = document.getElementById('iResident').value ? document.getElementById('iResident').value.split(',').filter(Boolean) : [];
   const contenu = document.getElementById('iContenu').value.trim();
-  if (!residentId) { toast('Sélectionnez un résident', 'error'); return; }
+  if (!residentIds.length) { toast('Sélectionnez au moins un résident', 'error'); return; }
   if (!contenu) { toast('Le contenu est requis', 'error'); return; }
   const residents = DB.get(DB.keys.residents) || [];
-  const res = residents.find(r => r.id === residentId);
   const visEl = document.querySelector('input[name="iVisibilite"]:checked');
   const entries = DB.get(DB.keys.journal) || [];
-  entries.push({
-    id: genId(), residentId,
-    resident: res ? `${res.prenom||''} ${res.nom||''}`.trim() : '',
-    residentColor: res?.color || 'var(--blue)',
-    categorie: document.getElementById('iCategorie').value,
-    date: document.getElementById('iDate').value || new Date().toISOString(),
-    objectif: document.getElementById('iObjectif').value,
-    contenu, visibilite: visEl?.value || 'equipe',
-    author: userName, authorId: session?.userId,
-    replies: [], readBy: [session?.userId],
-    createdAt: new Date().toISOString(), updatedAt: new Date().toISOString()
-  });
+  for (const residentId of residentIds) {
+    const res = residents.find(r => r.id === residentId);
+    entries.push({
+      id: genId(),
+      type: 'observation',
+      residentId,
+      resident: res ? `${res.prenom||''} ${res.nom||''}`.trim() : '',
+      residentColor: res?.color || 'var(--blue)',
+      categorie: document.getElementById('iCategorie').value,
+      date: document.getElementById('iDate').value || new Date().toISOString(),
+      objectif: document.getElementById('iObjectif').value,
+      contenu, visibilite: visEl?.value || 'equipe',
+      author: userName, authorId: session?.userId,
+      replies: [], readBy: [session?.userId],
+      createdAt: new Date().toISOString(), updatedAt: new Date().toISOString()
+    });
+  }
   DB.set(DB.keys.journal, entries);
-  toast('Entrée ajoutée ✓');
+  toast(residentIds.length + ' entrée' + (residentIds.length>1?'s':'') + ' ajoutée' + (residentIds.length>1?'s':'') + ' ✓');
   renderEntryForm();
   renderEntries();
 }
@@ -101,10 +192,10 @@ async function aiAssistJournalInline(action) {
   const ta = document.getElementById('iContenu');
   if (!ta) return;
   const current = ta.value || '';
-  const residentId = document.getElementById('iResident')?.value || '';
+  const residentIds = (document.getElementById('iResident')?.value || '').split(',').filter(Boolean);
   const residents = DB.get(DB.keys.residents) || [];
-  const resident = residents.find(r => r.id === residentId);
-  const residentName = resident ? `${resident.prenom||''} ${resident.nom||''}`.trim() : '';
+  const firstRes = residents.find(r => r.id === residentIds[0]);
+  const residentName = firstRes ? `${firstRes.prenom||''} ${firstRes.nom||''}`.trim() : (residentIds.length > 1 ? 'plusieurs résidents' : '');
   const hasKey = !!getAiKey();
   const labels = { redaction: 'Rédaction', correction: 'Correction', reformulation: 'Reformulation' };
   if (hasKey) {
