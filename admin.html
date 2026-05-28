@@ -214,6 +214,10 @@
       <span class="asb-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></span>
       Utilisateurs
     </button>
+    <button class="asb-item tab" data-tab="permissions" onclick="adminNav(this)">
+      <span class="asb-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></span>
+      Permissions
+    </button>
     <button class="asb-item tab" data-tab="compte" onclick="adminNav(this)">
       <span class="asb-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></span>
       Mon compte
@@ -616,6 +620,19 @@
       </div>
     </div>
 
+    <!-- ═══ PERMISSIONS ═══ -->
+    <div id="tab-permissions" class="admin-panel" style="display:none">
+      <div class="panel-header">
+        <div><div class="panel-title">Permissions des modules</div><div class="panel-sub">Contrôlez qui peut accéder à chaque page de la plateforme</div></div>
+      </div>
+      <div class="card">
+        <div class="card-body" style="padding:1.5rem">
+          <div style="display:flex;flex-direction:column;gap:.75rem" id="permList"></div>
+          <div class="alert alert-info" style="margin-top:1rem"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>Les utilisateurs avec le rôle <strong>admin</strong> ont toujours accès à tous les modules.</div>
+        </div>
+      </div>
+    </div>
+
     <!-- ═══ MON COMPTE ═══ -->
     <div id="tab-compte" class="admin-panel" style="display:none">
       <div class="panel-header">
@@ -776,9 +793,9 @@
 const PANEL_NAMES = {
   stats:'Statistiques', etablissement:'Établissement & personnalisation',
   fonctions:'Fonctions & Catégories', objectifs:'Objectifs',
-  educateurs:'Utilisateurs', compte:'Mon compte', donnees:'Données'
+  educateurs:'Utilisateurs', permissions:'Permissions', compte:'Mon compte', donnees:'Données'
 };
-const ALL_TABS = ['stats','etablissement','fonctions','objectifs','educateurs','compte','donnees'];
+const ALL_TABS = ['stats','etablissement','fonctions','objectifs','educateurs','permissions','compte','donnees'];
 
 function adminNav(btn) {
   const name = btn.dataset.tab;
@@ -789,6 +806,7 @@ function adminNav(btn) {
     el.style.display = n === name ? '' : 'none';
     el.classList.toggle('active', n === name);
   });
+  if (name === 'permissions') renderPermissions();
   document.getElementById('atbTitle').textContent = PANEL_NAMES[name] || name;
   document.getElementById('atbBadge').textContent = PANEL_NAMES[name] || name;
   // Show/hide stats strip and detail
@@ -798,6 +816,44 @@ function adminNav(btn) {
   if (detail) detail.style.display = name === 'stats' ? '' : 'none';
   // Refresh stats when navigating to the stats tab
   if (name === 'stats') refreshAllStats();
+}
+
+/* ═══════════ PERMISSIONS ═══════════ */
+function getPermissions() {
+  return JSON.parse(localStorage.getItem('ftr_permissions') || '{}');
+}
+function savePerm(key, value) {
+  const p = getPermissions();
+  p[key] = value;
+  localStorage.setItem('ftr_permissions', JSON.stringify(p));
+  renderPermissions();
+}
+const PERM_MODULES = [
+  { key:'incidents', label:'Incidents (page complète)', icon:'⚠️', desc:'Accès à la liste et à la gestion des incidents' },
+  { key:'admin', label:'Administration', icon:'⚙️', desc:'Page d\'administration de la plateforme' },
+  { key:'documents', label:'Documents', icon:'📁', desc:'Gestion des documents des résidents' },
+  { key:'vehicules', label:'Véhicules', icon:'🚗', desc:'Page de réservation et gestion des véhicules' }
+];
+function renderPermissions() {
+  const el = document.getElementById('permList');
+  if (!el) return;
+  const perms = getPermissions();
+  const roles = ['admin','educ'];
+  el.innerHTML = PERM_MODULES.map(m => {
+    const current = perms[m.key] || 'admin';
+    return `<div style="display:flex;align-items:center;justify-content:space-between;gap:1rem;padding:.75rem 0;border-bottom:1px solid var(--border)">
+      <div style="display:flex;align-items:center;gap:.75rem;flex:1">
+        <span style="font-size:1.2rem">${m.icon}</span>
+        <div>
+          <div style="font-weight:600;font-size:.85rem">${m.label}</div>
+          <div style="font-size:.72rem;color:var(--muted)">${m.desc}</div>
+        </div>
+      </div>
+      <select onchange="savePerm('${m.key}',this.value)" style="font-size:.78rem;padding:.3rem .6rem;border:1.5px solid var(--border);border-radius:var(--r-sm);background:var(--white);color:var(--text);font-weight:500;">
+        ${roles.map(r => `<option value="${r}" ${current===r?'selected':''}>${r==='admin'?'Admin uniquement':'Tous les utilisateurs'}</option>`).join('')}
+      </select>
+    </div>`;
+  }).join('');
 }
 
 /* ═══════════ CIRCULAR PROGRESS ═══════════ */

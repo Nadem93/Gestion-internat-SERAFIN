@@ -62,6 +62,7 @@
     <button class="admin-tab" data-tab="objectifs" onclick="adminNavSPA(this)">Objectifs</button>
     <button class="admin-tab" data-tab="fonctions" onclick="adminNavSPA(this)">Fonctions</button>
     <button class="admin-tab" data-tab="educateurs" onclick="adminNavSPA(this)">Utilisateurs</button>
+    <button class="admin-tab" data-tab="permissions" onclick="adminNavSPA(this)">Permissions</button>
     <button class="admin-tab" data-tab="compte" onclick="adminNavSPA(this)">Mon compte</button>
     <button class="admin-tab" data-tab="donnees" onclick="adminNavSPA(this)">Données</button>
   </div>
@@ -122,6 +123,15 @@
         <div style="text-align:right"><button class="btn btn-violet" onclick="saveSettings()">💾 Enregistrer les paramètres</button></div>
       </div>
       <details><summary style="cursor:pointer;font-weight:600;font-size:.85rem;padding:.2rem 0;color:var(--av)">⚙ Instructions IA personnalisées</summary><div style="margin-top:.75rem;display:flex;flex-direction:column;gap:1rem"><p style="font-size:.77rem;color:var(--muted)">Personnalisez les instructions système envoyées à l'IA pour chaque module.</p><div id="aiPromptsContainer"></div></div></details>
+    </div></div>
+  </div>
+
+  <!-- ═══ PERMISSIONS ═══ -->
+  <div id="tab-permissions" class="admin-panel" style="display:none">
+    <div class="panel-header"><div><div class="panel-title">Permissions des modules</div><div class="panel-sub">Contrôlez qui peut accéder à chaque page</div></div></div>
+    <div class="card"><div class="card-body" style="padding:1.5rem">
+      <div style="display:flex;flex-direction:column;gap:.75rem" id="permList"></div>
+      <div class="alert alert-info" style="margin-top:1rem"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>Les utilisateurs avec le rôle <strong>admin</strong> ont toujours accès à tous les modules.</div>
     </div></div>
   </div>
 
@@ -224,16 +234,56 @@
 </div>
 
 <script>
+if (typeof Auth !== 'undefined' && !Auth.requireAdmin()) { document.getElementById('app-view').innerHTML = '<div style="display:flex;align-items:center;justify-content:center;min-height:60vh;font-size:1.1rem;color:var(--muted)">⛔ Accès refusé.</div>'; }
 /* ── SPA ADMIN NAV ── */
+/* ═══════════ PERMISSIONS ═══════════ */
+function getPermissions() {
+  return JSON.parse(localStorage.getItem('ftr_permissions') || '{}');
+}
+function savePerm(key, value) {
+  const p = getPermissions();
+  p[key] = value;
+  localStorage.setItem('ftr_permissions', JSON.stringify(p));
+  renderPermissions();
+}
+const PERM_MODULES = [
+  { key:'incidents', label:'Incidents (page complète)', icon:'⚠️', desc:'Accès à la liste et à la gestion des incidents' },
+  { key:'admin', label:'Administration', icon:'⚙️', desc:'Page d\'administration de la plateforme' },
+  { key:'documents', label:'Documents', icon:'📁', desc:'Gestion des documents des résidents' },
+  { key:'vehicules', label:'Véhicules', icon:'🚗', desc:'Page de réservation et gestion des véhicules' }
+];
+function renderPermissions() {
+  const el = document.getElementById('permList');
+  if (!el) return;
+  const perms = getPermissions();
+  const roles = ['admin','educ'];
+  el.innerHTML = PERM_MODULES.map(m => {
+    const current = perms[m.key] || 'admin';
+    return `<div style="display:flex;align-items:center;justify-content:space-between;gap:1rem;padding:.75rem 0;border-bottom:1px solid var(--border)">
+      <div style="display:flex;align-items:center;gap:.75rem;flex:1">
+        <span style="font-size:1.2rem">${m.icon}</span>
+        <div>
+          <div style="font-weight:600;font-size:.85rem">${m.label}</div>
+          <div style="font-size:.72rem;color:var(--muted)">${m.desc}</div>
+        </div>
+      </div>
+      <select onchange="savePerm('${m.key}',this.value)" style="font-size:.78rem;padding:.3rem .6rem;border:1.5px solid var(--border);border-radius:var(--r-sm);background:var(--white);color:var(--text);font-weight:500;">
+        ${roles.map(r => `<option value="${r}" ${current===r?'selected':''}>${r==='admin'?'Admin uniquement':'Tous les utilisateurs'}</option>`).join('')}
+      </select>
+    </div>`;
+  }).join('');
+}
+
 function adminNavSPA(btn) {
   const name = btn.dataset.tab;
   document.querySelectorAll('.admin-tab').forEach(i => i.classList.toggle('active', i === btn));
-  ['etablissement','categories','objectifs','fonctions','educateurs','compte','donnees'].forEach(n => {
+  if (name === 'permissions') renderPermissions();
+  ['etablissement','categories','objectifs','fonctions','educateurs','permissions','compte','donnees'].forEach(n => {
     const el = document.getElementById('tab-' + n);
     if (el) { el.style.display = n === name ? '' : 'none'; if (n === name) el.classList.add('active'); else el.classList.remove('active'); }
   });
   document.getElementById('pageTitle').textContent = 'Administration';
-  const labels = {etablissement:'Établissement & personnalisation',categories:'Catégories',objectifs:'Objectifs',fonctions:'Fonctions',educateurs:'Utilisateurs',compte:'Mon compte',donnees:'Données'};
+  const labels = {etablissement:'Établissement & personnalisation',categories:'Catégories',objectifs:'Objectifs',fonctions:'Fonctions',educateurs:'Utilisateurs',permissions:'Permissions',compte:'Mon compte',donnees:'Données'};
   const sub = document.getElementById('pageSub');
   if (sub) sub.textContent = labels[name] || name;
 }

@@ -16,7 +16,7 @@
 </main>
 
 <div class="accueil-fab-stack">
-  <div class="accueil-fab" data-module="incidents" onclick="localStorage.setItem('ftr_last_visit_incidents_'+Auth.getSession().userId,Date.now());openModal('modalIncident')" title="Signaler un incident" style="background:#e11d48">
+  <div class="accueil-fab" data-module="incidents" onclick="var _s=Auth.getSession();localStorage.setItem('ftr_last_visit_incidents_'+_s.userId,Date.now());if(_s?.role==='admin'){location.href='incidents.html'}else{openModal('modalIncident')}" title="Signaler un incident" style="background:#e11d48">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
   </div>
   <div class="accueil-fab" data-module="interventions" onclick="localStorage.setItem('ftr_last_visit_interventions_'+Auth.getSession().userId,Date.now());openModal('modalIntervention')" title="Demande d'intervention" style="background:var(--accent)">

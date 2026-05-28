@@ -131,7 +131,7 @@ const Auth = {
   requireAdmin() {
     const s = this.requireAuth();
     if (!s) return null;
-    if (s.role !== 'admin' && !canAccessAdmin(s.userId)) { window.location.href = 'dashboard.html'; return null; }
+    if (s.role !== 'admin' && !canAccessAdmin(s.userId) && !canAccessModule('admin')) { window.location.href = 'dashboard.html'; return null; }
     return s;
   },
   isAdmin() {
@@ -568,6 +568,16 @@ function canAccessAdmin(userId) {
 
 function canManageUsers(userId) {
   return hasPermission(userId, 'manage_users');
+}
+
+// ── MODULE PERMISSIONS (par rôle) ──
+function canAccessModule(moduleKey) {
+  const s = Auth.getSession();
+  if (!s) return false;
+  if (s.role === 'admin') return true;
+  const perms = JSON.parse(localStorage.getItem('ftr_permissions') || '{}');
+  const allowedRole = perms[moduleKey] || 'admin';
+  return allowedRole === 'educ' && s.role === 'educ';
 }
 
 // ── AI ──
