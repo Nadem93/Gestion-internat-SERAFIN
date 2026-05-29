@@ -608,23 +608,23 @@ tbody tr:hover{background:var(--g50)}
 /* ── ACCUEIL HOME ── */
 .accueil-home{display:flex;flex-direction:column;min-height:100vh;background:var(--bg)}
 .accueil-home-main{flex:1;display:flex;align-items:center;justify-content:center;padding:2rem}
-.accueil-home-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1.25rem;max-width:640px;width:100%}
+.accueil-home-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1rem;max-width:580px;width:100%}
 .accueil-home-card{
   position:relative;
-  display:flex;flex-direction:column;align-items:center;gap:.6rem;
-  padding:1.5rem .5rem;border-radius:var(--r-lg);
+  display:flex;flex-direction:column;align-items:center;gap:.45rem;
+  padding:1rem .4rem;border-radius:var(--r);
   background:#fff;border:1px solid var(--border);
   text-decoration:none;color:var(--g700);
-  font-size:.8rem;font-weight:600;text-align:center;
+  font-size:.75rem;font-weight:600;text-align:center;
   transition:box-shadow var(--t),transform var(--t);
   cursor:pointer;
 }
-.accueil-home-card:hover{box-shadow:0 8px 28px rgba(0,0,0,.08);transform:translateY(-3px);border-color:transparent}
+.accueil-home-card:hover{box-shadow:0 6px 20px rgba(0,0,0,.08);transform:translateY(-2px);border-color:transparent}
 .accueil-home-icon{
-  width:60px;height:60px;border-radius:var(--r);
+  width:48px;height:48px;border-radius:var(--r-sm);
   display:flex;align-items:center;justify-content:center;flex-shrink:0;
 }
-.accueil-home-icon svg{width:28px;height:28px;color:inherit}
+.accueil-home-icon svg{width:24px;height:24px;color:inherit}
 .accueil-home-label{line-height:1.2}
 .notif-badge{
   position:absolute;top:-5px;right:-5px;
