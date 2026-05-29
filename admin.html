@@ -407,6 +407,17 @@
         </div>
       </div>
 
+      <!-- Répartition des types d'incidents -->
+      <div class="card" style="margin-top:1.25rem">
+        <div class="card-header">
+          <span class="card-title">⚠️ Répartition des incidents par type</span>
+          <span style="font-size:.73rem;color:var(--muted);margin-left:auto" id="incidentTypeTotal"></span>
+        </div>
+        <div class="card-body" style="padding:.9rem 1.25rem">
+          <div id="incidentTypeBars" style="display:flex;flex-direction:column;gap:.55rem"></div>
+        </div>
+      </div>
+
       <!-- Demandes d'intervention -->
       <div class="card" style="margin-top:1.25rem">
         <div class="card-header">
@@ -976,6 +987,9 @@ function refreshAllStats() {
   const activeFreq = document.querySelector('.btn-freq.active')?.dataset?.freq || 'semaine';
   renderJournalCatBars(journal, activeFreq);
 
+  // ── Types d'incidents ──
+  renderIncidentTypeBars(incidents);
+
   // ── Demandes d'intervention ──
   renderInterventions();
 }
@@ -1147,6 +1161,50 @@ function renderJournalCatBars(journal, freq) {
         <div style="height:100%;border-radius:var(--r-full);background:${c.color};width:${barW}%;transition:width 1s ease"></div>
       </div>
       <span style="font-size:.75rem;font-weight:700;color:var(--g600);min-width:36px;text-align:right">${c.count}</span>
+      <span style="font-size:.68rem;color:var(--muted);min-width:32px">${pct}%</span>
+    </div>`;
+  }).join('');
+}
+
+function renderIncidentTypeBars(incidents) {
+  const el = document.getElementById('incidentTypeBars');
+  const totalEl = document.getElementById('incidentTypeTotal');
+  if (!el) return;
+  const total = incidents.length;
+  if (totalEl) totalEl.textContent = `${total} incident${total > 1 ? 's' : ''} au total`;
+  if (!total) {
+    el.innerHTML = '<div style="text-align:center;color:var(--muted);font-size:.82rem;padding:.5rem 0">Aucun incident</div>';
+    return;
+  }
+  const types = {
+    chute:'Chute', agression:'Agression', fugue:'Fugue',
+    violence:'Violence', medical:'Médical', materiel:'Dégât',
+    accident:'Accident', autre:'Autre'
+  };
+  const colors = {
+    chute:'#f59e0b', agression:'#ef4444', fugue:'#8b5cf6',
+    violence:'#dc2626', medical:'#06b6d4', materiel:'#f97316',
+    accident:'#eab308', autre:'#6b7280'
+  };
+  const icons = {
+    chute:'🦶', agression:'👊', fugue:'🚪',
+    violence:'⚡', medical:'💊', materiel:'🔧',
+    accident:'⚠️', autre:'📋'
+  };
+  const counts = {};
+  incidents.forEach(i => { const t = i.type || 'autre'; counts[t] = (counts[t] || 0) + 1; });
+  const entries = Object.entries(types).map(([k,label]) => ({ key:k, label, count:counts[k]||0, color:colors[k], icon:icons[k] })).sort((a,b) => b.count - a.count);
+  const maxCount = Math.max(...entries.map(e => e.count), 1);
+  el.innerHTML = entries.map(e => {
+    const pct = Math.round((e.count / total) * 100);
+    const barW = Math.round((e.count / maxCount) * 100);
+    return `<div style="display:flex;align-items:center;gap:.75rem">
+      <span style="font-size:1rem;width:20px;text-align:center;flex-shrink:0">${e.icon}</span>
+      <span style="font-size:.78rem;font-weight:500;color:var(--text);min-width:100px">${e.label}</span>
+      <div style="flex:1;height:8px;border-radius:var(--r-full);background:var(--g100);overflow:hidden">
+        <div style="height:100%;border-radius:var(--r-full);background:${e.color};width:${barW}%;transition:width 1s ease"></div>
+      </div>
+      <span style="font-size:.75rem;font-weight:700;color:var(--g600);min-width:36px;text-align:right">${e.count}</span>
       <span style="font-size:.68rem;color:var(--muted);min-width:32px">${pct}%</span>
     </div>`;
   }).join('');
