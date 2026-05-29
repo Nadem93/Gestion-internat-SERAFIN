@@ -61,6 +61,7 @@
     <button class="admin-tab" data-tab="categories" onclick="adminNavSPA(this)">Catégories</button>
     <button class="admin-tab" data-tab="objectifs" onclick="adminNavSPA(this)">Objectifs</button>
     <button class="admin-tab" data-tab="fonctions" onclick="adminNavSPA(this)">Fonctions</button>
+    <button class="admin-tab" data-tab="employes" onclick="adminNavSPA(this)">Employés</button>
     <button class="admin-tab" data-tab="educateurs" onclick="adminNavSPA(this)">Utilisateurs</button>
     <button class="admin-tab" data-tab="permissions" onclick="adminNavSPA(this)">Permissions</button>
     <button class="admin-tab" data-tab="compte" onclick="adminNavSPA(this)">Mon compte</button>
@@ -162,6 +163,12 @@
     </div>
   </div>
 
+  <!-- ═══ EMPLOYÉS ═══ -->
+  <div id="tab-employes" class="admin-panel" style="display:none">
+    <div class="panel-header"><div><div class="panel-title">Employés</div><div class="panel-sub">Gestion du personnel de l'établissement</div></div><button class="btn btn-violet btn-sm" onclick="resetEmployeFormSPA();openModal('modalEmploye')">+ Ajouter</button></div>
+    <div class="card"><div class="card-body" style="padding:1rem"><div id="spaEmployesList" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:.75rem"></div></div></div>
+  </div>
+
   <!-- ═══ UTILISATEURS ═══ -->
   <div id="tab-educateurs" class="admin-panel" style="display:none">
     <div class="panel-header"><div><div class="panel-title">Comptes utilisateurs</div><div class="panel-sub">Gérez les accès à la plateforme</div></div><button class="btn btn-violet btn-sm" onclick="resetEducateurForm();openModal('modalEdu')">+ Ajouter</button></div>
@@ -233,9 +240,108 @@
   </div>
 </div>
 
+<div class="modal-overlay" id="modalEmploye">
+  <div class="modal" style="max-width:480px">
+    <div class="modal-header"><span class="modal-title" id="modalEmployeTitle">Nouvel employé</span><button class="modal-close" onclick="closeModal('modalEmploye')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button></div>
+    <div class="modal-body" style="display:flex;flex-direction:column;gap:.85rem">
+      <input type="hidden" id="spaEmpId"/>
+      <div class="form-row">
+        <div class="form-group"><label>Prénom</label><input type="text" id="spaEmpPrenom" placeholder="Prénom"/></div>
+        <div class="form-group"><label>Nom</label><input type="text" id="spaEmpNom" placeholder="Nom"/></div>
+      </div>
+      <div class="form-group"><label>Poste</label><input type="text" id="spaEmpPoste" placeholder="Ex : Éducateur spécialisé…"/></div>
+      <div class="form-row">
+        <div class="form-group"><label>Téléphone</label><input type="tel" id="spaEmpTel" placeholder="06 12 34 56 78"/></div>
+        <div class="form-group"><label>Email</label><input type="email" id="spaEmpEmail" placeholder="prenom.nom@exemple.fr"/></div>
+      </div>
+      <div class="form-group"><label>Date d'embauche</label><input type="date" id="spaEmpDate"/></div>
+      <div class="form-group"><label>Notes</label><textarea id="spaEmpNotes" rows="2" placeholder="Observations…"></textarea></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" onclick="closeModal('modalEmploye')">Annuler</button>
+      <button class="btn btn-danger btn-sm" id="spaBtnDeleteEmp" style="margin-right:auto;display:none" onclick="deleteEmployeSPA()">Supprimer</button>
+      <button class="btn btn-violet" onclick="saveEmployeSPA()">Enregistrer</button>
+    </div>
+  </div>
+</div>
+
 <script>
 if (typeof Auth !== 'undefined' && !Auth.requireAdmin()) { document.getElementById('app-view').innerHTML = '<div style="display:flex;align-items:center;justify-content:center;min-height:60vh;font-size:1.1rem;color:var(--muted)">⛔ Accès refusé.</div>'; }
 /* ── SPA ADMIN NAV ── */
+/* ═══════════ EMPLOYÉS (SPA) ═══════════ */
+function getEmployes() { return JSON.parse(localStorage.getItem(DB.keys.employes) || '[]'); }
+function saveEmployes(list) { localStorage.setItem(DB.keys.employes, JSON.stringify(list)); }
+function resetEmployeFormSPA() {
+  document.getElementById('spaEmpId').value = '';
+  ['spaEmpPrenom','spaEmpNom','spaEmpPoste','spaEmpTel','spaEmpEmail','spaEmpNotes'].forEach(id => document.getElementById(id).value = '');
+  document.getElementById('spaEmpDate').value = '';
+  document.getElementById('spaBtnDeleteEmp').style.display = 'none';
+  document.getElementById('modalEmployeTitle').textContent = 'Nouvel employé';
+}
+function saveEmployeSPA() {
+  const id = document.getElementById('spaEmpId').value;
+  const prenom = document.getElementById('spaEmpPrenom').value.trim();
+  const nom = document.getElementById('spaEmpNom').value.trim();
+  const poste = document.getElementById('spaEmpPoste').value.trim();
+  const telephone = document.getElementById('spaEmpTel').value.trim();
+  const email = document.getElementById('spaEmpEmail').value.trim();
+  const dateEmbauche = document.getElementById('spaEmpDate').value;
+  const notes = document.getElementById('spaEmpNotes').value.trim();
+  if (!prenom || !nom) { toast('Prénom et nom requis', 'error'); return; }
+  let list = getEmployes();
+  if (id) {
+    const idx = list.findIndex(e => e.id === id);
+    if (idx >= 0) list[idx] = { ...list[idx], prenom, nom, poste, telephone, email, dateEmbauche, notes };
+  } else {
+    list.unshift({ id:genId(), prenom, nom, poste, telephone, email, dateEmbauche, statut:'actif', photo:'', notes, createdAt:new Date().toISOString() });
+  }
+  saveEmployes(list);
+  closeModal('modalEmploye');
+  renderEmployesSPA();
+  toast(id ? 'Employé modifié' : 'Employé ajouté');
+}
+function deleteEmployeSPA() {
+  const id = document.getElementById('spaEmpId').value;
+  if (!id || !confirm('Supprimer cet employé ?')) return;
+  let list = getEmployes();
+  saveEmployes(list.filter(e => e.id !== id));
+  closeModal('modalEmploye');
+  renderEmployesSPA();
+  toast('Employé supprimé');
+}
+function editEmployeSPA(id) {
+  const list = getEmployes();
+  const e = list.find(x => x.id === id);
+  if (!e) return;
+  document.getElementById('spaEmpId').value = e.id;
+  document.getElementById('spaEmpPrenom').value = e.prenom || '';
+  document.getElementById('spaEmpNom').value = e.nom || '';
+  document.getElementById('spaEmpPoste').value = e.poste || '';
+  document.getElementById('spaEmpTel').value = e.telephone || '';
+  document.getElementById('spaEmpEmail').value = e.email || '';
+  document.getElementById('spaEmpDate').value = e.dateEmbauche || '';
+  document.getElementById('spaEmpNotes').value = e.notes || '';
+  document.getElementById('spaBtnDeleteEmp').style.display = '';
+  document.getElementById('modalEmployeTitle').textContent = 'Modifier employé';
+  openModal('modalEmploye');
+}
+function renderEmployesSPA() {
+  const el = document.getElementById('spaEmployesList');
+  if (!el) return;
+  const list = getEmployes();
+  if (!list.length) { el.innerHTML = '<div style="grid-column:1/-1;text-align:center;color:var(--muted);padding:2rem 0;font-size:.85rem">Aucun employé. Cliquez sur + Ajouter.</div>'; return; }
+  el.innerHTML = list.map(e => {
+    const initiales = ((e.prenom||'')[0]||'') + ((e.nom||'')[0]||'');
+    return `<div class="employe-card" onclick="editEmployeSPA('${e.id}')" style="display:flex;align-items:center;gap:.75rem;padding:.75rem;border-radius:var(--r);border:1px solid var(--border);background:#fff;cursor:pointer;transition:box-shadow .15s" onmouseover="this.style.boxShadow='0 2px 8px rgba(0,0,0,.06)'" onmouseout="this.style.boxShadow='none'">
+      <div style="width:42px;height:42px;border-radius:50%;background:var(--av-l);color:var(--av);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:.9rem;flex-shrink:0">${escHtml(initiales)}</div>
+      <div style="flex:1;min-width:0">
+        <div style="font-weight:600;font-size:.85rem">${escHtml(e.prenom||'')} ${escHtml(e.nom||'')}</div>
+        <div style="font-size:.72rem;color:var(--muted)">${escHtml(e.poste||'')}${e.statut==='inactif'?' · <span style="color:var(--red)">Inactif</span>':''}</div>
+      </div>
+      <button class="btn btn-ghost btn-sm" onclick="event.stopPropagation();editEmployeSPA('${e.id}')" style="padding:4px 8px">✎</button>
+    </div>`;
+  }).join('');
+}
 /* ═══════════ PERMISSIONS ═══════════ */
 function getPermissions() {
   return JSON.parse(localStorage.getItem('ftr_permissions') || '{}');
@@ -278,12 +384,13 @@ function adminNavSPA(btn) {
   const name = btn.dataset.tab;
   document.querySelectorAll('.admin-tab').forEach(i => i.classList.toggle('active', i === btn));
   if (name === 'permissions') renderPermissions();
-  ['etablissement','categories','objectifs','fonctions','educateurs','permissions','compte','donnees'].forEach(n => {
+  if (name === 'employes') renderEmployesSPA();
+  ['etablissement','categories','objectifs','fonctions','educateurs','employes','permissions','compte','donnees'].forEach(n => {
     const el = document.getElementById('tab-' + n);
     if (el) { el.style.display = n === name ? '' : 'none'; if (n === name) el.classList.add('active'); else el.classList.remove('active'); }
   });
   document.getElementById('pageTitle').textContent = 'Administration';
-  const labels = {etablissement:'Établissement & personnalisation',categories:'Catégories',objectifs:'Objectifs',fonctions:'Fonctions',educateurs:'Utilisateurs',permissions:'Permissions',compte:'Mon compte',donnees:'Données'};
+  const labels = {etablissement:'Établissement & personnalisation',categories:'Catégories',objectifs:'Objectifs',fonctions:'Fonctions',employes:'Employés',educateurs:'Utilisateurs',permissions:'Permissions',compte:'Mon compte',donnees:'Données'};
   const sub = document.getElementById('pageSub');
   if (sub) sub.textContent = labels[name] || name;
 }

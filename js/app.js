@@ -12,7 +12,8 @@ const DB = {
     repertoire:'ftr_repertoire', incidents:'ftr_incidents', ppe:'ftr_ppe',
     loginHistory:'ftr_login_history', fonctionColors:'ftr_fonction_colors',
     aiKey:'ftr_ai_key', aiPrompts:'ftr_ai_prompts',
-    interventions:'ftr_interventions'
+    interventions:'ftr_interventions',
+    employes:'ftr_employes'
   }
 };
 

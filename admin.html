@@ -209,6 +209,11 @@
       <span class="asb-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></span>
       Objectifs
     </button>
+    <div class="asb-lbl">Ressources</div>
+    <button class="asb-item tab" data-tab="employes" onclick="adminNav(this)">
+      <span class="asb-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></span>
+      Employés
+    </button>
     <div class="asb-lbl">Accès</div>
     <button class="asb-item tab" data-tab="educateurs" onclick="adminNav(this)">
       <span class="asb-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></span>
@@ -632,6 +637,15 @@
       </div>
     </div>
 
+    <!-- ═══ EMPLOYÉS ═══ -->
+    <div id="tab-employes" class="admin-panel" style="display:none">
+      <div class="panel-header">
+        <div><div class="panel-title">Employés</div><div class="panel-sub">Gestion du personnel de l'établissement</div></div>
+        <button class="btn btn-violet btn-sm" onclick="resetEmployeForm();openModal('modalEmploye')">+ Ajouter</button>
+      </div>
+      <div class="card"><div class="card-body" style="padding:1rem"><div id="employesList" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:.75rem"></div></div></div>
+    </div>
+
     <!-- ═══ PERMISSIONS ═══ -->
     <div id="tab-permissions" class="admin-panel" style="display:none">
       <div class="panel-header">
@@ -775,6 +789,31 @@
   </div>
 </div>
 
+<div class="modal-overlay" id="modalEmploye">
+  <div class="modal" style="max-width:480px">
+    <div class="modal-header"><span class="modal-title" id="modalEmployeTitle">Nouvel employé</span><button class="modal-close" onclick="closeModal('modalEmploye')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button></div>
+    <div class="modal-body" style="display:flex;flex-direction:column;gap:.85rem">
+      <input type="hidden" id="empId"/>
+      <div class="form-row">
+        <div class="form-group"><label>Prénom</label><input type="text" id="empPrenom" placeholder="Prénom"/></div>
+        <div class="form-group"><label>Nom</label><input type="text" id="empNom" placeholder="Nom"/></div>
+      </div>
+      <div class="form-group"><label>Poste</label><input type="text" id="empPoste" placeholder="Ex : Éducateur spécialisé…"/></div>
+      <div class="form-row">
+        <div class="form-group"><label>Téléphone</label><input type="tel" id="empTel" placeholder="06 12 34 56 78"/></div>
+        <div class="form-group"><label>Email</label><input type="email" id="empEmail" placeholder="prenom.nom@exemple.fr"/></div>
+      </div>
+      <div class="form-group"><label>Date d'embauche</label><input type="date" id="empDate"/></div>
+      <div class="form-group"><label>Notes</label><textarea id="empNotes" rows="2" placeholder="Observations…"></textarea></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" onclick="closeModal('modalEmploye')">Annuler</button>
+      <button class="btn btn-danger btn-sm" id="btnDeleteEmp" style="margin-right:auto;display:none" onclick="deleteEmploye()">Supprimer</button>
+      <button class="btn btn-violet" onclick="saveEmploye()">Enregistrer</button>
+    </div>
+  </div>
+</div>
+
 <div class="modal-overlay" id="modalEdu">
   <div class="modal">
     <div class="modal-header"><span class="modal-title" id="modalEduTitle">Nouvel utilisateur</span><button class="modal-close"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button></div>
@@ -805,9 +844,9 @@
 const PANEL_NAMES = {
   stats:'Statistiques', etablissement:'Établissement & personnalisation',
   fonctions:'Fonctions & Catégories', objectifs:'Objectifs',
-  educateurs:'Utilisateurs', permissions:'Permissions', compte:'Mon compte', donnees:'Données'
+  employes:'Employés', educateurs:'Utilisateurs', permissions:'Permissions', compte:'Mon compte', donnees:'Données'
 };
-const ALL_TABS = ['stats','etablissement','fonctions','objectifs','educateurs','permissions','compte','donnees'];
+const ALL_TABS = ['stats','etablissement','fonctions','objectifs','employes','educateurs','permissions','compte','donnees'];
 
 function adminNav(btn) {
   const name = btn.dataset.tab;
@@ -819,6 +858,7 @@ function adminNav(btn) {
     el.classList.toggle('active', n === name);
   });
   if (name === 'permissions') renderPermissions();
+  if (name === 'employes') renderEmployes();
   document.getElementById('atbTitle').textContent = PANEL_NAMES[name] || name;
   document.getElementById('atbBadge').textContent = PANEL_NAMES[name] || name;
   // Show/hide stats strip and detail
@@ -828,6 +868,79 @@ function adminNav(btn) {
   if (detail) detail.style.display = name === 'stats' ? '' : 'none';
   // Refresh stats when navigating to the stats tab
   if (name === 'stats') refreshAllStats();
+}
+function getEmployes() { return JSON.parse(localStorage.getItem(DB.keys.employes) || '[]'); }
+function saveEmployes(list) { localStorage.setItem(DB.keys.employes, JSON.stringify(list)); }
+function resetEmployeForm() {
+  document.getElementById('empId').value = '';
+  ['empPrenom','empNom','empPoste','empTel','empEmail','empNotes'].forEach(id => document.getElementById(id).value = '');
+  document.getElementById('empDate').value = '';
+  document.getElementById('btnDeleteEmp').style.display = 'none';
+  document.getElementById('modalEmployeTitle').textContent = 'Nouvel employé';
+}
+function saveEmploye() {
+  const id = document.getElementById('empId').value;
+  const prenom = document.getElementById('empPrenom').value.trim();
+  const nom = document.getElementById('empNom').value.trim();
+  const poste = document.getElementById('empPoste').value.trim();
+  const telephone = document.getElementById('empTel').value.trim();
+  const email = document.getElementById('empEmail').value.trim();
+  const dateEmbauche = document.getElementById('empDate').value;
+  const notes = document.getElementById('empNotes').value.trim();
+  if (!prenom || !nom) { toast('Prénom et nom requis', 'error'); return; }
+  let list = getEmployes();
+  if (id) {
+    const idx = list.findIndex(e => e.id === id);
+    if (idx >= 0) list[idx] = { ...list[idx], prenom, nom, poste, telephone, email, dateEmbauche, notes };
+  } else {
+    list.unshift({ id:genId(), prenom, nom, poste, telephone, email, dateEmbauche, statut:'actif', photo:'', notes, createdAt:new Date().toISOString() });
+  }
+  saveEmployes(list);
+  closeModal('modalEmploye');
+  renderEmployes();
+  toast(id ? 'Employé modifié' : 'Employé ajouté');
+}
+function deleteEmploye() {
+  const id = document.getElementById('empId').value;
+  if (!id || !confirm('Supprimer cet employé ?')) return;
+  let list = getEmployes();
+  saveEmployes(list.filter(e => e.id !== id));
+  closeModal('modalEmploye');
+  renderEmployes();
+  toast('Employé supprimé');
+}
+function editEmploye(id) {
+  const list = getEmployes();
+  const e = list.find(x => x.id === id);
+  if (!e) return;
+  document.getElementById('empId').value = e.id;
+  document.getElementById('empPrenom').value = e.prenom || '';
+  document.getElementById('empNom').value = e.nom || '';
+  document.getElementById('empPoste').value = e.poste || '';
+  document.getElementById('empTel').value = e.telephone || '';
+  document.getElementById('empEmail').value = e.email || '';
+  document.getElementById('empDate').value = e.dateEmbauche || '';
+  document.getElementById('empNotes').value = e.notes || '';
+  document.getElementById('btnDeleteEmp').style.display = '';
+  document.getElementById('modalEmployeTitle').textContent = 'Modifier employé';
+  openModal('modalEmploye');
+}
+function renderEmployes() {
+  const el = document.getElementById('employesList');
+  if (!el) return;
+  const list = getEmployes();
+  if (!list.length) { el.innerHTML = '<div style="grid-column:1/-1;text-align:center;color:var(--muted);padding:2rem 0;font-size:.85rem">Aucun employé. Cliquez sur + Ajouter.</div>'; return; }
+  el.innerHTML = list.map(e => {
+    const initiales = ((e.prenom||'')[0]||'') + ((e.nom||'')[0]||'');
+    return `<div class="employe-card" onclick="editEmploye('${e.id}')" style="display:flex;align-items:center;gap:.75rem;padding:.75rem;border-radius:var(--r);border:1px solid var(--border);background:#fff;cursor:pointer;transition:box-shadow .15s" onmouseover="this.style.boxShadow='0 2px 8px rgba(0,0,0,.06)'" onmouseout="this.style.boxShadow='none'">
+      <div style="width:42px;height:42px;border-radius:50%;background:var(--av-l);color:var(--av);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:.9rem;flex-shrink:0">${escHtml(initiales)}</div>
+      <div style="flex:1;min-width:0">
+        <div style="font-weight:600;font-size:.85rem">${escHtml(e.prenom||'')} ${escHtml(e.nom||'')}</div>
+        <div style="font-size:.72rem;color:var(--muted)">${escHtml(e.poste||'')}${e.statut==='inactif'?' · <span style="color:var(--red)">Inactif</span>':''}</div>
+      </div>
+      <button class="btn btn-ghost btn-sm" onclick="event.stopPropagation();editEmploye('${e.id}')" style="padding:4px 8px">✎</button>
+    </div>`;
+  }).join('');
 }
 
 /* ═══════════ PERMISSIONS ═══════════ */
