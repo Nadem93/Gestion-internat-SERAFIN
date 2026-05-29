@@ -653,12 +653,12 @@
     <!-- ═══ PERMISSIONS ═══ -->
     <div id="tab-permissions" class="admin-panel" style="display:none">
       <div class="panel-header">
-        <div><div class="panel-title">Permissions des modules</div><div class="panel-sub">Contrôlez qui peut accéder à chaque page de la plateforme</div></div>
+        <div><div class="panel-title">Permissions par poste</div><div class="panel-sub">Définissez les accès de chaque métier aux différents modules</div></div>
       </div>
       <div class="card">
         <div class="card-body" style="padding:1.5rem">
-          <div style="display:flex;flex-direction:column;gap:.75rem" id="permList"></div>
-          <div class="alert alert-info" style="margin-top:1rem"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>Les utilisateurs avec le rôle <strong>admin</strong> ont toujours accès à tous les modules.</div>
+          <div style="overflow-x:auto" id="permList"></div>
+          <div class="alert alert-info" style="margin-top:1rem"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>Le rôle <strong>admin</strong> a toujours accès à tous les modules, indépendamment de son poste.</div>
         </div>
       </div>
     </div>
@@ -973,42 +973,53 @@ function renderEmployes() {
   }).join('');
 }
 
-/* ═══════════ PERMISSIONS ═══════════ */
-function getPermissions() {
+/* ═══════════ PERMISSIONS (par poste) ═══════════ */
+const POSTES = [
+  'Éducateur spécialisé','Éducateur de jeunes enfants','Assistant de service social',
+  'Conseiller en économie sociale','Psychologue','Infirmier','Aide-soignant',
+  'Moniteur-éducateur','Accompagnant éducatif et social','Animateur social',
+  'Médiateur social','Chef de service','Directeur d\'établissement',
+  'Coordonnateur de parcours','Agent de développement social',
+  'Technicien d\'intervention sociale','Chargé d\'insertion','Autre'
+];
+const PERM_MODULES = [
+  { key:'incidents', label:'Incidents', icon:'⚠️' },
+  { key:'documents', label:'Documents', icon:'📁' },
+  { key:'vehicules', label:'Véhicules', icon:'🚗' },
+  { key:'admin', label:'Admin', icon:'⚙️' }
+];
+function getPermPostes() {
   return JSON.parse(localStorage.getItem('ftr_permissions') || '{}');
 }
-function savePerm(key, value) {
-  const p = getPermissions();
-  p[key] = value;
+function savePermPoste(posteIdx, moduleKey, allowed) {
+  const poste = POSTES[posteIdx];
+  const p = getPermPostes();
+  if (!p[poste] || typeof p[poste] !== 'object') p[poste] = {};
+  p[poste][moduleKey] = allowed;
   localStorage.setItem('ftr_permissions', JSON.stringify(p));
   renderPermissions();
 }
-const PERM_MODULES = [
-  { key:'incidents', label:'Incidents (page complète)', icon:'⚠️', desc:'Accès à la liste et à la gestion des incidents' },
-  { key:'admin', label:'Administration', icon:'⚙️', desc:'Page d\'administration de la plateforme' },
-  { key:'documents', label:'Documents', icon:'📁', desc:'Gestion des documents des résidents' },
-  { key:'vehicules', label:'Véhicules', icon:'🚗', desc:'Page de réservation et gestion des véhicules' }
-];
 function renderPermissions() {
   const el = document.getElementById('permList');
   if (!el) return;
-  const perms = getPermissions();
-  const roles = ['admin','educ'];
-  el.innerHTML = PERM_MODULES.map(m => {
-    const current = perms[m.key] || 'admin';
-    return `<div style="display:flex;align-items:center;justify-content:space-between;gap:1rem;padding:.75rem 0;border-bottom:1px solid var(--border)">
-      <div style="display:flex;align-items:center;gap:.75rem;flex:1">
-        <span style="font-size:1.2rem">${m.icon}</span>
-        <div>
-          <div style="font-weight:600;font-size:.85rem">${m.label}</div>
-          <div style="font-size:.72rem;color:var(--muted)">${m.desc}</div>
-        </div>
-      </div>
-      <select onchange="savePerm('${m.key}',this.value)" style="font-size:.78rem;padding:.3rem .6rem;border:1.5px solid var(--border);border-radius:var(--r-sm);background:var(--white);color:var(--text);font-weight:500;">
-        ${roles.map(r => `<option value="${r}" ${current===r?'selected':''}>${r==='admin'?'Admin uniquement':'Tous les utilisateurs'}</option>`).join('')}
-      </select>
-    </div>`;
-  }).join('');
+  const perms = getPermPostes();
+  el.innerHTML =
+    `<div style="display:grid;grid-template-columns:180px repeat(${PERM_MODULES.length},1fr);gap:0;font-size:.78rem;border-bottom:2px solid var(--border);padding-bottom:.5rem;margin-bottom:.5rem;font-weight:600;color:var(--muted)">
+      <div>Poste</div>
+      ${PERM_MODULES.map(m => `<div style="text-align:center">${m.icon} ${m.label}</div>`).join('')}
+    </div>` +
+    POSTES.map((poste, i) => {
+      const p = perms[poste] || {};
+      return `<div style="display:grid;grid-template-columns:180px repeat(${PERM_MODULES.length},1fr);gap:0;align-items:center;padding:.55rem 0;border-bottom:1px solid var(--g100)">
+        <div style="font-weight:500;font-size:.78rem">${escHtml(poste)}</div>
+        ${PERM_MODULES.map(m => {
+          const checked = p[m.key] === true;
+          return `<div style="text-align:center">
+            <input type="checkbox" ${checked?'checked':''} onchange="savePermPoste(${i},'${m.key}',this.checked)" style="width:16px;height:16px;cursor:pointer;accent-color:var(--accent)">
+          </div>`;
+        }).join('')}
+      </div>`;
+    }).join('');
 }
 
 /* ═══════════ CIRCULAR PROGRESS ═══════════ */

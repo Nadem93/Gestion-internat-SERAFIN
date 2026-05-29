@@ -114,7 +114,7 @@ const Auth = {
     const users = DB.get(DB.keys.users) || DEFAULTS.users;
     const user = users.find(u => u.username === username.trim() && u.password === password);
     if (!user) return false;
-    DB.set(DB.keys.session, { userId: user.id, username: user.username, role: user.role, prenom: user.prenom || '', nom: user.nom || '', mustChangePassword: user.mustChangePassword || false });
+    DB.set(DB.keys.session, { userId: user.id, username: user.username, role: user.role, prenom: user.prenom || '', nom: user.nom || '', fonction: user.fonction || '', mustChangePassword: user.mustChangePassword || false });
     logConnexion('login', user);
     return true;
   },
@@ -571,14 +571,15 @@ function canManageUsers(userId) {
   return hasPermission(userId, 'manage_users');
 }
 
-// ── MODULE PERMISSIONS (par rôle) ──
+// ── MODULE PERMISSIONS (par poste) ──
 function canAccessModule(moduleKey) {
   const s = Auth.getSession();
   if (!s) return false;
   if (s.role === 'admin') return true;
   const perms = JSON.parse(localStorage.getItem('ftr_permissions') || '{}');
-  const allowedRole = perms[moduleKey] || 'admin';
-  return allowedRole === 'educ' && s.role === 'educ';
+  const postePerms = perms[s.fonction];
+  if (!postePerms || typeof postePerms !== 'object') return false;
+  return postePerms[moduleKey] === true;
 }
 
 // ── AI ──
