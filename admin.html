@@ -932,7 +932,7 @@ function renderEmployes() {
   if (!list.length) { el.innerHTML = '<div style="grid-column:1/-1;text-align:center;color:var(--muted);padding:2rem 0;font-size:.85rem">Aucun employé. Cliquez sur + Ajouter.</div>'; return; }
   el.innerHTML = list.map(e => {
     const initiales = ((e.prenom||'')[0]||'') + ((e.nom||'')[0]||'');
-    return `<div class="employe-card" onclick="editEmploye('${e.id}')" style="display:flex;align-items:center;gap:.75rem;padding:.75rem;border-radius:var(--r);border:1px solid var(--border);background:#fff;cursor:pointer;transition:box-shadow .15s" onmouseover="this.style.boxShadow='0 2px 8px rgba(0,0,0,.06)'" onmouseout="this.style.boxShadow='none'">
+    return `<div class="employe-card" onclick="window.location='employe.html?id=${e.id}'" style="display:flex;align-items:center;gap:.75rem;padding:.75rem;border-radius:var(--r);border:1px solid var(--border);background:#fff;cursor:pointer;transition:box-shadow .15s" onmouseover="this.style.boxShadow='0 2px 8px rgba(0,0,0,.06)'" onmouseout="this.style.boxShadow='none'">
       <div style="width:42px;height:42px;border-radius:50%;background:var(--av-l);color:var(--av);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:.9rem;flex-shrink:0">${escHtml(initiales)}</div>
       <div style="flex:1;min-width:0">
         <div style="font-weight:600;font-size:.85rem">${escHtml(e.prenom||'')} ${escHtml(e.nom||'')}</div>

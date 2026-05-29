@@ -12,6 +12,7 @@ const ROUTES = {
   'documents':   { view:'documents',   title:'Documents',        sub:'GED résidents',          js:'js/documents.js' },
   'repertoire':  { view:'repertoire',  title:'Répertoire',       sub:'Contacts utiles',         js:'js/repertoire.js' },
   'vehicules':   { view:'vehicules',   title:'Véhicules',        sub:'Réservations véhicules',  js:'js/vehicules.js' },
+  'employe':     { view:'employe',     title:'Fiche employé',    sub:'',                      js:'' },
   'admin':       { view:'admin',       title:'Administration',   sub:'Paramètres',              js:'js/admin.js' }
 };
 
