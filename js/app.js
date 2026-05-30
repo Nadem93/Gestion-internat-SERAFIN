@@ -302,8 +302,9 @@ function renderUserInfo() {
 
 // ── MENU 9 POINTS ──
 function initMenuPopup() {
-  const header = document.querySelector('.header');
+  const header = document.querySelector('.header') || document.querySelector('.admin-topbar');
   if (!header) return;
+  const isAdmin = header.classList.contains('admin-topbar');
 
   // Get reference to the title wrapper before inserting the button
   const titleWrap = header.firstElementChild;
@@ -329,7 +330,7 @@ function initMenuPopup() {
   }
 
   // French clock display (all pages)
-  if (!document.getElementById('headerClock')) {
+  if (!document.getElementById('headerClock') && !isAdmin) {
     const clock = document.createElement('span');
     clock.id = 'headerClock';
     clock.style.cssText = 'font-size:1.1rem;font-weight:700;color:var(--g700);margin-left:.75rem;font-variant-numeric:tabular-nums;letter-spacing:.02em';
@@ -344,7 +345,7 @@ function initMenuPopup() {
   }
 
   // Centered site brand
-  if (!document.getElementById('headerBrand')) {
+  if (!document.getElementById('headerBrand') && !isAdmin) {
     const brand = document.createElement('div');
     brand.id = 'headerBrand';
     brand.textContent = 'INTERNALIS';
@@ -352,8 +353,8 @@ function initMenuPopup() {
     header.appendChild(brand);
   }
 
-  // Add user avatar to header-right
-  const hr = header.querySelector('.header-right');
+  // Add user avatar to header-right (or atb-right for admin page)
+  const hr = isAdmin ? header.querySelector('.atb-right') : header.querySelector('.header-right');
   if (hr && !document.getElementById('headerUserBox')) {
     const session = Auth.getSession();
     const name = session ? [session.prenom, session.nom].filter(Boolean).join(' ') || session.username : 'Utilisateur';
