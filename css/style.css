@@ -745,16 +745,10 @@ tbody tr:hover .table-actions{opacity:1}
    RESPONSIVE — Mobile First System
 ══════════════════════════════════════════ */
 
-/* ── 1280px: Large tablet landscape ── */
-@media(max-width:1280px){
-  .grid-5{grid-template-columns:repeat(3,1fr)}
-}
-
 /* ── 1024px: Tablet ── */
 @media(max-width:1024px){
   .grid-4{grid-template-columns:repeat(2,1fr)}
   .grid-3{grid-template-columns:repeat(2,1fr)}
-  .grid-5{grid-template-columns:repeat(3,1fr)}
   .content{padding:1.5rem}
 }
 
@@ -783,7 +777,7 @@ tbody tr:hover .table-actions{opacity:1}
   .page-title h1{font-size:1.2rem}
 
   /* Grids */
-  .grid-2,.grid-3,.grid-4,.grid-5{grid-template-columns:1fr}
+  .grid-2,.grid-3,.grid-4{grid-template-columns:1fr}
 
   /* Forms */
   .form-row,.form-row-3{grid-template-columns:1fr}
