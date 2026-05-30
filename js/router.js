@@ -3,7 +3,7 @@ const ROUTES = {
   'accueil':     { view:'accueil',     title:'Accueil',          sub:'',                      js:'' },
   'resident':    { view:'resident',    title:'Fiche résident',   sub:'',                      js:'js/residents.js' },
   'dashboard':   { view:'dashboard',   title:'Tableau de bord',  sub:'Vue d\'ensemble',        js:'' },
-  'journal':     { view:'journal',     title:'Journal',          sub:'Suivi quotidien',        js:'js/journal.js' },
+  'journal':     { view:'journal',     title:'Journal',          sub:'',                      js:'js/journal.js' },
   'planning':    { view:'planning',    title:'Planning',         sub:'Activités & sorties',     js:'js/planning.js' },
   'presences':   { view:'presences',   title:'Présences',        sub:'Pointage des résidents',  js:'js/presences.js' },
   'ppe':         { view:'ppe',         title:'PPE',              sub:'Projets Personnalisés',   js:'js/ppe.js' },
