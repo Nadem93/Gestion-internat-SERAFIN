@@ -235,7 +235,7 @@ function residentCard(r) {
       ${photoEl}
       <div class="res-card-info">
         <div class="res-card-name">${escHtml(r.prenom||'')} ${escHtml(r.nom||'')}</div>
-        <div class="res-card-meta">${r.dob ? age(r.dob)+' ans' : ''}${r.chambre ? ' · Ch. '+escHtml(r.chambre) : ''}</div>
+        <div class="res-card-meta">${r.dob ? age(r.dob)+' ans' : ''}${r.chambre ? ' · Ch. '+escHtml(r.chambre) : ''}${r.entree ? ' · Dep. '+new Date(r.entree).toLocaleDateString('fr-FR',{month:'long',year:'numeric'}) : ''}</div>
         ${r.protection ? `<div class="res-card-ref">${PROTECTION_LABELS[r.protection] || r.protection}</div>` : ''}
         <div>${statusBadge(presenceStatus)}</div>
       </div>
