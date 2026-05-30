@@ -155,32 +155,41 @@ function exportPresencesPDF() {
     const s = { present:'Présent', absent:'Absent', sortie:'Sorti', permission:'Permission', malade:'Malade', '':'-' };
     const c = { present:'#16a34a', absent:'#dc2626', sortie:'#ca8a04', permission:'#2563eb', malade:'#9333ea' };
     const rowsHtml = rows.map(r => `<tr><td style="font-weight:600;color:#334155">${r.date}</td><td>${r.resident}</td><td><span style="background:${c[r.status]||'#94a3b8'};color:#fff;padding:2px 10px;border-radius:12px;font-size:10px;font-weight:700;letter-spacing:.02em">${s[r.status]||r.status}</span></td></tr>`).join('');
-    const printEl = document.createElement('div');
-    printEl.id = 'printExport';
-    printEl.innerHTML = `<style nonce>
-#printExport{position:fixed;top:0;left:0;right:0;bottom:0;z-index:99999;background:#f8fafc;padding:0;font-family:Inter,system-ui,sans-serif;font-size:11px;color:#1e293b;overflow:auto}
-.print-header{background:linear-gradient(135deg,${pc},${ac});color:#fff;padding:32px 40px 28px}
-.print-header h1{font-size:22px;margin:0;font-weight:800;letter-spacing:-.02em}
-.print-header .sub{font-size:12px;margin-top:6px;opacity:.85}
-.print-meta{display:flex;gap:24px;padding:16px 40px;background:#fff;border-bottom:2px solid #e2e8f0;font-size:11px}
-.print-meta span{display:flex;align-items:center;gap:6px}
-.print-meta .label{color:#94a3b8;font-weight:500}
-.print-meta .val{color:#1e293b;font-weight:700}
-.print-body{padding:24px 40px 40px}
+    const html = `<!DOCTYPE html><html><head><meta charset="utf-8"><title>Export Pr&eacute;sences</title><style>
+body{margin:0;font-family:Inter,system-ui,sans-serif;font-size:11px;color:#1e293b}
+.header{background:linear-gradient(135deg,${pc},${ac});color:#fff;padding:28px 40px}
+.header h1{font-size:22px;margin:0;font-weight:800;letter-spacing:-.02em}
+.header .sub{font-size:12px;margin-top:4px;opacity:.85}
+.meta{display:flex;gap:24px;padding:14px 40px;background:#fff;border-bottom:2px solid #e2e8f0;font-size:11px}
+.meta .lbl{color:#94a3b8;font-weight:500}
+.meta .val{color:#1e293b;font-weight:700;margin-left:4px}
+.body{padding:24px 40px}
+.actions{margin-bottom:16px}
+.actions button{padding:8px 20px;border:none;border-radius:8px;background:${pc};color:#fff;font-weight:600;cursor:pointer;font-size:12px;margin-right:8px}
+.actions button:hover{opacity:.9}
 table{width:100%;border-collapse:collapse;border-radius:12px;overflow:hidden;box-shadow:0 1px 4px rgba(0,0,0,.06)}
 th{background:${pc};color:#fff;padding:10px 12px;text-align:left;font-size:10px;text-transform:uppercase;letter-spacing:.06em;font-weight:700}
 td{padding:8px 12px;border-bottom:1px solid #e2e8f0;font-size:11px}
-tbody tr:nth-child(even){background:#f1f5f9}
-tbody tr:hover{background:#e2e8f0}
-@media print{body>*:not(#printExport){display:none!important}#printExport{position:static!important}.print-header{padding:28px 0 20px!important}.print-body{padding:20px 0 0!important}.print-meta{padding:12px 0!important}table{box-shadow:none!important}}
-</style>
-<div class="print-header"><h1>${etab}</h1><div class="sub">Registre des pr&eacute;sences</div></div>
-<div class="print-meta"><span><span class="label">P&eacute;riode</span> <span class="val">du ${start} au ${end}</span></span><span><span class="label">Entr&eacute;es</span> <span class="val">${rows.length}</span></span><span><span class="label">G&eacute;n&eacute;r&eacute; le</span> <span class="val">${now}</span></span></div>
-<div class="print-body"><table><thead><tr><th style="width:120px">Date</th><th>R&eacute;sident</th><th style="width:100px">Statut</th></tr></thead><tbody>${rowsHtml}</tbody></table></div>`;
-    document.body.appendChild(printEl);
+tr:nth-child(even){background:#f1f5f9}
+@media print{body{background:#fff!important}.header{padding:28px 0 20px!important}.body{padding:20px 0 0!important}.meta{padding:12px 0!important}table{box-shadow:none!important}.actions{display:none!important}}
+<\/style></head><body>
+<div class="header"><h1>${etab}</h1><div class="sub">Registre des pr&eacute;sences</div></div>
+<div class="meta"><span><span class="lbl">P&eacute;riode</span><span class="val">du ${start} au ${end}</span></span><span><span class="lbl">Entr&eacute;es</span><span class="val">${rows.length}</span></span><span><span class="lbl">G&eacute;n&eacute;r&eacute; le</span><span class="val">${now}</span></span></div>
+<div class="body"><div class="actions"><button onclick="window.print()">🖨 Imprimer / PDF</button> <button onclick="window.close()">Fermer</button></div>
+<table><thead><tr><th style="width:120px">Date</th><th>R&eacute;sident</th><th style="width:100px">Statut</th></tr></thead><tbody>${rowsHtml}</tbody></table></div>
+</body></html>`;
     closeModal('modalExportAbs');
-    setTimeout(() => { window.focus(); window.print(); setTimeout(() => printEl.remove(), 300); }, 200);
-    toast('Export en cours...');
+    const w = window.open('', '_blank', 'width=900,height=700');
+    if (w) {
+      w.document.write(html);
+      w.document.close();
+    } else {
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(new Blob([html], { type:'text/html' }));
+      a.download = 'export-presences.html';
+      a.click();
+    }
+    toast('Export généré');
   } catch(e) { toast('Erreur: '+e.message, 'error'); console.error(e); }
 }
 
