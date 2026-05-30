@@ -40,7 +40,7 @@ function loadScriptSingle(src) {
     if (old) old.remove();
     const script = document.createElement('script');
     script.setAttribute('data-route-src', src);
-    script.src = src;
+    script.src = src + (src.includes('?') ? '&' : '?') + 'v=' + Date.now();
     script.onload = () => resolve();
     script.onerror = () => reject(new Error('Failed to load ' + src));
     document.body.appendChild(script);
