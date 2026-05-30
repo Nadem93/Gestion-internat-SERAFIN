@@ -283,6 +283,54 @@
     /* ── SCROLLBAR GLOBAL ── */
     .admin-main::-webkit-scrollbar{width:5px}
     .admin-main::-webkit-scrollbar-thumb{background:rgba(15,43,74,.18);border-radius:5px}
+
+    /* ── MOBILE RESPONSIVE ── */
+    .asb-overlay{
+      display:none;position:fixed;inset:0;
+      background:rgba(15,43,74,.45);backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px);
+      z-index:205;cursor:pointer;
+    }
+    .asb-overlay.open{display:block}
+    .mob-menu-btn{
+      display:none;align-items:center;justify-content:center;
+      width:36px;height:36px;border-radius:8px;flex-shrink:0;
+      border:1px solid rgba(15,43,74,.12);
+      background:rgba(255,255,255,.8);
+      color:var(--muted);cursor:pointer;
+      transition:all .18s;margin-right:.5rem;
+    }
+    .mob-menu-btn:hover{background:#fff;color:var(--av)}
+    .mob-menu-btn svg{width:17px;height:17px}
+
+    @media(max-width:900px){
+      .admin-sidebar{
+        transform:translateX(-100%);
+        transition:transform .28s cubic-bezier(.4,0,.2,1);
+        z-index:210;
+      }
+      .admin-sidebar.open{transform:translateX(0)}
+      .admin-main{margin-left:0}
+      .mob-menu-btn{display:flex}
+      .admin-topbar{padding:.85rem 1.1rem}
+      .atb-badge{display:none}
+      .stats-strip{grid-template-columns:repeat(2,1fr);padding:1rem 1rem 0}
+      .stats-detail{grid-template-columns:1fr;padding:.75rem 1rem 0}
+      .admin-content{padding:1rem 1rem 3rem}
+      .fonc-grid{grid-template-columns:1fr}
+    }
+
+    @media(max-width:480px){
+      .stats-strip{gap:.625rem;padding:.75rem .75rem 0}
+      .admin-content{padding:.75rem .75rem 3rem}
+      .admin-topbar{padding:.7rem .75rem}
+      .atb-title{font-size:.9rem}
+      .circ-wrap{width:72px;height:72px}
+      .circ-svg{width:72px;height:72px}
+      .circ-label{font-size:1rem}
+      .stat-circ-card{padding:1rem .75rem .875rem}
+      .sdcard-body{padding:.75rem 1rem}
+      .sdcard-head{padding:.75rem 1rem}
+    }
   </style>
 </head>
 <body>
@@ -355,8 +403,14 @@
 <!-- ══════════ MAIN ══════════ -->
 <div class="admin-main">
 
+  <!-- Overlay mobile sidebar -->
+  <div class="asb-overlay" id="asbOverlay" onclick="closeSidebar()"></div>
+
   <!-- Topbar -->
   <header class="admin-topbar">
+    <button class="mob-menu-btn" onclick="toggleSidebar()" aria-label="Menu">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+    </button>
     <div>
       <div class="atb-greeting">Administration</div>
       <div class="atb-title" id="atbTitle">Statistiques</div>
@@ -955,7 +1009,21 @@ const PANEL_NAMES = {
 };
 const ALL_TABS = ['stats','etablissement','fonctions','employes','educateurs','permissions','compte','donnees'];
 
+function toggleSidebar() {
+  const sb = document.querySelector('.admin-sidebar');
+  const ov = document.getElementById('asbOverlay');
+  sb.classList.toggle('open');
+  ov.classList.toggle('open');
+  document.body.style.overflow = sb.classList.contains('open') ? 'hidden' : '';
+}
+function closeSidebar() {
+  document.querySelector('.admin-sidebar').classList.remove('open');
+  document.getElementById('asbOverlay').classList.remove('open');
+  document.body.style.overflow = '';
+}
+
 function adminNav(btn) {
+  if(window.innerWidth <= 900) closeSidebar();
   const name = btn.dataset.tab;
   document.querySelectorAll('.asb-item').forEach(i => i.classList.toggle('active', i === btn));
   ALL_TABS.forEach(n => {
