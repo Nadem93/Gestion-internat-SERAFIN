@@ -488,7 +488,14 @@ function resetEntryForm() {
 function initJournal() {
   document.getElementById('eDate').value = new Date().toISOString().slice(0,16);
   populateSelects();
-  renderEntryForm();
+  const entries = DB.get(DB.keys.journal) || [];
+  if (entries.length) {
+    const last = entries[entries.length - 1];
+    selectedEntryId = last.id;
+    selectEntry(last.id);
+  } else {
+    renderEntryForm();
+  }
   renderEntries();
   ['jSearch','jFilterResident','jFilterCat','jFilterDate'].forEach(id => {
     document.getElementById(id)?.addEventListener('input', renderEntries);
