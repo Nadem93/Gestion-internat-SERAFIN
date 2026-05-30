@@ -148,13 +148,35 @@ function exportPresencesPDF() {
     }
     if (!rows.length) { toast('Aucune donnée pour cette période', 'info'); return; }
     const etab = DB.get(DB.keys.settings)?.etablissement || 'FTR';
+    const brand = DB.get(DB.keys.branding) || {};
+    const pc = brand.primaryColor || '#0f2b4a';
+    const ac = brand.accentColor || '#e85d04';
     const now = new Date().toLocaleDateString('fr-FR');
     const s = { present:'Présent', absent:'Absent', sortie:'Sorti', permission:'Permission', malade:'Malade', '':'-' };
     const c = { present:'#16a34a', absent:'#dc2626', sortie:'#ca8a04', permission:'#2563eb', malade:'#9333ea' };
-    const rowsHtml = rows.map(r => `<tr><td>${r.date}</td><td>${r.resident}</td><td><span style="background:${c[r.status]||'#94a3b8'};color:#fff;padding:1px 8px;border-radius:10px;font-size:9px;font-weight:600">${s[r.status]||r.status}</span></td></tr>`).join('');
+    const rowsHtml = rows.map(r => `<tr><td style="font-weight:600;color:#334155">${r.date}</td><td>${r.resident}</td><td><span style="background:${c[r.status]||'#94a3b8'};color:#fff;padding:2px 10px;border-radius:12px;font-size:10px;font-weight:700;letter-spacing:.02em">${s[r.status]||r.status}</span></td></tr>`).join('');
     const printEl = document.createElement('div');
     printEl.id = 'printExport';
-    printEl.innerHTML = `<style nonce>#printExport{position:fixed;top:0;left:0;right:0;bottom:0;z-index:99999;background:#fff;padding:40px;font-family:Inter,system-ui,sans-serif;font-size:11px;color:#1e293b;overflow:auto}#printExport h1{font-size:20px;margin:0 0 4px}#printExport .sub{font-size:12px;color:#64748b;margin-bottom:20px}#printExport table{width:100%;border-collapse:collapse}#printExport th{background:#1e293b;color:#fff;padding:7px 10px;text-align:left;font-size:10px}#printExport td{padding:6px 10px;border-bottom:1px solid #e2e8f0}@media print{body>*:not(#printExport){display:none!important}#printExport{position:static!important;padding:0!important}}</style><h1>${etab}</h1><div class="sub">Export présences du ${start} au ${end} &mdash; ${rows.length} entr&eacute;e(s) &mdash; ${now}</div><table><thead><tr><th>Date</th><th>R&eacute;sident</th><th>Statut</th></tr></thead><tbody>${rowsHtml}</tbody></table>`;
+    printEl.innerHTML = `<style nonce>
+#printExport{position:fixed;top:0;left:0;right:0;bottom:0;z-index:99999;background:#f8fafc;padding:0;font-family:Inter,system-ui,sans-serif;font-size:11px;color:#1e293b;overflow:auto}
+.print-header{background:linear-gradient(135deg,${pc},${ac});color:#fff;padding:32px 40px 28px}
+.print-header h1{font-size:22px;margin:0;font-weight:800;letter-spacing:-.02em}
+.print-header .sub{font-size:12px;margin-top:6px;opacity:.85}
+.print-meta{display:flex;gap:24px;padding:16px 40px;background:#fff;border-bottom:2px solid #e2e8f0;font-size:11px}
+.print-meta span{display:flex;align-items:center;gap:6px}
+.print-meta .label{color:#94a3b8;font-weight:500}
+.print-meta .val{color:#1e293b;font-weight:700}
+.print-body{padding:24px 40px 40px}
+table{width:100%;border-collapse:collapse;border-radius:12px;overflow:hidden;box-shadow:0 1px 4px rgba(0,0,0,.06)}
+th{background:${pc};color:#fff;padding:10px 12px;text-align:left;font-size:10px;text-transform:uppercase;letter-spacing:.06em;font-weight:700}
+td{padding:8px 12px;border-bottom:1px solid #e2e8f0;font-size:11px}
+tbody tr:nth-child(even){background:#f1f5f9}
+tbody tr:hover{background:#e2e8f0}
+@media print{body>*:not(#printExport){display:none!important}#printExport{position:static!important}.print-header{padding:28px 0 20px!important}.print-body{padding:20px 0 0!important}.print-meta{padding:12px 0!important}table{box-shadow:none!important}}
+</style>
+<div class="print-header"><h1>${etab}</h1><div class="sub">Registre des pr&eacute;sences</div></div>
+<div class="print-meta"><span><span class="label">P&eacute;riode</span> <span class="val">du ${start} au ${end}</span></span><span><span class="label">Entr&eacute;es</span> <span class="val">${rows.length}</span></span><span><span class="label">G&eacute;n&eacute;r&eacute; le</span> <span class="val">${now}</span></span></div>
+<div class="print-body"><table><thead><tr><th style="width:120px">Date</th><th>R&eacute;sident</th><th style="width:100px">Statut</th></tr></thead><tbody>${rowsHtml}</tbody></table></div>`;
     document.body.appendChild(printEl);
     closeModal('modalExportAbs');
     setTimeout(() => { window.focus(); window.print(); setTimeout(() => printEl.remove(), 300); }, 200);
