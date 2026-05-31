@@ -1,5 +1,6 @@
 @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@900&display=swap');
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+img,video{max-width:100%;height:auto;display:block}
 
 /* ══════════════════════════════════════════
    DESIGN TOKENS — FTR v3 (Linear/Notion style)
@@ -258,6 +259,7 @@ body{
 .grid-4{grid-template-columns:repeat(4,1fr)}
 .grid-5{grid-template-columns:repeat(5,1fr)}
 .grid-auto{grid-template-columns:repeat(auto-fill,minmax(280px,1fr))}
+.res-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr))}
 .flex{display:flex;gap:.75rem}
 .flex-1{flex:1}
 .items-center{align-items:center}
@@ -753,6 +755,11 @@ tbody tr:hover .table-actions{opacity:1}
   .content{padding:1.5rem}
 }
 
+/* ── 900px ── */
+@media(max-width:900px){
+  .res-card-photo{width:68px;height:68px;border-radius:10px}
+}
+
 /* ── 768px: Small tablet / large phone ── */
 @media(max-width:768px){
   :root{--header-h:60px}
@@ -782,6 +789,9 @@ tbody tr:hover .table-actions{opacity:1}
 
   /* Forms */
   .form-row,.form-row-3{grid-template-columns:1fr}
+
+  /* Photos résidents */
+  .res-card-photo{width:60px;height:60px;border-radius:9px}
 
   /* Tables — actions always visible on touch */
   .table-actions{opacity:1}
@@ -868,6 +878,7 @@ tbody tr:hover .table-actions{opacity:1}
   .grid-auto{grid-template-columns:1fr}
   .res-card{aspect-ratio:auto;min-height:auto}
   .res-card .res-card-body{padding:.75rem}
+  .res-card-photo{width:52px;height:52px;border-radius:8px}
 
   /* Section labels */
   .section-label{font-size:.65rem}
@@ -886,6 +897,9 @@ tbody tr:hover .table-actions{opacity:1}
 
   .content{padding:.75rem}
   .header{padding:0 .75rem}
+
+  /* Photos résidents */
+  .res-card-photo{width:44px;height:44px;border-radius:7px}
 
   /* Accueil grid — 2 cols */
   .accueil-home-grid{grid-template-columns:repeat(2,1fr);gap:.625rem}
