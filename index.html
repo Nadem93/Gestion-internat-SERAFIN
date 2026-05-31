@@ -10,11 +10,11 @@
     :root {
       --first-color: hsl(263,64%,48%);
       --first-color-alt: hsl(263,64%,38%);
-      --border-color: hsl(0,0%,35%);
-      --title-color: hsl(0,0%,95%);
-      --text-color: hsl(0,0%,55%);
-      --body-color: hsl(0,0%,4%);
-      --container-color: hsl(0,0%,9%);
+      --border-color: hsl(0,0%,82%);
+      --title-color: hsl(0,0%,10%);
+      --text-color: hsl(0,0%,45%);
+      --body-color: hsl(0,0%,100%);
+      --container-color: hsl(0,0%,100%);
       --error-color: hsl(0,70%,55%);
     }
 
@@ -52,12 +52,9 @@
     .login__brand-name {
       font-size:2rem;
       font-weight:800;
-      color:var(--title-color);
+      color:var(--first-color);
       letter-spacing:.22em;
       text-transform:uppercase;
-    }
-    .login__brand-name span {
-      color:var(--first-color);
     }
     .login__brand-sub {
       font-size:.75rem;
@@ -72,7 +69,8 @@
       background:var(--container-color);
       border-radius:1.5rem;
       padding:2.5rem 2rem;
-      box-shadow:0 4px 32px hsla(263,45%,2%,.6);
+      box-shadow:0 4px 24px hsla(0,0%,0%,.08);
+      border:1px solid hsl(0,0%,90%);
     }
 
     .login__title {
@@ -205,7 +203,7 @@
 <div class="login">
   <!-- INTERNALIS -->
   <div class="login__brand">
-    <div class="login__brand-name">INTER<span>NALIS</span></div>
+    <div class="login__brand-name">INTERNALIS</div>
     <div class="login__brand-sub">Plateforme de gestion médico-sociale</div>
   </div>
 
