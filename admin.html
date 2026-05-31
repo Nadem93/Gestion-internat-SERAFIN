@@ -1393,8 +1393,9 @@ function renderPresenceChart(residents, presences, freq) {
   document.getElementById('presenceFreqAvg').textContent = `Ø ${avg}%`;
   el.innerHTML = days.map(d => {
     const isToday = d.str === todayStr;
+    const barH = Math.max(Math.round(Math.min(d.pct, 100) / 100 * 100), d.present > 0 ? 4 : 2);
     return `<div class="bar-col">
-      <div class="bar-fill" style="height:${Math.max(d.pct * 1.2, d.present > 0 ? 6 : 4)}px;background:${d.present > 0 ? '#10b981' : 'var(--g200)'};${isToday ? 'outline:2px solid var(--primary);outline-offset:-2px;position:relative;z-index:1' : ''}" data-count="${d.present}/${totalActifs}"></div>
+      <div class="bar-fill" style="height:${barH}px;background:${d.present > 0 ? '#10b981' : 'var(--g200)'};${isToday ? 'outline:2px solid var(--primary);outline-offset:-2px;position:relative;z-index:1' : ''}" data-count="${d.present}/${totalActifs}"></div>
       <div class="bar-lbl" style="${isToday ? 'color:var(--primary);font-weight:700' : ''}">${d.label}</div>
     </div>`;
   }).join('');
