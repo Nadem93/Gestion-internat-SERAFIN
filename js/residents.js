@@ -210,7 +210,7 @@ function renderResidents() {
   }
 
   if (currentView === 'grid') {
-    container.innerHTML = `<div class="grid grid-5" style="gap:.5rem">${list.map(residentCard).join('')}</div>`;
+    container.innerHTML = `<div class="res-grid" style="gap:.5rem">${list.map(residentCard).join('')}</div>`;
   } else {
     container.innerHTML = `<div class="table-wrap"><table><thead><tr><th>Résident</th><th>Âge / Naissance</th><th>Entrée</th><th>Chambre</th><th>Actions</th><th>Statut</th><th>Objectifs</th></tr></thead><tbody>${list.map(residentRow).join('')}</tbody></table></div>`;
   }
