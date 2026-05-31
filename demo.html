@@ -136,12 +136,11 @@ function generateDemo() {
   const now = new Date();
   const today = now.toISOString().slice(0,10);
 
-  // ── RÉSIDENTS (100) ──
+  // ── RÉSIDENTS (20) ──
   const usedNames = new Set();
   const resList = [];
 
-  // Generate 100 unique residents
-  for (let i = 0; i < 100; i++) {
+  for (let i = 0; i < 20; i++) {
     let prenom, nom, key;
     do {
       prenom = i < 50 ? pick(PRENOMS_M) : pick(PRENOMS_F);
@@ -188,7 +187,7 @@ function generateDemo() {
   resList.length = 0;
   sortedRes.forEach(r => resList.push(r));
   DB.set(DB.keys.residents, resList);
-  log('<span class="ok">✅ ' + resList.length + ' résidents créés</span> — avec photos avatar');
+  log('<span class="ok">✅ ' + resList.length + ' résidents créés par établissement</span> — avec photos avatar');
 
   // ── CATÉGORIES ──
   const cats = [
@@ -267,35 +266,41 @@ function generateDemo() {
     'Sortie au parc zoologique. Très intéressé par les animaux.'
   ];
 
-  let entryId = 0;
-  cats.forEach(cat => {
-    for (let i = 0; i < 10; i++) {
-      entryId++;
-      const res = resList[(entryId - 1) % resList.length];
-      const d = new Date(now.getTime() - rand(0, 365) * 86400000);
-      const author = pick(journalAuthors);
-      const contenu = pick(journalTemplates);
-      const visibilite = Math.random() < .1 ? 'confidentiel' : Math.random() < .2 ? 'tous' : 'equipe';
-      journal.push({
-        id: 'dj-' + entryId,
-        type: 'observation',
-        residentId: res.id,
-        resident: res.prenom + ' ' + res.nom,
-        residentColor: res.color,
-        categorie: cat.id,
-        date: d.toISOString(),
-        contenu,
-        visibilite,
-        objectif: '',
-        author: author.name,
-        authorId: author.id,
-        createdAt: d.toISOString(),
-        updatedAt: d.toISOString()
-      });
+  for (let i = 0; i < 20; i++) {
+    const res = resList[i % resList.length];
+    const cat = cats[i % cats.length];
+    const d = new Date(now.getTime() - rand(0, 365) * 86400000);
+    const author = pick(journalAuthors);
+    // 4 lignes de texte par entrée
+    const lignes = [];
+    const used = new Set();
+    while (lignes.length < 4) {
+      const t = pick(journalTemplates);
+      if (!used.has(t)) { used.add(t); lignes.push(t); }
     }
-  });
+    const contenu = lignes.join('\n');
+    const visibilite = Math.random() < .1 ? 'confidentiel' : Math.random() < .2 ? 'tous' : 'equipe';
+    journal.push({
+      id: 'dj-' + (i + 1),
+      type: 'observation',
+      residentId: res.id,
+      resident: res.prenom + ' ' + res.nom,
+      residentColor: res.color,
+      categorie: cat.id,
+      date: d.toISOString(),
+      contenu,
+      visibilite,
+      objectif: '',
+      author: author.name,
+      authorId: author.id,
+      replies: [],
+      readBy: [],
+      createdAt: d.toISOString(),
+      updatedAt: d.toISOString()
+    });
+  }
   DB.set(DB.keys.journal, journal);
-  log('<span class="ok">✅ ' + journal.length + ' entrées journal créées (10 × ' + cats.length + ' catégories)</span>');
+  log('<span class="ok">✅ 20 entrées journal créées (4 lignes chacune)</span>');
 
   // ── PLANNING (70 events) ──
   const planning = [];
