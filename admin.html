@@ -706,10 +706,41 @@
             <div style="font-size:.78rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);margin-bottom:.75rem">Nouvel établissement</div>
             <div class="form-row">
               <div class="form-group"><label>Nom de l'établissement</label><input type="text" id="newEtabNom" placeholder="Ex : Foyer Les Pins" class="form-control"/></div>
-              <div class="form-group"><label>Type de public</label>
+              <div class="form-group"><label>Type d'établissement</label>
                 <select id="newEtabType" class="form-control">
-                  <option value="adultes">Adultes</option>
-                  <option value="enfants">Enfants / Jeunes</option>
+                  <optgroup label="Hébergement">
+                    <option value="foyer_hebergement">Foyer d'hébergement</option>
+                    <option value="foyer_vie">Foyer de vie</option>
+                    <option value="foyer_jeunes">Foyer de jeunes travailleurs (FJT)</option>
+                    <option value="mecs">MECS — Maison d'enfants à caractère social</option>
+                    <option value="lhss">LHSS — Lits halte soins santé</option>
+                  </optgroup>
+                  <optgroup label="Médico-social enfants">
+                    <option value="ime">IME — Institut médico-éducatif</option>
+                    <option value="itep">ITEP — Institut thérapeutique éducatif</option>
+                    <option value="sessad">SESSAD — Service d'éducation spéciale</option>
+                    <option value="camsp">CAMSP — Centre d'action médico-sociale précoce</option>
+                  </optgroup>
+                  <optgroup label="Médico-social adultes">
+                    <option value="esat">ESAT — Établissement et service d'aide par le travail</option>
+                    <option value="mas">MAS — Maison d'accueil spécialisée</option>
+                    <option value="fam">FAM — Foyer d'accueil médicalisé</option>
+                    <option value="savs">SAVS — Service d'accompagnement à la vie sociale</option>
+                    <option value="samsah">SAMSAH — Service d'accompagnement médico-social</option>
+                    <option value="saj">SAJ — Service d'accueil de jour</option>
+                  </optgroup>
+                  <optgroup label="Protection de l'enfance">
+                    <option value="pead">PEAD — Placement éducatif à domicile</option>
+                    <option value="aemo">AEMO — Action éducative en milieu ouvert</option>
+                    <option value="cea">CEA — Centre éducatif autorisé</option>
+                    <option value="cef">CEF — Centre éducatif fermé</option>
+                  </optgroup>
+                  <optgroup label="Insertion / Social">
+                    <option value="chrs">CHRS — Centre d'hébergement et réinsertion sociale</option>
+                    <option value="cada">CADA — Centre d'accueil de demandeurs d'asile</option>
+                    <option value="siao">SIAO — Service intégré d'accueil et d'orientation</option>
+                    <option value="autre">Autre structure</option>
+                  </optgroup>
                 </select>
               </div>
               <div class="form-group"><label>Couleur</label><input type="color" id="newEtabColor" value="#0f2b4a" style="width:44px;height:38px;border-radius:7px;cursor:pointer;padding:0;border:1px solid var(--border)"/></div>
@@ -1576,9 +1607,9 @@ function renderEtabAdminList() {
       <div style="width:36px;height:36px;border-radius:8px;background:${e.color||'#0f2b4a'};flex-shrink:0"></div>
       <div style="flex:1;min-width:0">
         <div style="font-weight:700;font-size:.875rem">${escHtml(e.nom)}</div>
-        <div style="font-size:.72rem;color:var(--muted)">${e.type==='enfants'?'Enfants / Jeunes':'Adultes'}</div>
+        <div style="font-size:.72rem;color:var(--muted)">${etabTypeLabel(e.type)}</div>
       </div>
-      <span class="badge" style="background:${e.type==='enfants'?'#8b5cf620':'#0891b220'};color:${e.type==='enfants'?'#8b5cf6':'#0891b2'}">${e.type==='enfants'?'Jeunes':'Adultes'}</span>
+      <span class="badge" style="background:#0891b220;color:#0891b2">${etabTypeLabel(e.type)}</span>
       ${etabs.length > 1 ? `<button class="btn btn-ghost btn-sm" style="color:var(--red)" onclick="adminDeleteEtab(${e.id})">✕</button>` : ''}
     </div>`).join('');
 }

@@ -83,6 +83,18 @@ function addUserToAllEtabs(user) {
   });
 }
 
+function etabTypeLabel(type) {
+  const labels = {
+    foyer_hebergement:"Foyer d'hébergement", foyer_vie:"Foyer de vie", foyer_jeunes:"FJT",
+    mecs:"MECS", lhss:"LHSS", ime:"IME", itep:"ITEP", sessad:"SESSAD", camsp:"CAMSP",
+    esat:"ESAT", mas:"MAS", fam:"FAM", savs:"SAVS", samsah:"SAMSAH", saj:"SAJ",
+    pead:"PEAD", aemo:"AEMO", cea:"CEA", cef:"CEF",
+    chrs:"CHRS", cada:"CADA", siao:"SIAO", autre:"Autre",
+    adultes:"Adultes", enfants:"Enfants / Jeunes"
+  };
+  return labels[type] || type || '—';
+}
+
 function applyTerminology() {
   const etab = getCurrentEtab();
   if (!etab || etab.type !== 'enfants') return;

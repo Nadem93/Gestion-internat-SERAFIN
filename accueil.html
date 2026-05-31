@@ -390,7 +390,7 @@ function renderEtabCards() {
         <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" style="width:26px;height:26px"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
       </div>
       <div style="font-weight:800;font-size:.95rem;color:#1e293b;margin-bottom:.3rem">${escHtml(e.nom)}</div>
-      <div style="font-size:.72rem;color:#64748b;background:${e.type==='enfants'?'#8b5cf620':'#0891b220'};color:${e.type==='enfants'?'#8b5cf6':'#0891b2'};border-radius:99px;padding:2px 10px;display:inline-block">${e.type==='enfants'?'Enfants':'Adultes'}</div>
+      <div style="font-size:.72rem;background:#0891b220;color:#0891b2;border-radius:99px;padding:2px 10px;display:inline-block">${etabTypeLabel(e.type)}</div>
     </div>`).join('');
 }
 
