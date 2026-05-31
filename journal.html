@@ -12,7 +12,7 @@
     <header class="header">
       <div class="header-info"><div class="header-title">Journal de bord</div></div>
       <div class="header-right">
-        <button class="btn btn-accent btn-add-resident" onclick="selectedEntryId=null;renderEntryForm();renderEntries()">
+        <button class="btn btn-accent btn-add-resident" onclick="showNewEntryForm()">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="width:15px;height:15px"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
           <span class="btn-add-label">Nouvelle entrée</span>
         </button>
@@ -20,22 +20,27 @@
     </header>
 
     <main class="content">
-      <div class="toolbar" style="margin-bottom:1.5rem">
-        <div class="search-box">
-          <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-          <input type="text" id="jSearch" placeholder="Rechercher…"/>
+      <!-- VUE LISTE -->
+      <div id="journalListView">
+        <div class="toolbar" style="margin-bottom:1.5rem">
+          <div class="search-box">
+            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+            <input type="text" id="jSearch" placeholder="Rechercher…"/>
+          </div>
+          <select id="jFilterResident" style="width:auto"><option value="">Tous les résidents</option></select>
+          <select id="jFilterCat" style="width:auto"><option value="">Toutes les catégories</option></select>
+          <input type="date" id="jFilterDate" style="width:auto"/>
         </div>
-        <select id="jFilterResident" style="width:auto"><option value="">Tous les résidents</option></select>
-        <select id="jFilterCat" style="width:auto"><option value="">Toutes les catégories</option></select>
-        <input type="date" id="jFilterDate" style="width:auto"/>
+        <div id="entriesList" style="display:flex;flex-direction:column;gap:.75rem"></div>
       </div>
 
-      <div style="display:grid;grid-template-columns:360px 1fr;gap:1.5rem;align-items:start">
-        <div>
-
-          <div id="entriesList" style="display:flex;flex-direction:column;gap:.75rem"></div>
-        </div>
-        <div id="entryDetail"></div>
+      <!-- VUE FORMULAIRE -->
+      <div id="journalFormView" style="display:none;max-width:720px;margin:0 auto">
+        <button class="btn btn-ghost btn-sm" onclick="showJournalList()" style="margin-bottom:1.25rem">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:15px;height:15px"><polyline points="15 18 9 12 15 6"/></svg>
+          Retour à la liste
+        </button>
+        <div id="entryFormContainer"></div>
       </div>
     </main>
   </div>

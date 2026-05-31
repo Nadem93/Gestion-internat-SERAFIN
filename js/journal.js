@@ -1,5 +1,17 @@
 let selectedEntryId = null;
 
+function showJournalList() {
+  document.getElementById('journalListView').style.display = '';
+  document.getElementById('journalFormView').style.display = 'none';
+}
+
+function showNewEntryForm() {
+  selectedEntryId = null;
+  renderEntryForm();
+  document.getElementById('journalListView').style.display = 'none';
+  document.getElementById('journalFormView').style.display = '';
+}
+
 function populateSelects() {
   const residents = (DB.get(DB.keys.residents) || []).filter(r => r.statut !== 'sorti');
   const cats = DB.get(DB.keys.categories) || [];
@@ -99,7 +111,7 @@ function renderEntryForm() {
       </div>
       <button class="btn btn-primary" onclick="saveInlineEntry()" style="margin-top:1rem">Enregistrer l'entrée</button>
     </div>`;
-  document.getElementById('entryDetail').innerHTML = html;
+  document.getElementById('entryFormContainer').innerHTML = html;
 }
 
 function selectCatPill(id) {
@@ -184,7 +196,7 @@ function saveInlineEntry() {
   }
   DB.set(DB.keys.journal, entries);
   toast(residentIds.length + ' entrée' + (residentIds.length>1?'s':'') + ' ajoutée' + (residentIds.length>1?'s':'') + ' ✓');
-  renderEntryForm();
+  showJournalList();
   renderEntries();
 }
 
@@ -256,7 +268,21 @@ function renderEntries() {
   el.innerHTML = list.map(e => {
     const cat = cats.find(c => String(c.id) === String(e.categorie));
     const jRes = journalResidents.find(r => r.id === e.residentId);
-    return `<div class="entry-card ${e.id === selectedEntryId ? 'selected' : ''}" onclick="selectEntry('${e.id}')">
+    const isSelected = e.id === selectedEntryId;
+    const expandedSection = isSelected ? `
+      <div onclick="event.stopPropagation()" style="margin-top:.75rem;padding-top:.75rem;border-top:1px solid var(--border)">
+        <p style="font-size:.88rem;line-height:1.8;white-space:pre-wrap;color:var(--text);margin-bottom:.75rem">${escHtml(e.contenu)||''}</p>
+        ${renderReplies(e)}
+        <div style="display:flex;gap:.5rem;align-items:flex-end;margin-top:.75rem">
+          <textarea id="replyContent_${e.id}" rows="2" class="form-control" style="flex:1;font-size:.82rem;resize:vertical" placeholder="Écrire une réponse…"></textarea>
+          <button class="btn btn-primary btn-sm" style="align-self:flex-end;flex-shrink:0" onclick="addReply('${e.id}')">Envoyer</button>
+        </div>
+        <div style="display:flex;gap:.4rem;justify-content:flex-end;margin-top:.5rem">
+          <button class="btn btn-ghost btn-sm" onclick="editEntry('${e.id}')">Modifier</button>
+          <button class="btn btn-ghost btn-sm" style="color:var(--red)" onclick="deleteEntryById('${e.id}')">Supprimer</button>
+        </div>
+      </div>` : '';
+    return `<div class="entry-card ${isSelected ? 'selected' : ''}" onclick="selectEntry('${e.id}')">
       <div class="entry-header">
         ${jRes?.photo?`<img src="${jRes.photo}" style="width:32px;height:32px;border-radius:50%;object-fit:cover;flex-shrink:0" alt=""/>`:`<div class="avatar sm" style="background:${e.residentColor||'var(--blue)'};flex-shrink:0">${(escHtml(e.resident)||'?')[0].toUpperCase()}</div>`}
         <div style="flex:1;min-width:0">
@@ -268,8 +294,9 @@ function renderEntries() {
           <div class="entry-meta">${formatDateTime(e.date)} · <span style="font-weight:500;background:${getAuthorColor(e)}18;color:${getAuthorColor(e)};padding:1px 8px;border-radius:10px;font-size:.75rem">${escHtml(getJournalAuthor(e))}</span></div>
         </div>
       </div>
-      <div class="entry-preview">${escHtml(e.contenu)||''}</div>
-      ${(e.replies||[]).length ? `<div style="font-size:.7rem;color:var(--blue);margin-top:.4rem;font-weight:600">💬 ${e.replies.length} réponse${e.replies.length>1?'s':''}</div>` : ''}
+      ${!isSelected ? `<div class="entry-preview">${escHtml(e.contenu)||''}</div>` : ''}
+      ${!isSelected && (e.replies||[]).length ? `<div style="font-size:.7rem;color:var(--blue);margin-top:.4rem;font-weight:600">💬 ${e.replies.length} réponse${e.replies.length>1?'s':''}</div>` : ''}
+      ${expandedSection}
     </div>`;
   }).join('');
 }
@@ -294,20 +321,16 @@ function renderReplies(e) {
 }
 
 function selectEntry(id) {
+  // Toggle: cliquer à nouveau ferme la carte
+  if (selectedEntryId === id) { selectedEntryId = null; renderEntries(); return; }
   selectedEntryId = id;
+
+  // Mark as read
+  const session = Auth.getSession();
   let entries = DB.get(DB.keys.journal) || [];
   const eIdx = entries.findIndex(x => x.id === id);
   if (eIdx === -1) return;
   const e = entries[eIdx];
-  const cats = DB.get(DB.keys.categories) || [];
-  const objs = DB.get(DB.keys.objectives) || [];
-  const cat = cats.find(c => String(c.id) === String(e.categorie));
-  const obj = objs.find(o => String(o.id) === String(e.objectif));
-  const vis = { equipe: 'Équipe uniquement', tous: 'Tous', confidentiel: 'Confidentiel' };
-  const session = Auth.getSession();
-  const userName = session ? [session.prenom, session.nom].filter(Boolean).join(' ') || session.username : 'Utilisateur';
-
-  // Mark as read
   if (session && (!e.readBy || !e.readBy.includes(session.userId))) {
     if (!e.readBy) e.readBy = [];
     e.readBy.push(session.userId);
@@ -315,64 +338,15 @@ function selectEntry(id) {
     DB.set(DB.keys.journal, entries);
   }
 
-  // Build reader avatars
-  const users = DB.get(DB.keys.users) || [];
-  const readerHtml = (e.readBy || []).length > 0 ? `
-    <div style="margin-top:1rem;padding-top:.75rem;border-top:1px solid var(--border)">
-      <div style="font-size:.68rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);margin-bottom:.5rem">Vu par</div>
-      <div style="display:flex;flex-wrap:wrap;gap:.5rem">
-        ${(e.readBy || []).map(uid => {
-          const u = users.find(x => String(x.id) === String(uid));
-          const name = u ? [u.prenom||'', u.nom||''].filter(Boolean).join(' ') || u.username : 'Inconnu';
-          const initials = ((u?.prenom||'')[0]||'') + ((u?.nom||'')[0]||'') || '?';
-          const color = u?.fonction ? (() => {
-            const list = DB.get(DB.keys.fonctionColors) || [];
-            const f = list.find(x => u.fonction.toLowerCase().includes(x.fonction.toLowerCase()));
-            return f ? f.color : 'var(--accent)';
-          })() : 'var(--accent)';
-          return `<div style="display:flex;align-items:center;gap:5px;background:var(--g50);border-radius:var(--r-full);padding:3px 10px 3px 3px;border:1px solid var(--border)">
-            <div style="width:22px;height:22px;border-radius:50%;background:${color};color:#fff;display:flex;align-items:center;justify-content:center;font-size:.55rem;font-weight:700;flex-shrink:0">${initials}</div>
-            <span style="font-size:.72rem;font-weight:600;color:var(--g700)">${escHtml(name)}</span>
-          </div>`;
-        }).join('')}
-      </div>
-    </div>` : '';
-
-  document.getElementById('entryDetail').innerHTML = `
-    <div class="entry-detail fade-in">
-      <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:1rem;gap:.5rem">
-        <div>
-          <div style="display:flex;align-items:center;gap:.5rem;flex-wrap:wrap;margin-bottom:.3rem">
-            <span style="font-weight:800;font-size:1rem">${escHtml(e.resident)||'—'}</span>
-            ${cat ? `<span class="badge" style="background:${cat.color}22;color:${cat.color};border:1px solid ${cat.color}44">${escHtml(cat.name)}</span>` : ''}
-          </div>
-          <div style="font-size:.78rem;color:var(--muted)">${formatDateTime(e.date)} · ${vis[e.visibilite]||''} · <span style="font-weight:500;background:${getAuthorColor(e)}18;color:${getAuthorColor(e)};padding:1px 8px;border-radius:10px;font-size:.72rem">${escHtml(getJournalAuthor(e))}</span></div>
-          ${obj ? `<div style="font-size:.78rem;color:var(--purple);margin-top:3px">Objectif : ${escHtml(obj.name)}</div>` : ''}
-        </div>
-        <div style="display:flex;gap:.4rem;flex-shrink:0">
-          <button class="btn btn-ghost btn-sm" onclick="editEntry('${e.id}')">Modifier</button>
-          <button class="btn btn-ghost btn-sm" style="color:var(--red)" onclick="deleteEntryById('${e.id}')">Supprimer</button>
-        </div>
-      </div>
-      <div class="divider"></div>
-      <p style="font-size:.9rem;line-height:1.8;white-space:pre-wrap;color:var(--text)">${escHtml(e.contenu)||''}</p>
-      ${readerHtml}
-      ${renderReplies(e)}
-      <div style="margin-top:1rem;padding-top:1rem;border-top:1px solid var(--border)">
-        <div style="display:flex;gap:.6rem">
-          <div class="avatar sm" style="background:var(--accent);flex-shrink:0;width:28px;height:28px;font-size:.65rem">${(escHtml(userName)||'?')[0].toUpperCase()}</div>
-          <div style="flex:1;display:flex;gap:.5rem">
-            <textarea id="replyContent" rows="2" style="flex:1;font-size:.82rem;padding:.5rem .75rem" placeholder="Écrire une réponse…"></textarea>
-            <button class="btn btn-primary btn-sm" style="align-self:flex-end" onclick="addReply('${e.id}')">Répondre</button>
-          </div>
-        </div>
-      </div>
-    </div>`;
   renderEntries();
+  setTimeout(() => {
+    const el = document.querySelector('.entry-card.selected');
+    if (el) el.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  }, 50);
 }
 
 function addReply(entryId) {
-  const content = document.getElementById('replyContent')?.value?.trim();
+  const content = document.getElementById('replyContent_'+entryId)?.value?.trim();
   if (!content) { toast('Écrivez une réponse', 'error'); return; }
   const session = Auth.getSession();
   const userName = session ? [session.prenom, session.nom].filter(Boolean).join(' ') || session.username : 'Utilisateur';
@@ -453,9 +427,9 @@ function saveEntry() {
   DB.set(DB.keys.journal, entries);
   closeAllModals();
   resetEntryForm();
+  showJournalList();
+  if (id) { selectedEntryId = id; }
   renderEntries();
-  if (id) selectEntry(id);
-  else renderEntryForm();
 }
 
 function deleteEntry() { deleteEntryById(document.getElementById('entryId').value); }
@@ -467,7 +441,7 @@ function deleteEntryById(id) {
     DB.set(DB.keys.journal, entries);
     closeAllModals();
     selectedEntryId = null;
-    renderEntryForm();
+    showJournalList();
     renderEntries();
     toast('Entrée supprimée', 'info');
   });
@@ -488,14 +462,6 @@ function resetEntryForm() {
 function initJournal() {
   document.getElementById('eDate').value = new Date().toISOString().slice(0,16);
   populateSelects();
-  const entries = DB.get(DB.keys.journal) || [];
-  if (entries.length) {
-    const last = entries[entries.length - 1];
-    selectedEntryId = last.id;
-    selectEntry(last.id);
-  } else {
-    renderEntryForm();
-  }
   renderEntries();
   ['jSearch','jFilterResident','jFilterCat','jFilterDate'].forEach(id => {
     document.getElementById(id)?.addEventListener('input', renderEntries);
