@@ -106,11 +106,11 @@ function renderReservations() {
         <svg viewBox="0 0 24 24" fill="none" stroke="#6366f1" stroke-width="2" style="width:18px;height:18px"><rect x="2" y="7" width="20" height="12" rx="2"/><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/><circle cx="7.5" cy="16.5" r="1.5"/><circle cx="16.5" cy="16.5" r="1.5"/></svg>
       </div>
       <div style="flex:1;min-width:0">
-        <div style="font-weight:600;font-size:.85rem">${escapeHtml(e.vehicule||'')}</div>
+        <div style="font-weight:600;font-size:.85rem">${escHtml(e.vehicule||'')}</div>
         <div style="font-size:.78rem;color:var(--muted)">
           ${e.date ? formatDate(e.date) : '?'} ${e.time ? '· '+e.time.slice(0,5) : ''}
-          ${e.destination ? '→ '+escapeHtml(e.destination) : ''}
-          ${e.reservedBy ? '· '+escapeHtml(e.reservedBy) : ''}
+          ${e.destination ? '→ '+escHtml(e.destination) : ''}
+          ${e.reservedBy ? '· '+escHtml(e.reservedBy) : ''}
         </div>
       </div>
       <button class="btn btn-ghost btn-sm" style="color:var(--red)" onclick="annulerReservation('${e.id}')">✕</button>
@@ -133,12 +133,7 @@ function renderReservations() {
   }
 }
 
-function escapeHtml(s) {
-  if (!s) return '';
-  const d = document.createElement('div');
-  d.textContent = s;
-  return d.innerHTML;
-}
+
 
 function escapeAttr(s) {
   if (!s) return '';

@@ -35,13 +35,13 @@ function renderContacts() {
     const col = contactColor(c.organisme);
     const initiale = (c.organisme||'?')[0].toUpperCase();
     return `<div style="cursor:pointer;background:#fff;border:1px solid #cbd5e1;border-radius:16px;padding:1.5rem 1.25rem;text-align:center;transition:box-shadow .2s,transform .2s;display:flex;flex-direction:column;align-items:center;gap:.5rem" onmouseenter="this.style.boxShadow='0 4px 12px rgba(0,0,0,.1)';this.style.transform='translateY(-2px)'" onmouseleave="this.style.boxShadow='none';this.style.transform='none'" onclick="openEditContact('${c.id}')">
-      <div style="font-weight:700;font-size:.95rem;color:${col};border:2px solid ${col}66;border-radius:8px;padding:.2rem .75rem;display:inline-block">${escapeHtml(c.organisme)}</div>
-      <div style="font-size:.82rem;color:var(--muted)">${escapeHtml(c.nom)}${c.fonction ? ' · '+escapeHtml(c.fonction) : ''}</div>
+      <div style="font-weight:700;font-size:.95rem;color:${col};border:2px solid ${col}66;border-radius:8px;padding:.2rem .75rem;display:inline-block">${escHtml(c.organisme)}</div>
+      <div style="font-size:.82rem;color:var(--muted)">${escHtml(c.nom)}${c.fonction ? ' · '+escHtml(c.fonction) : ''}</div>
       <div style="font-size:.75rem;color:var(--muted);display:flex;align-items:center;justify-content:center;gap:.5rem;flex-wrap:wrap">
-        ${c.tel ? `<span>📞 ${escapeHtml(c.tel)}</span>` : ''}
-        ${c.email ? `<span>✉️ ${escapeHtml(c.email)}</span>` : ''}
+        ${c.tel ? `<span>📞 ${escHtml(c.tel)}</span>` : ''}
+        ${c.email ? `<span>✉️ ${escHtml(c.email)}</span>` : ''}
       </div>
-      ${c.adresse ? `<div style="font-size:.7rem;color:#94a3b8">${escapeHtml(c.adresse).slice(0,40)+(c.adresse.length>40?'…':'')}</div>` : ''}
+      ${c.adresse ? `<div style="font-size:.7rem;color:#94a3b8">${escHtml(c.adresse).slice(0,40)+(c.adresse.length>40?'…':'')}</div>` : ''}
     </div>`;
   }).join('')}</div>`;
 }
@@ -124,12 +124,7 @@ function deleteContact() {
   renderContacts();
 }
 
-function escapeHtml(s) {
-  if (!s) return '';
-  const d = document.createElement('div');
-  d.textContent = s;
-  return d.innerHTML;
-}
+
 
 document.addEventListener('DOMContentLoaded', renderContacts);
 if (typeof registerPageInit === 'function') registerPageInit('repertoire', renderContacts);
