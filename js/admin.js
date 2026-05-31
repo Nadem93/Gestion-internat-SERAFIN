@@ -396,25 +396,55 @@ function resetFonctionForm() {
 }
 
 // ── UTILISATEURS ──
+function getUserEtabs(userId) {
+  return getEtabs().filter(e => {
+    const users = JSON.parse(localStorage.getItem(`${DB.keys.users}__${e.id}`) || '[]');
+    return users.find(u => String(u.id) === String(userId));
+  }).map(e => String(e.id));
+}
+
+function renderEtabCheckboxes(userEtabIds = []) {
+  const etabs = getEtabs();
+  const group = document.getElementById('etabAssignGroup');
+  const el = document.getElementById('etabAssignList');
+  if (!el || !group) return;
+  if (etabs.length <= 1) { group.style.display = 'none'; return; }
+  group.style.display = '';
+  el.innerHTML = etabs.map(e => `
+    <label style="display:flex;align-items:center;gap:.6rem;cursor:pointer;padding:.4rem .6rem;border-radius:var(--r-sm);border:1px solid var(--border)">
+      <input type="checkbox" name="etabAssign" value="${e.id}" ${userEtabIds.includes(String(e.id)) ? 'checked' : ''}/>
+      <div style="width:12px;height:12px;border-radius:3px;background:${e.color||'#0f2b4a'};flex-shrink:0"></div>
+      <span style="font-size:.85rem;font-weight:600">${escHtml(e.nom)}</span>
+      <span style="font-size:.72rem;color:var(--muted);margin-left:auto">${etabTypeLabel(e.type)}</span>
+    </label>`).join('');
+}
+
 function renderEducateurs() {
   const users = DB.get(DB.keys.users) || [];
   const educateurs = users.filter(u => u.role === 'educateur');
+  const etabs = getEtabs();
   const el = document.getElementById('eduList');
   if (!el) return;
   if (!educateurs.length) {
     el.innerHTML = `<div class="empty" style="padding:2rem"><p>Aucun utilisateur enregistré</p></div>`;
     return;
   }
-  el.innerHTML = educateurs.map(u => `
+  el.innerHTML = educateurs.map(u => {
+    const userEtabs = etabs.filter(e => {
+      const list = JSON.parse(localStorage.getItem(`${DB.keys.users}__${e.id}`) || '[]');
+      return list.find(x => String(x.id) === String(u.id));
+    });
+    return `
     <div style="display:flex;align-items:center;gap:.75rem;padding:.85rem 1.25rem;border-bottom:1px solid var(--border)">
       <div class="avatar sm" style="background:var(--blue)">${initials(u.prenom||'', u.nom||'') || u.username[0].toUpperCase()}</div>
-      <div style="flex:1">
+      <div style="flex:1;min-width:0">
         <div style="font-weight:600;font-size:.875rem">${escHtml([u.prenom, u.nom].filter(Boolean).join(' ') || u.username)}</div>
         <div style="font-size:.75rem;color:var(--muted)">${u.fonction ? escHtml(u.fonction)+' · ' : ''}@${escHtml(u.username)}</div>
+        ${userEtabs.length ? `<div style="display:flex;gap:.3rem;flex-wrap:wrap;margin-top:.3rem">${userEtabs.map(e => `<span class="badge" style="background:${e.color||'#0f2b4a'}22;color:${e.color||'#0f2b4a'};font-size:.65rem">${escHtml(e.nom)}</span>`).join('')}</div>` : ''}
       </div>
-      <span class="badge" style="background:#eff6ff;color:var(--blue)">Utilisateur</span>
       <button class="btn btn-ghost btn-sm" onclick="editEducateur(${u.id})">Modifier</button>
-    </div>`).join('');
+    </div>`;
+  }).join('');
 }
 
 function editEducateur(id) {
@@ -430,6 +460,7 @@ function editEducateur(id) {
   document.getElementById('eduPassword').value = '';
   document.getElementById('eduPasswordLabel').textContent = 'Nouveau mot de passe (vide = inchangé)';
   document.getElementById('btnDeleteEdu').style.display = '';
+  renderEtabCheckboxes(getUserEtabs(id));
   openModal('modalEdu');
 }
 
@@ -459,6 +490,22 @@ function saveEducateur() {
     toast('Utilisateur ajouté');
   }
   DB.set(DB.keys.users, users);
+  // Synchroniser avec les établissements sélectionnés
+  const selectedEtabs = [...document.querySelectorAll('input[name="etabAssign"]:checked')].map(cb => cb.value);
+  const allEtabs = getEtabs();
+  const savedUser = (DB.get(DB.keys.users) || []).find(u => u.username === username);
+  allEtabs.forEach(e => {
+    const k = `${DB.keys.users}__${e.id}`;
+    let eUsers = JSON.parse(localStorage.getItem(k) || '[]');
+    if (selectedEtabs.includes(String(e.id))) {
+      const idx = eUsers.findIndex(u => String(u.id) === String(savedUser?.id));
+      if (idx >= 0) eUsers[idx] = { ...eUsers[idx], ...savedUser };
+      else if (savedUser) eUsers.push(savedUser);
+    } else {
+      eUsers = eUsers.filter(u => String(u.id) !== String(savedUser?.id));
+    }
+    localStorage.setItem(k, JSON.stringify(eUsers));
+  });
   closeAllModals();
   resetEducateurForm();
   renderEducateurs();
@@ -486,6 +533,7 @@ function resetEducateurForm() {
   document.getElementById('eduPassword').value = '';
   document.getElementById('modalEduTitle').textContent = 'Nouvel utilisateur';
   document.getElementById('eduPasswordLabel').textContent = 'Mot de passe';
+  renderEtabCheckboxes([String(DB._id())].filter(Boolean));
   document.getElementById('btnDeleteEdu').style.display = 'none';
 }
 
