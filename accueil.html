@@ -31,13 +31,7 @@ if (Auth.getSession()?.role !== 'admin') document.querySelectorAll('.admin-only'
 <div class="accueil-home" id="mainAccueilView" style="display:none">
   <header class="header" style="background:transparent;border:none;position:absolute;width:100%">
     <div style="visibility:hidden;pointer-events:none"><div class="header-title"></div></div>
-    <div class="header-right">
-      <button class="btn btn-sm" id="etabSwitchBtn" onclick="showEtabSelection()" title="Changer d'établissement" style="background:rgba(255,255,255,.85);border:1px solid rgba(15,43,74,.15);color:var(--primary);font-size:.78rem;font-weight:600;gap:.4rem;backdrop-filter:blur(8px);box-shadow:0 1px 4px rgba(0,0,0,.08)">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:13px;height:13px;flex-shrink:0"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>
-        <span id="etabSwitchLabel">Établissement</span>
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:11px;height:11px;opacity:.5;flex-shrink:0"><polyline points="6 9 12 15 18 9"/></svg>
-      </button>
-    </div>
+    <div class="header-right"></div>
   </header>
   <main class="accueil-home-main">
     <div class="accueil-home-grid">
@@ -65,6 +59,9 @@ if (Auth.getSession()?.role !== 'admin') document.querySelectorAll('.admin-only'
   </div>
   <div class="accueil-fab" onclick="openModal('modalVehiculeAccueil')" title="Réserver un véhicule" style="background:#6366f1">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 16H9m10 0h3v-3.15a1 1 0 0 0-.84-.99L16 11l-2.7-3.6a1 1 0 0 0-.8-.4H5.5a1 1 0 0 0-.8.4L2 11v5h2m10 1.5a1.5 1.5 0 0 1-3 0m3 0a1.5 1.5 0 0 0-3 0m3 0h3m-3 0H9m6-6V7a1 1 0 0 0-1-1h-3a1 1 0 0 0-1 1v3M6 17.5a1.5 1.5 0 0 1-3 0m3 0a1.5 1.5 0 0 0-3 0"/></svg>
+  </div>
+  <div id="etabFab" class="accueil-fab" onclick="showEtabSelection()" title="Changer d'établissement" style="background:#0f2b4a;font-family:'Playfair Display',serif;font-size:.85rem;font-weight:900;letter-spacing:.05em;display:none">
+    <span id="etabFabLabel">E</span>
   </div>
 </div>
 
@@ -415,8 +412,17 @@ function showMainAccueil() {
   const etab = getCurrentEtab();
   document.getElementById('etabSelectView').style.display = 'none';
   document.getElementById('mainAccueilView').style.display = 'block';
-  const lbl = document.getElementById('etabSwitchLabel');
-  if (lbl && etab) lbl.textContent = etab.nom;
+  // FAB établissement
+  const fab = document.getElementById('etabFab');
+  const fabLbl = document.getElementById('etabFabLabel');
+  if (fab && etab) {
+    const etabs = getEtabs();
+    if (etabs.length > 1) {
+      fab.style.display = '';
+      fab.style.background = etab.color || '#0f2b4a';
+      if (fabLbl) fabLbl.textContent = etab.nom.slice(0,2).toUpperCase();
+    }
+  }
   applyTerminology();
 }
 
