@@ -893,6 +893,13 @@ tbody tr:hover .table-actions{opacity:1}
   /* Tags */
   .tags{min-height:36px}
 
+  /* Présences — légende masquée, header compact */
+  .presence-legend{display:none!important}
+  #presenceDate{font-size:.75rem;padding:.2rem .3rem;width:120px}
+  #todayBtn{display:none}
+  .card-header{flex-wrap:wrap;gap:.5rem}
+  .presence-actions{width:100%;justify-content:flex-start!important}
+
   /* Accueil — 2 colonnes pour que les labels ne wrappent pas */
   .accueil-home-grid{grid-template-columns:repeat(2,1fr);gap:.75rem}
   .accueil-home-main{padding:1rem;padding-top:calc(var(--header-h) + .875rem)}
