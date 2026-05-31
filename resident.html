@@ -5,6 +5,33 @@
   <title>Fiche résident — FTR</title>
   <link rel="stylesheet" href="css/style.css"/>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet"/>
+  <style>
+    @media print {
+      * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; box-sizing: border-box !important; }
+      @page { margin: 0.5cm; size: A4; }
+
+      /* Masquer l'interface */
+      .header, #toast-container { display: none !important; }
+      .btn, .tab { display: none !important; }
+
+      /* Libérer toutes les contraintes de hauteur */
+      html, body { height: auto !important; overflow: visible !important; background: #f1f5f9 !important; margin: 0 !important; }
+      .app-layout { display: block !important; height: auto !important; min-height: 0 !important; overflow: visible !important; }
+      .main { display: block !important; height: auto !important; overflow: visible !important; }
+      .content { display: block !important; height: auto !important; overflow: visible !important; padding: .75rem !important; max-width: 100% !important; width: 100% !important; margin: 0 !important; flex: none !important; }
+
+      /* Forcer les grilles */
+      .grid-4 { grid-template-columns: repeat(4, 1fr) !important; }
+      .grid-2 { grid-template-columns: repeat(2, 1fr) !important; }
+      .grid-3 { grid-template-columns: repeat(3, 1fr) !important; }
+
+      /* Cartes */
+      .card, .stat-card { box-shadow: 0 1px 4px rgba(0,0,0,.1) !important; background: rgba(255,255,255,.9) !important; break-inside: avoid; }
+
+      /* Sections exclues du téléchargement */
+      .no-print { display: none !important; }
+    }
+  </style>
 </head>
 <body>
 <div class="app-layout">
@@ -13,6 +40,10 @@
       <div class="header-info"><div class="header-title" id="pageTitle">Fiche résident</div></div>
       <div class="header-right">
         <button class="btn btn-outline btn-sm btn-add-resident" onclick="history.back()">←<span class="btn-add-label"> Retour</span></button>
+        <button class="btn btn-ghost btn-sm btn-add-resident" onclick="printResident()" title="Télécharger la fiche">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:15px;height:15px"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+          <span class="btn-add-label"> Télécharger</span>
+        </button>
         <button class="btn btn-accent btn-sm btn-add-resident" id="btnEdit" onclick="togglePageEdit()">✎<span class="btn-add-label"> Modifier</span></button>
       </div>
     </header>
@@ -134,16 +165,16 @@ function renderViewMode(r) {
       ${r.notes ? infoCard('6366f1', '📝 Notes', [`<div style="grid-column:1/-1"><p style="white-space:pre-wrap;line-height:1.8;font-size:.875rem;margin:0">${escHtml(r.notes)}</p></div>`]) : ''}
       ${r.contacts ? infoCard('6366f1', '📞 Contacts d\'urgence', [`<div style="grid-column:1/-1"><p style="white-space:pre-wrap;line-height:1.8;font-size:.875rem;margin:0">${escHtml(r.contacts)}</p></div>`]) : ''}
     </div>
-    <div style="display:flex;align-items:center;gap:.75rem;margin:1.5rem 0 1rem;padding:.5rem 0">
+    <div class="no-print" style="display:flex;align-items:center;gap:.75rem;margin:1.5rem 0 1rem;padding:.5rem 0">
       <div style="flex:1;height:1px;background:var(--border)"></div>
       <span style="font-size:.78rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);white-space:nowrap">TABLEAU DE BORD DU RÉSIDENT</span>
       <div style="flex:1;height:1px;background:var(--border)"></div>
     </div>
-    ${renderDataCards(r)}
-    <div class="tabs" style="margin-bottom:1rem">
+    <div class="no-print">${renderDataCards(r)}</div>
+    <div class="no-print tabs" style="margin-bottom:1rem">
       <button class="tab active" data-tab="documents">📎 Documents ${docs.length ? `<span class="badge badge-gray" style="margin-left:.3rem">${docs.length}</span>` : ''}</button>
     </div>
-    <div id="tab-documents">${docsHtml(docs)}</div>`;
+    <div class="no-print" id="tab-documents">${docsHtml(docs)}</div>`;
 }
 
 function docsHtml(docs) {
@@ -417,6 +448,14 @@ function deleteDocFromPage(docId, resId) {
 document.addEventListener('DOMContentLoaded', () => {
   loadResident();
 });
+
+function printResident() {
+  const r = getResident();
+  const name = r ? `${r.prenom||''} ${r.nom||''}`.trim() : 'Résident';
+  document.title = `Fiche — ${name}`;
+  window.print();
+  document.title = 'Fiche résident — FTR';
+}
 </script>
 </body>
 </html>
