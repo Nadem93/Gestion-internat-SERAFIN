@@ -32,7 +32,11 @@ if (Auth.getSession()?.role !== 'admin') document.querySelectorAll('.admin-only'
   <header class="header" style="background:transparent;border:none;position:absolute;width:100%">
     <div style="visibility:hidden;pointer-events:none"><div class="header-title"></div></div>
     <div class="header-right">
-      <button class="btn btn-ghost btn-sm" id="etabSwitchBtn" onclick="showEtabSelection()" title="Changer d'établissement" style="font-size:.75rem;opacity:.7"></button>
+      <button class="btn btn-sm" id="etabSwitchBtn" onclick="showEtabSelection()" title="Changer d'établissement" style="background:rgba(255,255,255,.85);border:1px solid rgba(15,43,74,.15);color:var(--primary);font-size:.78rem;font-weight:600;gap:.4rem;backdrop-filter:blur(8px);box-shadow:0 1px 4px rgba(0,0,0,.08)">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:13px;height:13px;flex-shrink:0"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>
+        <span id="etabSwitchLabel">Établissement</span>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:11px;height:11px;opacity:.5;flex-shrink:0"><polyline points="6 9 12 15 18 9"/></svg>
+      </button>
     </div>
   </header>
   <main class="accueil-home-main">
@@ -410,8 +414,8 @@ function showMainAccueil() {
   const etab = getCurrentEtab();
   document.getElementById('etabSelectView').style.display = 'none';
   document.getElementById('mainAccueilView').style.display = 'block';
-  const btn = document.getElementById('etabSwitchBtn');
-  if (btn && etab) btn.textContent = '🏠 ' + etab.nom;
+  const lbl = document.getElementById('etabSwitchLabel');
+  if (lbl && etab) lbl.textContent = etab.nom;
   applyTerminology();
 }
 
