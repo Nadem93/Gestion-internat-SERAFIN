@@ -158,7 +158,8 @@ function getSelectedEtabs() {
   const checks = document.querySelectorAll('#etabSelector input:checked');
   const all = getEtabs();
   if (!checks.length) return [];
-  return all.filter(e => Array.from(checks).some(c => c.value === e.id));
+  const ids = new Set(Array.from(checks).map(c => String(c.value)));
+  return all.filter(e => ids.has(String(e.id)));
 }
 
 function populateEtabSelector() {
@@ -569,6 +570,7 @@ function generateForCurrentEtab() {
 
   return resList.length;
 }
+initDefaults();
 populateEtabSelector();
 </script>
 </body>
