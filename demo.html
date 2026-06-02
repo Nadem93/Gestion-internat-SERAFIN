@@ -3,58 +3,76 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Génération données de démonstration</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
+<title>Démo — FTR</title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
-*{box-sizing:border-box;margin:0;padding:0}
-body{font-family:'Inter',system-ui,sans-serif;background:linear-gradient(135deg,#b8b0d4,#f5f0fc);min-height:100vh;display:flex;align-items:center;justify-content:center;padding:2rem;margin:0}
-.card{background:rgba(255,255,255,.85);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border:2px solid rgba(255,255,255,.6);border-radius:24px;padding:3rem;max-width:720px;width:100%;box-shadow:0 8px 32px rgba(0,0,0,.1);text-align:center}
-h1{font-size:2rem;font-weight:800;color:#1e293b;margin-bottom:.5rem}
-p{color:#64748b;margin-bottom:2rem;line-height:1.6}
-.btn{display:inline-flex;align-items:center;gap:.6rem;background:linear-gradient(135deg,#e85d04,#f97316);color:#fff;border:none;padding:1rem 2.5rem;border-radius:14px;font-size:1rem;font-weight:700;cursor:pointer;width:100%;justify-content:center;transition:transform .2s,box-shadow .2s;box-shadow:0 4px 16px rgba(232,93,4,.3)}
-.btn:hover{transform:translateY(-2px);box-shadow:0 6px 24px rgba(232,93,4,.4)}
-.btn:disabled{opacity:.5;cursor:not-allowed;transform:none;box-shadow:none}
-.btn svg{width:20px;height:20px;flex-shrink:0}
-.status{text-align:left;margin-top:2rem;font-size:.85rem;color:#64748b;background:#f8fafc;border-radius:12px;padding:1.25rem;max-height:300px;overflow-y:auto;line-height:1.8;border:1px solid #e2e8f0}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{font-family:Inter,sans-serif;background:#f1f5f9;color:#334155;min-height:100vh;padding:2rem;display:flex;flex-direction:column;align-items:center}
+.card{background:#fff;border-radius:12px;padding:2.5rem;max-width:800px;width:100%;box-shadow:0 1px 3px rgba(0,0,0,.08);border:1.5px solid #0f2b4a;margin-bottom:1.5rem}
+h1{font-size:1.6rem;font-weight:800;color:#0f2b4a;margin-bottom:.25rem}
+.sub{color:#64748b;font-size:.85rem;margin-bottom:1.5rem}
+.btn{display:inline-flex;align-items:center;gap:.6rem;background:#0f2b4a;color:#fff;border:none;padding:.85rem 2rem;border-radius:8px;font-size:.9rem;font-weight:600;cursor:pointer;width:100%;justify-content:center;transition:background .2s,transform .1s}
+.btn:hover{background:#1a4a7a}
+.btn:active{transform:scale(.98)}
+.btn:disabled{opacity:.5;cursor:not-allowed;transform:none}
+.status{text-align:left;margin-top:1.5rem;font-size:.82rem;color:#475569;background:#f8fafc;border-radius:8px;padding:1.25rem;max-height:320px;overflow-y:auto;line-height:1.8;border:1px solid #e2e8f0}
 .status .ok{color:#16a34a;font-weight:600}
-.status .info{color:#3b82f6}
 .status .sep{border-top:1px dashed #e2e8f0;margin:.6rem 0}
-.stat-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:12px;margin-bottom:2rem}
-.stat-item{background:#f8fafc;border-radius:12px;padding:.8rem .4rem;border:1px solid #e2e8f0}
-.stat-num{font-size:1.4rem;font-weight:800;color:#0f2b4a}
-.stat-label{font-size:.65rem;color:#64748b;text-transform:uppercase;letter-spacing:.03em}
-.footer{font-size:.75rem;color:#94a3b8;margin-top:1.5rem}
+.mod-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin:1.25rem 0}
+.mod-item{background:#f8fafc;border-radius:8px;padding:.7rem .5rem;text-align:center;border:1px solid #e2e8f0}
+.mod-icon{font-size:1.2rem;margin-bottom:.2rem}
+.mod-num{font-size:1.1rem;font-weight:800;color:#0f2b4a}
+.mod-label{font-size:.6rem;color:#64748b;text-transform:uppercase;letter-spacing:.03em}
+.etab-grid{display:grid;gap:10px;margin:1rem 0}
+.etab-item{background:#f8fafc;border-radius:8px;padding:.75rem 1rem;display:flex;align-items:center;gap:.75rem;border:1px solid #e2e8f0}
+.etab-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0}
+.etab-name{font-weight:600;font-size:.82rem;flex:1;min-width:0}
+.etab-count{font-size:.72rem;color:#64748b}
+.footer{font-size:.75rem;color:#94a3b8;margin-top:1rem;text-align:center}
 </style>
 </head>
 <body>
-<div class="card">
-  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:48px;height:48px;color:#e85d04;margin-bottom:1rem"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
-  <h1>Génération des données de démonstration</h1>
-  <p>100 résidents avec photos, journal (10 entrées par catégorie), planning, présences, avenants, incidents, messagerie, répertoire — tout sera généré automatiquement.</p>
 
-  <div class="stat-grid">
-    <div class="stat-item"><div class="stat-num">100</div><div class="stat-label">RÉSIDENTS</div></div>
-    <div class="stat-item"><div class="stat-num">200+</div><div class="stat-label">JOURNAL</div></div>
-    <div class="stat-item"><div class="stat-num">60+</div><div class="stat-label">PLANNING</div></div>
-    <div class="stat-item"><div class="stat-num">15</div><div class="stat-label">INTERVENTIONS</div></div>
-    <div class="stat-item"><div class="stat-num">16</div><div class="stat-label">AVENANTS</div></div>
+<div class="card">
+  <div style="display:flex;align-items:flex-start;gap:1rem;margin-bottom:1rem">
+    <div style="width:48px;height:48px;background:#0f2b4a;border-radius:10px;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:800;font-size:1.1rem;flex-shrink:0">FTR</div>
+    <div style="flex:1">
+      <h1>Données de démonstration</h1>
+      <div class="sub">Génération automatique de données réalistes pour tous les établissements</div>
+    </div>
+  </div>
+
+  <div id="etabList" class="etab-grid" style="display:none"></div>
+
+  <div class="mod-grid" id="modGrid">
+    <div class="mod-item"><div class="mod-icon">👤</div><div class="mod-num">100</div><div class="mod-label">RÉSIDENTS</div></div>
+    <div class="mod-item"><div class="mod-icon">📖</div><div class="mod-num">80</div><div class="mod-label">JOURNAL</div></div>
+    <div class="mod-item"><div class="mod-icon">📅</div><div class="mod-num">70</div><div class="mod-label">PLANNING</div></div>
+    <div class="mod-item"><div class="mod-icon">🚗</div><div class="mod-num">4</div><div class="mod-label">VÉHICULES</div></div>
+    <div class="mod-item"><div class="mod-icon">✅</div><div class="mod-num">14j</div><div class="mod-label">PRÉSENCES</div></div>
+    <div class="mod-item"><div class="mod-icon">📄</div><div class="mod-num">16</div><div class="mod-label">AVENANTS</div></div>
+    <div class="mod-item"><div class="mod-icon">⚠️</div><div class="mod-num">15</div><div class="mod-label">INCIDENTS</div></div>
+    <div class="mod-item"><div class="mod-icon">🔧</div><div class="mod-num">15</div><div class="mod-label">INTERVENTIONS</div></div>
+    <div class="mod-item"><div class="mod-icon">💬</div><div class="mod-num">55</div><div class="mod-label">MESSAGES</div></div>
+    <div class="mod-item"><div class="mod-icon">📞</div><div class="mod-num">23</div><div class="mod-label">RÉPERTOIRE</div></div>
+    <div class="mod-item"><div class="mod-icon">👥</div><div class="mod-num">20</div><div class="mod-label">EMPLOYÉS</div></div>
+    <div class="mod-item"><div class="mod-icon">📂</div><div class="mod-num">8</div><div class="mod-label">CATÉGORIES</div></div>
   </div>
 
   <button class="btn" id="genBtn" onclick="generateDemo()">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 12a8 8 0 018-8V0L18 6l-6 6V4a8 8 0 000 16 8 8 0 01-8-8z"/><path d="M12 20l6-6v4a8 8 0 01-8 8z"/></svg>
-    Générer les données
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:18px;height:18px"><path d="M4 12a8 8 0 018-8V0L18 6l-6 6V4a8 8 0 000 16 8 8 0 01-8-8z"/><path d="M12 20l6-6v4a8 8 0 01-8 8z"/></svg>
+    Générer les données pour tous les établissements
   </button>
 
-  <div class="status" id="status">Cliquez sur le bouton pour lancer la génération…</div>
-  <div class="footer">Identifiants après génération : <strong>admin / admin123</strong></div>
+  <div class="status" id="status">Cliquez sur le bouton pour lancer la génération.</div>
+  <div class="footer">Identifiants : <strong>admin / admin123</strong></div>
 </div>
 
 <script src="js/app.js"></script>
 <script>
 function log(msg) {
   const s = document.getElementById('status');
-  s.innerHTML += msg.replace(/\n/g, '<br>') + '<br>';
+  s.innerHTML += msg + '<br>';
   s.scrollTop = s.scrollHeight;
 }
 function $(v) { return document.getElementById(v); }
@@ -136,22 +154,31 @@ function generateDemo() {
   const etabs = getEtabs();
   if (!etabs.length) { alert('Aucun établissement trouvé.'); btn.disabled = false; return; }
 
-  etabs.forEach(etab => {
+  const etabListEl = document.getElementById('etabList');
+  etabListEl.style.display = 'grid';
+
+  let totalRes = 0;
+  etabs.forEach((etab, ei) => {
     sessionStorage.setItem('ftr_current_etab', etab.id);
-    log('<div style="margin:.5rem 0;font-weight:700;color:#1e40af">🏢 Génération pour : ' + escHtml(etab.nom) + '</div>');
-    generateForCurrentEtab();
+    log('<div style="margin:.5rem 0;font-weight:700;color:#0f2b4a">🏢 <strong>' + escHtml(etab.nom) + '</strong> <span style="font-weight:400;color:#64748b">' + escHtml(etab.ville||'') + '</span></div>');
+    const count = generateForCurrentEtab();
+    totalRes += count;
+    log('<span class="ok">✅ ' + count + ' résidents · données complètes</span>');
+
+    const dot = etabListEl.querySelector('[data-id="' + etab.id + '"]');
+    if (dot) dot.style.background = '#16a34a';
   });
 
-  // Restaurer l'étab d'origine
   if (originalEtabId) sessionStorage.setItem('ftr_current_etab', originalEtabId);
   else sessionStorage.removeItem('ftr_current_etab');
 
   log('<div class="sep"></div>');
-  log('<span style="color:#16a34a;font-weight:700;font-size:1.05rem">🎉 Données générées pour ' + etabs.length + ' établissement' + (etabs.length > 1 ? 's' : '') + ' !</span>');
-  log('<a href="index.html" style="display:inline-block;margin-top:.8rem;background:linear-gradient(135deg,#0f2b4a,#1a4a7a);color:#fff;padding:.7rem 2rem;border-radius:10px;text-decoration:none;font-weight:700;font-size:.95rem">→ Aller à la page de connexion</a>');
-  log('<span style="display:block;margin-top:.4rem;font-size:.8rem;color:#94a3b8">Identifiants : admin / admin123</span>');
+  log('<span style="color:#16a34a;font-weight:700;font-size:1rem">🎉 Données générées pour <strong>' + etabs.length + '</strong> établissement' + (etabs.length > 1 ? 's' : '') + '</span>');
+  log('<span style="display:block;margin-top:.5rem;font-size:.82rem;color:#64748b">Total : ' + totalRes + ' résidents · 80 entrées journal · 70 événements · 16 avenants · 15 incidents · 15 interventions</span>');
+  log('<a href="index.html" style="display:inline-block;margin-top:.8rem;background:#0f2b4a;color:#fff;padding:.7rem 2rem;border-radius:8px;text-decoration:none;font-weight:600;font-size:.9rem">→ Aller à la page de connexion</a>');
+  log('<span style="display:block;margin-top:.3rem;font-size:.75rem;color:#94a3b8">Identifiants : admin / admin123</span>');
   btn.disabled = false;
-  btn.textContent = 'Générer les données';
+  btn.textContent = 'Générer les données pour tous les établissements';
 }
 
 function generateForCurrentEtab() {
@@ -160,14 +187,13 @@ function generateForCurrentEtab() {
   const now = new Date();
   const today = now.toISOString().slice(0,10);
 
-  // ── RÉSIDENTS (20) ──
   const usedNames = new Set();
   const resList = [];
 
   for (let i = 0; i < 20; i++) {
     let prenom, nom, key;
     do {
-      prenom = i < 50 ? pick(PRENOMS_M) : pick(PRENOMS_F);
+      prenom = i < 10 ? pick(PRENOMS_M) : pick(PRENOMS_F);
       nom = pick(NOMS);
       key = prenom + '_' + nom;
     } while (usedNames.has(key));
@@ -205,15 +231,11 @@ function generateForCurrentEtab() {
   }
 
   DB.set(DB.keys.residents, []);
-  // Re-assign IDs for sorted list
   const sortedRes = shuffle([...resList]).map((r, i) => ({ ...r, id: 'demo-' + (i + 1) }));
-  // Fix the sorted list back to resList for index access
   resList.length = 0;
   sortedRes.forEach(r => resList.push(r));
   DB.set(DB.keys.residents, resList);
-  log('<span class="ok">✅ ' + resList.length + ' résidents créés par établissement</span> — avec photos avatar');
 
-  // ── CATÉGORIES ──
   const cats = [
     { id: 1, name: 'Accompagnement', color: '#3b82f6' },
     { id: 2, name: 'Médical', color: '#ef4444' },
@@ -225,9 +247,7 @@ function generateForCurrentEtab() {
     { id: 8, name: 'Psychologique', color: '#9333ea' }
   ];
   DB.set(DB.keys.categories, cats);
-  log('<span class="ok">✅ 8 catégories créées</span>');
 
-  // ── JOURNAL (10 entrées × 8 catégories = 80 entrées) ──
   const journal = [];
   const journalAuthors = [
     { id: 2, name: 'Sophie Martin' }, { id: 3, name: 'Pierre Dubois' },
@@ -295,12 +315,11 @@ function generateForCurrentEtab() {
     const cat = cats[i % cats.length];
     const d = new Date(now.getTime() - rand(0, 365) * 86400000);
     const author = pick(journalAuthors);
-    // 4 lignes de texte par entrée
     const lignes = [];
-    const used = new Set();
+    const usedSet = new Set();
     while (lignes.length < 4) {
       const t = pick(journalTemplates);
-      if (!used.has(t)) { used.add(t); lignes.push(t); }
+      if (!usedSet.has(t)) { usedSet.add(t); lignes.push(t); }
     }
     const contenu = lignes.join('\n');
     const visibilite = Math.random() < .1 ? 'confidentiel' : Math.random() < .2 ? 'tous' : 'equipe';
@@ -324,9 +343,7 @@ function generateForCurrentEtab() {
     });
   }
   DB.set(DB.keys.journal, journal);
-  log('<span class="ok">✅ 20 entrées journal créées (4 lignes chacune)</span>');
 
-  // ── PLANNING (70 events) ──
   const planning = [];
   const eventTypes = [
     { title: 'Réunion d équipe', type: 'reunion', color: '#8b5cf6', time: '09:00', dur: '60' },
@@ -369,13 +386,12 @@ function generateForCurrentEtab() {
     });
   }
 
-  // Add vehicle reservations
   const vehs = ['Renault Kangoo', 'Citroën Berlingo', 'Peugeot Partner', 'Volkswagen Caddy'];
   vehs.forEach((v, vi) => {
     const dayOffset = rand(0, 14);
     const d = new Date(now.getTime() + dayOffset * 86400000);
     const ds = d.toISOString().slice(0,10);
-    const res = resList[rand(0, 99)];
+    const res = resList[rand(0, resList.length - 1)];
     planning.push({
       id: 'dp-v' + (vi + 1),
       titre: 'Véhicule — ' + v,
@@ -391,13 +407,8 @@ function generateForCurrentEtab() {
   });
 
   DB.set(DB.keys.planning, planning);
-  log('<span class="ok">✅ ' + planning.length + ' événements planning créés</span>');
-
-  // ── VÉHICULES ──
   DB.set(DB.keys.vehicules, vehs);
-  log('<span class="ok">✅ ' + vehs.length + ' véhicules créés</span>');
 
-  // ── PRÉSENCES (14 jours × 100 résidents) ──
   const presences = {};
   for (let j = -13; j <= 0; j++) {
     const d = new Date(today + 'T00:00:00');
@@ -411,165 +422,7 @@ function generateForCurrentEtab() {
     presences[ds] = dayPresences;
   }
   DB.set(DB.keys.presences, presences);
-  log('<span class="ok">✅ Présences générées sur 14 jours</span>');
 
-  // ── UTILISATEURS (20 profils) ──
-  const users = DB.get(DB.keys.users) || [];
-  if (users.length <= 1) {
-    const profils = [
-      { prenom:'Sophie', nom:'Martin', fonction:'Éducatrice spécialisée', username:'smartin' },
-      { prenom:'Pierre', nom:'Dubois', fonction:'Éducateur jeunesse', username:'pdubois' },
-      { prenom:'Camille', nom:'Legrand', fonction:'Psychologue', username:'clegrand' },
-      { prenom:'Julien', nom:'Fontaine', fonction:'Moniteur éducateur', username:'jfontaine' },
-      { prenom:'Nathalie', nom:'Petit', fonction:'Chef de service', username:'npetit' },
-      { prenom:'Antoine', nom:'Leroy', fonction:'Éducateur sportif', username:'aleroy' },
-      { prenom:'Mélanie', nom:'Roux', fonction:'Assistante sociale', username:'mroux' },
-      { prenom:'David', nom:'Moreau', fonction:'Infirmier', username:'dmoreau' },
-      { prenom:'Élodie', nom:'Fournier', fonction:'Éducatrice jeunes enfants', username:'efournier' },
-      { prenom:'Sébastien', nom:'Girard', fonction:'VEilleur de nuit', username:'sgirard' },
-      { prenom:'Caroline', nom:'Bonnet', fonction:'Psychomotricienne', username:'cbonnet' },
-      { prenom:'Alexandre', nom:'Dupont', fonction:'Médiateur social', username:'adupont' },
-      { prenom:'Virginie', nom:'Lambert', fonction:'CESF', username:'vlambert' },
-      { prenom:'Romain', nom:'Chevallier', fonction:'Animateur socioculturel', username:'rchevallier' },
-      { prenom:'Isabelle', nom:'Perrin', fonction:'Coordinatrice de parcours', username:'iperrin' },
-      { prenom:'Laurent', nom:'Gauthier', fonction:'Éducateur technique', username:'lgauthier' },
-      { prenom:'Stéphanie', nom:'Caron', fonction:'Secrétaire médico-sociale', username:'scaron' },
-      { prenom:'Grégory', nom:'Moulin', fonction:'Agent de maintien', username:'gmoulin' },
-      { prenom:'Audrey', nom:'Renard', fonction:'Référente ASE', username:'arenard' },
-      { prenom:'Florian', nom:'Marchand', fonction:'Stagiaire éducateur', username:'fmarchand' }
-    ];
-    profils.forEach((p, i) => users.push({
-      id: i + 2, ...p, password: 'educ123', role: 'educ'
-    }));
-    DB.set(DB.keys.users, users);
-    // Ajouter tous les utilisateurs dans chaque établissement
-    users.forEach(u => addUserToAllEtabs(u));
-  }
-  log('<span class="ok">✅ ' + users.length + ' utilisateurs ajoutés dans tous les établissements</span>');
-
-  // ── Messages (8 conversations, ~55 messages) ──
-  const conversations = {};
-  const allMsgs = [];
-  const convDefs = [
-    { users: [1,2,3], msgs: [
-      'Bonjour à tous, réunion d équipe demain à 14h. Merci de confirmer.',
-      'Présente, merci !',
-      'Présent également. Je dois faire le point sur le suivi.',
-      'Parfait. Préparez un rapport.',
-      'OK, je m en occupe.',
-      'J ai croisé sa référente, elle dit qu il progresse.',
-      'Bien, continuez comme ça.'
-    ]},
-    { users: [1,4], msgs: [
-      'Bonjour, RDV CMP pour Sarah confirmé demain 15h.',
-      'Merci. Le transport est organisé ?',
-      'Oui, j ai réservé le Kangoo.',
-      'Très bien. Tenez-moi au courant.',
-      'RDV passé. Le médecin ajuste son traitement.',
-      'Parfait. Et pour Enzo ?',
-      'Premier RDV programmé jeudi prochain.'
-    ]},
-    { users: [2,3,4,5], msgs: [
-      'Info : Fatima a trouvé un stage en crèche !',
-      'Super nouvelle ! Suivi rapproché la première semaine.',
-      'Je peux m en charger.',
-      'Parfait. Leila a aussi eu son stage.',
-      'Génial ! Bonne semaine pour les stages.',
-      'On prévoit un atelier préparation entretien ?',
-      'Bonne idée. Je peux animer jeudi.'
-    ]},
-    { users: [1,6,14], msgs: [
-      'Bonjour, point sur les budgets. Plusieurs dépassements.',
-      'Oui, Ryan a tout dépensé en une semaine.',
-      'On met un suivi renforcé ? Virginie tu prends ?',
-      'Bien sûr. Atelier budget 2x/semaine.',
-      'Parfait. Budget sorties collectives dans le vert.'
-    ]},
-    { users: [12,13,15], msgs: [
-      'Je propose un atelier psychomotricité pour Lucas et Mehdi.',
-      'Bonne idée. Je les prépare en amont.',
-      'Je veux bien co-animer.',
-      'Super ! Je propose mardi 14h.',
-      'Je confirme ma disponibilité.'
-    ]},
-    { users: [8,10,18], msgs: [
-      'Bonjour, point MDPH. Elena et Sarah à renouveler.',
-      'Il manque le certificat médical pour Elena.',
-      'Je relance le Dr Moreau.',
-      'Parfait. Et pour le logement d Assia ?',
-      'Commission d attribution le 15.',
-      'J ai préparé le dossier renouvellement contrat jeune majeur.'
-    ]},
-    { users: [7,17,19], msgs: [
-      'On organise un tournoi de foot inter-foyers ?',
-      'Excellente idée ! Je prépare les jeunes.',
-      'Je gère la logistique.',
-      'On vise samedi dans 3 semaines.',
-      'Sofiane et Amine sont chauds.',
-      'On inscrit aussi Kylian ?',
-      'Bonne idée, je valide avec son référent.'
-    ]},
-    { users: [1,2], msgs: [
-      'Nouvel arrivant prévu lundi. Chambre 105 à préparer.',
-      'OK, je m en occupe. Il faut commander un lit ?',
-      'Oui, vérifie le stock. Sinon bon de commande.',
-      'Compris. Briefing équipe demain matin ?',
-      'À 9h en salle de réunion. Présents : Sophie, Pierre, Julien.',
-      'Noté. Je prépare le dossier d accueil.'
-    ]}
-  ];
-
-  convDefs.forEach((cd, ci) => {
-    const convId = cd.users.sort((a,b)=>a-b).join('_');
-    conversations[convId] = { id: convId, userIds: cd.users, createdAt: new Date(now.getTime() - (convDefs.length - ci) * 86400000*2).toISOString() };
-    cd.msgs.forEach((body, mi) => {
-      const d = new Date(now.getTime() - ((cd.msgs.length - mi) + (convDefs.length - ci) * 7) * 86400000);
-      d.setHours(rand(8, 18), rand(0, 59), 0, 0);
-      allMsgs.push({
-        id: 'dm-' + (ci + 1) + '-' + (mi + 1),
-        convId: convId,
-        from: cd.users[mi % cd.users.length],
-        body: body,
-        date: d.toISOString(),
-        readBy: [cd.users[mi % cd.users.length]]
-      });
-    });
-  });
-
-  DB.set(DB.keys.messages, allMsgs);
-  localStorage.setItem('ftr_conversations', JSON.stringify(conversations));
-  log('<span class="ok">✅ ' + allMsgs.length + ' messages dans ' + Object.keys(conversations).length + ' conversations</span>');
-
-  // ── RÉPERTOIRE (23 contacts) ──
-  const contacts = [
-    { organisme:'CMP Maison Blanche', nom:'Dr Anne Moreau', tel:'01 45 67 89 01', email:'anne.moreau@gh-paris.fr', fonction:'Pédopsychiatre', adresse:'15 Rue de la Santé, 75014 Paris', notes:'Suivi de Lucas et Sarah.' },
-    { organisme:'ASE Paris', nom:'Mme Valérie Legrand', tel:'01 23 45 67 10', email:'valerie.legrand@paris.fr', fonction:'Référente ASE', adresse:'12 Rue du Château, 75010 Paris', notes:'Référente dossiers ASE.' },
-    { organisme:'PJJ Paris', nom:'M. Christophe Fontaine', tel:'01 23 45 67 20', email:'christophe.fontaine@justice.fr', fonction:'Éducateur PJJ', adresse:'3 Boulevard du Palais, 75001 Paris', notes:'Suivi mesures PJJ.' },
-    { organisme:'Mission Locale Paris Centre', nom:'Mme Karima Saadi', tel:'01 45 78 90 12', email:'k.saadi@ml-paris.fr', fonction:'Conseillère insertion', adresse:'8 Rue de la Paix, 75002 Paris', notes:'Insertion professionnelle.' },
-    { organisme:'CIDFF Paris', nom:'Mme Laure Blanc', tel:'01 45 67 89 34', email:'l.blanc@cidff.fr', fonction:'Psychologue', adresse:'20 Rue de la Roquette, 75011 Paris', notes:'Suivi d Emma.' },
-    { organisme:'Hôpital Saint-Antoine', nom:'Dr Paul Lefèvre', tel:'01 49 28 20 00', email:'paul.lefevre@aphp.fr', fonction:'Psychiatre', adresse:'184 Rue du Faubourg Saint-Antoine, 75012 Paris', notes:'Suivi psychiatrique.' },
-    { organisme:'OFII Paris', nom:'M. Amadou Ba', tel:'01 40 77 25 00', email:'amadou.ba@ofii.fr', fonction:'Référent intégration', adresse:'44 Rue Bargue, 75015 Paris', notes:'Dossiers de demande d asile.' },
-    { organisme:'École Élémentaire Jules Ferry', nom:'Mme Christine Petit', tel:'01 43 56 78 90', email:'ce.0751234a@ac-paris.fr', fonction:'Directrice', adresse:'2 Rue Jules Ferry, 75011 Paris', notes:'' },
-    { organisme:'Collège Victor Hugo', nom:'M. Laurent Roux', tel:'01 43 56 78 91', email:'ce.0751235b@ac-paris.fr', fonction:'CPE', adresse:'5 Rue Victor Hugo, 75011 Paris', notes:'Problèmes d absentéisme.' },
-    { organisme:'ESAT Les Ateliers du Val', nom:'M. Franck Morel', tel:'01 48 90 12 34', email:'f.morel@esat-val.fr', fonction:'Directeur adjoint', adresse:'Route de la Vallée, 94120 Fontenay', notes:'Stage possible.' },
-    { organisme:'MDPH Val-de-Marne', nom:'Mme Sophie Leroy', tel:'09 72 12 34 56', email:'sophie.leroy@mdph94.fr', fonction:'Chargée de dossier', adresse:'1 Place de la Préfecture, 94000 Créteil', notes:'Dossiers MDPH.' },
-    { organisme:'CCAS Paris 10e', nom:'M. David Cohen', tel:'01 45 67 89 50', email:'d.cohen@ccas-paris.fr', fonction:'Travailleur social', adresse:'10 Rue de la Grange aux Belles, 75010 Paris', notes:'Logement social.' },
-    { organisme:'Service Solideo', nom:'Mme Fatou Ba', tel:'06 12 34 56 13', email:'f.ba@solideo.org', fonction:'Travailleuse sociale', adresse:'18 Rue des Martyrs, 75009 Paris', notes:'Suivi MNA.' },
-    { organisme:'Lycée Hôtelier Guillaume Tirel', nom:'M. Jean-Claude Roux', tel:'01 44 14 77 77', email:'jc.roux@ac-paris.fr', fonction:'Chef des travaux', adresse:'18 Rue Guillaume Tirel, 75014 Paris', notes:'CAP Cuisine.' },
-    { organisme:'CMP Enfants-Ados Paris 13e', nom:'Dr Catherine Lefèvre', tel:'01 45 85 45 85', email:'catherine.lefevre@gh-paris.fr', fonction:'Pédopsychiatre', adresse:'43 Rue de la Santé, 75013 Paris', notes:'Suivi Ryan et Enzo.' },
-    { organisme:'GRETA Paris', nom:'Mme Sylvie Mercier', tel:'01 44 62 36 00', email:'s.mercier@greta-paris.fr', fonction:'Coordinatrice', adresse:'164 Rue de Rivoli, 75001 Paris', notes:'Formations professionnelles.' },
-    { organisme:'France Parrainages', nom:'M. Jacques Delors', tel:'01 42 72 13 13', email:'j.delors@france-parrainages.org', fonction:'Coordinateur', adresse:'7 Rue du Château d Eau, 75010 Paris', notes:'Parrainage.' },
-    { organisme:'Université Paris Cité', nom:'Mme Françoise Weber', tel:'01 45 87 50 00', email:'francoise.weber@u-paris.fr', fonction:'Responsable pédagogique', adresse:'85 Boulevard Saint-Germain, 75006 Paris', notes:'' },
-    { organisme:'Lycée Pro Charles de Gaulle', nom:'M. Philippe Durand', tel:'01 48 95 65 00', email:'philippe.durand@ac-paris.fr', fonction:'Directeur délégué', adresse:'4 Avenue de la Porte de Clichy, 75017 Paris', notes:'' },
-    { organisme:'France Victimes 75', nom:'Mme Sophie Rivière', tel:'01 45 88 50 00', email:'sophie.riviere@francevictimes.fr', fonction:'Juriste', adresse:'12 Rue de la Félicité, 75017 Paris', notes:'Aide juridique.' },
-    { organisme:'Tribunal Judiciaire Paris', nom:'Mme Laurence Fontaine', tel:'01 44 32 50 00', email:'laurence.fontaine@justice.fr', fonction:'Juge des Enfants', adresse:'4 Boulevard du Palais, 75001 Paris', notes:'Audiences trimestrielles.' },
-    { organisme:'Service Social Départemental 75', nom:'Mme Isabelle Garnier', tel:'01 40 27 75 00', email:'isabelle.garnier@paris.fr', fonction:'Chef de service', adresse:'3 Rue des Enfants Rouges, 75003 Paris', notes:'Coordination ASE.' },
-    { organisme:'Médiation Familiale Paris Centre', nom:'Mme Catherine Dubois', tel:'01 42 71 00 00', email:'c.dubois@mediation-paris.fr', fonction:'Médiatrice', adresse:'22 Rue des Francs-Bourgeois, 75003 Paris', notes:'Médiations familiales.' }
-  ].map(c => ({ id:'dc-'+rand(100000,999999).toString(36), updatedAt:new Date(now.getTime()-rand(0,60)*86400000).toISOString(), ...c }));
-  DB.set(DB.keys.repertoire, contacts);
-  log('<span class="ok">✅ ' + contacts.length + ' contacts répertoire créés</span>');
-
-  // ── AVENANTS / PPE (16 avenants) ──
   const domaines = ['autonomie','sante','viePro','logement','vieSociale','vieAffective','budget','transport','orientation'];
   const avenantResidents = [
     { idx: 0, statut: 'actif', dateRedac: '2026-02-10', dateRev: '2026-08-10', referent: 'M. Dubois', protection: 'Curatelle simple' },
@@ -596,12 +449,7 @@ function generateForCurrentEtab() {
     domaines.forEach(d => {
       sections[d] = {
         bilan: 'Bilan en cours pour ' + d + '. Évolution à suivre.',
-        objectifs: [{
-          objectif: 'Objectif principal ' + d,
-          moyens: 'Accompagnement éducatif adapté',
-          echeance: t.dateRev,
-          evaluation: ''
-        }],
+        objectifs: [{ objectif: 'Objectif principal ' + d, moyens: 'Accompagnement éducatif adapté', echeance: t.dateRev, evaluation: '' }],
         expression: res.prenom + ' souhaite progresser dans ce domaine.'
       };
     });
@@ -623,9 +471,7 @@ function generateForCurrentEtab() {
     };
   });
   DB.set(DB.keys.ppe, avenants);
-  log('<span class="ok">✅ ' + avenants.length + ' avenants créés</span>');
 
-  // ── INCIDENTS (15) ──
   const incidents = [
     { titre:'Chute dans l escalier', type:'chute', gravite:'moyen', resident:18, lieu:'Escalier principal', desc:'Ryan a glissé dans l escalier en courant. Entorse cheville droite.', statut:'classe', dec:9, decName:'David Moreau' },
     { titre:'Fugue d Enzo', type:'fugue', gravite:'grave', resident:20, lieu:'Foyer', desc:'Enzo s est enfui par la fenêtre du RDC après le coucher. Retrouvé par la police.', statut:'cours', dec:5, decName:'Julien Fontaine' },
@@ -664,9 +510,7 @@ function generateForCurrentEtab() {
     };
   });
   localStorage.setItem('ftr_incidents', JSON.stringify(incList));
-  log('<span class="ok">✅ ' + incList.length + ' incidents créés</span>');
 
-  // ── INTERVENTIONS (15) ──
   const intervs = [
     { lieu:'Chambre 101 — Lavabo', desc:'Lavabo bouché, se vide très lentement.', urgence:'basse' },
     { lieu:'Chambre 103 — Radiateur', desc:'Radiateur ne chauffe plus depuis hier.', urgence:'haute' },
@@ -688,18 +532,11 @@ function generateForCurrentEtab() {
   const intervsList = intervs.map((inc, i) => {
     const d = new Date(now.getTime() - rand(0, 30) * 86400000);
     const statut = Math.random() < .4 ? 'traitee' : 'ouverte';
-    return {
-      id: Date.now() + i,
-      lieu: inc.lieu,
-      desc: inc.desc,
-      urgence: inc.urgence,
-      date: d.toISOString(),
-      statut
-    };
+    return { id: Date.now() + i, lieu: inc.lieu, desc: inc.desc, urgence: inc.urgence, date: d.toISOString(), statut };
   });
   localStorage.setItem('ftr_interventions', JSON.stringify(intervsList));
-  log('<span class="ok">✅ ' + intervsList.length + ' interventions créées</span>');
 
+  return resList.length;
 }
 </script>
 </body>
