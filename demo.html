@@ -23,9 +23,16 @@ h1{font-size:1.6rem;font-weight:800;color:#0f2b4a;margin-bottom:.25rem}
 .mod-icon{font-size:1.2rem;margin-bottom:.2rem}
 .mod-num{font-size:1.1rem;font-weight:800;color:#0f2b4a}
 .mod-label{font-size:.6rem;color:#64748b;text-transform:uppercase;letter-spacing:.03em}
+.sel-label{font-size:.78rem;font-weight:600;color:#64748b;margin-bottom:.5rem;display:block}
+.etab-selector{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:1.25rem}
+.etab-chip{display:flex;align-items:center;gap:.5rem;padding:.4rem .7rem .4rem .5rem;background:#f8fafc;border:1.5px solid #e2e8f0;border-radius:8px;cursor:pointer;transition:border-color .15s,background .15s;font-size:.78rem;font-weight:500}
+.etab-chip:hover{border-color:#94a3b8}
+.etab-chip input{display:none}
+.etab-chip input:checked+.etab-dot{box-shadow:0 0 0 2.5px #0f2b4a}
+.etab-chip:has(input:checked){border-color:#0f2b4a;background:#eff6ff}
+.etab-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0;transition:box-shadow .1s}
 .etab-grid{display:grid;gap:10px;margin:1rem 0}
 .etab-item{background:#f8fafc;border-radius:8px;padding:.75rem 1rem;display:flex;align-items:center;gap:.75rem;border:1px solid #e2e8f0}
-.etab-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0}
 .etab-name{font-weight:600;font-size:.82rem;flex:1;min-width:0}
 .etab-count{font-size:.72rem;color:#64748b}
 .footer{font-size:.75rem;color:#94a3b8;margin-top:1rem;text-align:center}
@@ -59,9 +66,12 @@ h1{font-size:1.6rem;font-weight:800;color:#0f2b4a;margin-bottom:.25rem}
     <div class="mod-item"><div class="mod-icon">📂</div><div class="mod-num">8</div><div class="mod-label">CATÉGORIES</div></div>
   </div>
 
+  <label class="sel-label">Établissements à générer</label>
+  <div class="etab-selector" id="etabSelector"></div>
+
   <button class="btn" id="genBtn" onclick="generateDemo()">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:18px;height:18px"><path d="M4 12a8 8 0 018-8V0L18 6l-6 6V4a8 8 0 000 16 8 8 0 01-8-8z"/><path d="M12 20l6-6v4a8 8 0 01-8 8z"/></svg>
-    Générer les données pour tous les établissements
+    Générer les données
   </button>
 
   <div class="status" id="status">Cliquez sur le bouton pour lancer la génération.</div>
@@ -144,6 +154,27 @@ const NOTES = [
 ];
 const NOTES_COURTES = NOTES.map(n => n.split('.')[0] + '.');
 
+function getSelectedEtabs() {
+  const checks = document.querySelectorAll('#etabSelector input:checked');
+  const all = getEtabs();
+  if (!checks.length) return [];
+  return all.filter(e => Array.from(checks).some(c => c.value === e.id));
+}
+
+function populateEtabSelector() {
+  const el = document.getElementById('etabSelector');
+  const etabs = getEtabs();
+  el.innerHTML = etabs.map(e =>
+    `<label class="etab-chip"><input type="checkbox" value="${e.id}" checked onchange="updateGenBtn()"/><span class="etab-dot" style="background:${e.color||'#3b82f6'}"></span>${escHtml(e.nom||'Sans nom')}</label>`
+  ).join('');
+  updateGenBtn();
+}
+
+function updateGenBtn() {
+  const n = document.querySelectorAll('#etabSelector input:checked').length;
+  document.getElementById('genBtn').innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:18px;height:18px"><path d="M4 12a8 8 0 018-8V0L18 6l-6 6V4a8 8 0 000 16 8 8 0 01-8-8z"/><path d="M12 20l6-6v4a8 8 0 01-8 8z"/></svg> Générer les données' + (n ? ' (' + n + ' établissement' + (n > 1 ? 's' : '') + ')' : '');
+}
+
 function generateDemo() {
   const btn = $('genBtn');
   btn.disabled = true;
@@ -151,8 +182,8 @@ function generateDemo() {
   $('status').innerHTML = '';
 
   const originalEtabId = sessionStorage.getItem('ftr_current_etab');
-  const etabs = getEtabs();
-  if (!etabs.length) { alert('Aucun établissement trouvé.'); btn.disabled = false; return; }
+  const etabs = getSelectedEtabs();
+  if (!etabs.length) { alert('Sélectionnez au moins un établissement.'); btn.disabled = false; return; }
 
   const etabListEl = document.getElementById('etabList');
   etabListEl.style.display = 'grid';
@@ -538,6 +569,7 @@ function generateForCurrentEtab() {
 
   return resList.length;
 }
+populateEtabSelector();
 </script>
 </body>
 </html>
