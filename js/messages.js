@@ -150,13 +150,18 @@ function renderComposeUsers() {
       })
     : users;
 
+  const title = document.querySelector('#composeOverlay h3');
+  if (!composeTargetConv) {
+    title.textContent = composeSelected.length > 1 ? `Nouveau groupe (${composeSelected.length})` : 'Nouveau message';
+  }
+
   let html = filtered.map(u => {
-    const sel = composeSelected[0] === String(u.id);
+    const sel = composeSelected.includes(String(u.id));
     const initials = ((u.prenom||'')[0]||'') + ((u.nom||'')[0]||'');
     const name = `${u.prenom||''} ${u.nom||''}`.trim() || u.username;
     const role = u.fonction || (u.role==='admin' ? 'Administrateur' : 'Utilisateur');
     return `<div class="chat-overlay-user" onclick="toggleComposeUser('${u.id}')">
-      <div style="width:20px;height:20px;border-radius:50%;border:2px solid ${sel?'var(--blue)':'#c7c7cc'};display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all .1s;background:${sel?'var(--blue)':'transparent'}">${sel?'<div style="width:8px;height:8px;border-radius:50%;background:#fff"></div>':''}</div>
+      <div class="ck ${sel?'checked':''}"></div>
       <div class="avatar" style="background:${u.role==='admin'?'#5856d6':'#007aff'}">${initials||'?'}</div>
       <div class="chat-overlay-user-info">
         <div class="chat-overlay-user-name">${escHtml(name)}</div>
@@ -174,8 +179,12 @@ function renderComposeUsers() {
 
 function toggleComposeUser(id) {
   id = String(id);
-  if (composeSelected[0] === id) return;
-  composeSelected = [id];
+  const idx = composeSelected.indexOf(id);
+  if (idx >= 0) {
+    composeSelected.splice(idx, 1);
+  } else {
+    composeSelected.push(id);
+  }
   renderComposeUsers();
 }
 
