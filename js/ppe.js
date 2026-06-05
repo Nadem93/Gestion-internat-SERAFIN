@@ -647,7 +647,7 @@ async function aiAvenantFromJournal(resident, entries) {
             { role: 'user', content: `Rédige un avenant de PPE pour ${residentInfo} (${entries.length} entrées journal) :\n\n${journalText}` }
           ],
           temperature: 0.7,
-          max_tokens: 3000
+          max_tokens: 4000
         })
       });
       if (res.ok) {
@@ -690,6 +690,12 @@ function ensureSectionsComplete(sections) {
       if (!sec.objectifs) sec.objectifs = [];
       if (sec.bilan === undefined) sec.bilan = '';
       if (sec.expression === undefined) sec.expression = '';
+      sec.objectifs.forEach(o => {
+        if (o.objectif === undefined) o.objectif = '';
+        if (o.moyens === undefined) o.moyens = '';
+        if (o.echeance === undefined) o.echeance = '';
+        if (o.evaluation === undefined) o.evaluation = '';
+      });
     }
   });
 }
