@@ -52,17 +52,17 @@ h1{font-size:1.6rem;font-weight:800;color:#0f2b4a;margin-bottom:.25rem}
   <div id="etabList" class="etab-grid" style="display:none"></div>
 
   <div class="mod-grid" id="modGrid">
-    <div class="mod-item"><div class="mod-icon">👤</div><div class="mod-num">100</div><div class="mod-label">RÉSIDENTS</div></div>
-    <div class="mod-item"><div class="mod-icon">📖</div><div class="mod-num">80</div><div class="mod-label">JOURNAL</div></div>
-    <div class="mod-item"><div class="mod-icon">📅</div><div class="mod-num">70</div><div class="mod-label">PLANNING</div></div>
-    <div class="mod-item"><div class="mod-icon">🚗</div><div class="mod-num">4</div><div class="mod-label">VÉHICULES</div></div>
+    <div class="mod-item"><div class="mod-icon">👤</div><div class="mod-num">50</div><div class="mod-label">RÉSIDENTS</div></div>
+    <div class="mod-item"><div class="mod-icon">📖</div><div class="mod-num">200</div><div class="mod-label">JOURNAL</div></div>
+    <div class="mod-item"><div class="mod-icon">📅</div><div class="mod-num">50</div><div class="mod-label">PLANNING</div></div>
+    <div class="mod-item"><div class="mod-icon">🚗</div><div class="mod-num">50</div><div class="mod-label">VÉHICULES</div></div>
     <div class="mod-item"><div class="mod-icon">✅</div><div class="mod-num">14j</div><div class="mod-label">PRÉSENCES</div></div>
-    <div class="mod-item"><div class="mod-icon">📄</div><div class="mod-num">16</div><div class="mod-label">AVENANTS</div></div>
+    <div class="mod-item"><div class="mod-icon">📄</div><div class="mod-num">15</div><div class="mod-label">AVENANTS</div></div>
     <div class="mod-item"><div class="mod-icon">⚠️</div><div class="mod-num">15</div><div class="mod-label">INCIDENTS</div></div>
-    <div class="mod-item"><div class="mod-icon">🔧</div><div class="mod-num">15</div><div class="mod-label">INTERVENTIONS</div></div>
-    <div class="mod-item"><div class="mod-icon">💬</div><div class="mod-num">55</div><div class="mod-label">MESSAGES</div></div>
-    <div class="mod-item"><div class="mod-icon">📞</div><div class="mod-num">23</div><div class="mod-label">RÉPERTOIRE</div></div>
-    <div class="mod-item"><div class="mod-icon">👥</div><div class="mod-num">20</div><div class="mod-label">EMPLOYÉS</div></div>
+    <div class="mod-item"><div class="mod-icon">🔧</div><div class="mod-num">30</div><div class="mod-label">INTERVENTIONS</div></div>
+    <div class="mod-item"><div class="mod-icon">💬</div><div class="mod-num">20</div><div class="mod-label">MESSAGES</div></div>
+    <div class="mod-item"><div class="mod-icon">📞</div><div class="mod-num">30</div><div class="mod-label">RÉPERTOIRE</div></div>
+    <div class="mod-item"><div class="mod-icon">👥</div><div class="mod-num">50</div><div class="mod-label">EMPLOYÉS</div></div>
     <div class="mod-item"><div class="mod-icon">📂</div><div class="mod-num">8</div><div class="mod-label">CATÉGORIES</div></div>
   </div>
 
@@ -189,13 +189,13 @@ function generateDemo() {
   const etabListEl = document.getElementById('etabList');
   etabListEl.style.display = 'grid';
 
-  let totals = { residents:0, journal:0, planning:0, ppe:0, incidents:0, interventions:0, messages:0, contacts:0, users:0, documents:0 };
+  let totals = { residents:0, journal:0, planning:0, ppe:0, incidents:0, interventions:0, messages:0, contacts:0, users:0, employes:0, documents:0 };
   etabs.forEach((etab, ei) => {
     sessionStorage.setItem('ftr_current_etab', etab.id);
     log('<div style="margin:.5rem 0;font-weight:700;color:#0f2b4a">🏢 <strong>' + escHtml(etab.nom) + '</strong> <span style="font-weight:400;color:#64748b">' + escHtml(etab.ville||'') + '</span></div>');
     const r = generateForCurrentEtab();
     Object.keys(totals).forEach(k => totals[k] += r[k] || 0);
-    log('<span class="ok">✅ ' + r.residents + ' résidents · ' + r.journal + ' journaux · ' + r.messages + ' messages · ' + r.contacts + ' contacts</span>');
+    log('<span class="ok">✅ ' + r.residents + ' résidents · ' + r.journal + ' journaux · ' + r.messages + ' messages · ' + r.contacts + ' contacts · ' + r.employes + ' employés</span>');
 
     const dot = etabListEl.querySelector('[data-id="' + etab.id + '"]');
     if (dot) dot.style.background = '#16a34a';
@@ -215,7 +215,7 @@ function generateDemo() {
   updateGrid('#modGrid .mod-item:nth-child(8) .mod-num', totals.interventions);
   updateGrid('#modGrid .mod-item:nth-child(9) .mod-num', totals.messages);
   updateGrid('#modGrid .mod-item:nth-child(10) .mod-num', totals.contacts);
-  updateGrid('#modGrid .mod-item:nth-child(11) .mod-num', totals.users);
+  updateGrid('#modGrid .mod-item:nth-child(11) .mod-num', totals.employes);
   updateGrid('#modGrid .mod-item:nth-child(12) .mod-num', '8');
 
   log('<div class="sep"></div>');
@@ -249,10 +249,10 @@ function generateForCurrentEtab() {
   const usedNames = new Set();
   const resList = [];
 
-  for (let i = 0; i < 100; i++) {
+  for (let i = 0; i < 50; i++) {
     let prenom, nom, key;
     do {
-      prenom = i < 50 ? pick(PRENOMS_M) : pick(PRENOMS_F);
+      prenom = i < 25 ? pick(PRENOMS_M) : pick(PRENOMS_F);
       nom = pick(NOMS);
       key = prenom + '_' + nom;
     } while (usedNames.has(key));
@@ -369,14 +369,14 @@ function generateForCurrentEtab() {
     'Sortie au parc zoologique. Très intéressé par les animaux.'
   ];
 
-  for (let i = 0; i < 20; i++) {
+  for (let i = 0; i < 200; i++) {
     const res = resList[i % resList.length];
     const cat = cats[i % cats.length];
     const d = new Date(now.getTime() - rand(0, 365) * 86400000);
     const author = pick(journalAuthors);
-    const lignes = [];
     const usedSet = new Set();
-    while (lignes.length < 4) {
+    const lignes = [];
+    while (lignes.length < 5) {
       const t = pick(journalTemplates);
       if (!usedSet.has(t)) { usedSet.add(t); lignes.push(t); }
     }
@@ -427,12 +427,12 @@ function generateForCurrentEtab() {
     { title: 'Sortie parc', type: 'sortie', color: '#0891b2', time: '10:00', dur: '240' }
   ];
 
-  for (let i = 0; i < 70; i++) {
+  for (let i = 0; i < 50; i++) {
     const ev = pick(eventTypes);
     const dayOffset = rand(-14, 21);
     const d = new Date(now.getTime() + dayOffset * 86400000);
     const dateStr = d.toISOString().slice(0,10);
-    const res = i < 50 ? resList[i % resList.length] : null;
+    const res = resList[i % resList.length];
     planning.push({
       id: 'dp-' + (i + 1),
       titre: res ? ev.title + ' — ' + res.prenom + ' ' + res.nom : ev.title,
@@ -446,11 +446,12 @@ function generateForCurrentEtab() {
   }
 
   const vehs = ['Renault Kangoo', 'Citroën Berlingo', 'Peugeot Partner', 'Volkswagen Caddy'];
-  vehs.forEach((v, vi) => {
-    const dayOffset = rand(0, 14);
+  for (let vi = 0; vi < 50; vi++) {
+    const dayOffset = rand(0, 30);
     const d = new Date(now.getTime() + dayOffset * 86400000);
     const ds = d.toISOString().slice(0,10);
     const res = resList[rand(0, resList.length - 1)];
+    const v = pick(vehs);
     planning.push({
       id: 'dp-v' + (vi + 1),
       titre: 'Véhicule — ' + v,
@@ -463,7 +464,7 @@ function generateForCurrentEtab() {
       reservedPrenom: res.prenom,
       createdAt: d.toISOString(), updatedAt: d.toISOString()
     });
-  });
+  }
 
   DB.set(DB.keys.planning, planning);
   DB.set(DB.keys.vehicules, vehs);
@@ -498,8 +499,7 @@ function generateForCurrentEtab() {
     { idx: 22, statut: 'actif', dateRedac: '2026-04-05', dateRev: '2026-10-05', referent: 'M. Dubois', protection: '' },
     { idx: 35, statut: 'brouillon', dateRedac: '2026-05-15', dateRev: '2026-11-15', referent: 'Mme Martin', protection: '' },
     { idx: 28, statut: 'actif', dateRedac: '2026-01-20', dateRev: '2026-07-20', referent: 'M. Dubois', protection: '' },
-    { idx: 41, statut: 'actif', dateRedac: '2026-02-28', dateRev: '2026-08-28', referent: 'Mme Martin', protection: '' },
-    { idx: 5, statut: 'actif', dateRedac: '2026-03-05', dateRev: '2026-09-05', referent: 'Mme Martin', protection: '' }
+    { idx: 41, statut: 'actif', dateRedac: '2026-02-28', dateRev: '2026-08-28', referent: 'Mme Martin', protection: '' }
   ];
 
   const avenants = avenantResidents.map((t, i) => {
@@ -585,7 +585,22 @@ function generateForCurrentEtab() {
     { lieu:'WC garçons — Chasse', desc:'Chasse d eau ne se vide plus.', urgence:'moyenne' },
     { lieu:'Portail électrique', desc:'Portail grince et bloque en milieu de course.', urgence:'basse' },
     { lieu:'Buanderie — Machine', desc:'Machine à laver bruyante en essorage.', urgence:'moyenne' },
-    { lieu:'Chambre 120 — Prise', desc:'Prise murale près du lit desserrée.', urgence:'basse' }
+    { lieu:'Chambre 120 — Prise', desc:'Prise murale près du lit desserrée.', urgence:'basse' },
+    { lieu:'Salle informatique — Écran', desc:'Écran d ordinateur qui reste noir après démarrage.', urgence:'moyenne' },
+    { lieu:'Chambre 105 — Serrure', desc:'Serrure de porte grippée, clé tourne difficilement.', urgence:'basse' },
+    { lieu:'Cuisine — Four', desc:'Four qui ne chauffe plus en position chaleur tournante.', urgence:'haute' },
+    { lieu:'Buanderie — Sèche-linge', desc:'Sèche-linge fait un bruit anormal en rotation.', urgence:'moyenne' },
+    { lieu:'Salle à manger — Table', desc:'Pied de table cassé, instable.', urgence:'basse' },
+    { lieu:'Chambre 109 — Store', desc:'Store enrouleur bloqué, ne remonte plus.', urgence:'basse' },
+    { lieu:'Couloir RDC — Néon', desc:'Néon du couloir qui clignote sans arrêt.', urgence:'moyenne' },
+    { lieu:'Salle pause — Micro-ondes', desc:'Micro-ondes ne chauffe plus les aliments.', urgence:'moyenne' },
+    { lieu:'Chambre 205 — Fenêtre', desc:'Fenêtre qui ferme mal, courant d air.', urgence:'moyenne' },
+    { lieu:'Local poubelles — Porte', desc:'Porte du local poubelles arrachée.', urgence:'basse' },
+    { lieu:'Salle de bain — Miroir', desc:'Miroir mural décollé, risque de chute.', urgence:'haute' },
+    { lieu:'Chaufferie — Voyant', desc:'Voyant d alarme allumé sur la chaudière.', urgence:'haute' },
+    { lieu:'Jardin — Portillon', desc:'Portillon du jardin ne ferme plus correctement.', urgence:'haute' },
+    { lieu:'Salle d activité — Vidéoprojecteur', desc:'Vidéoprojecteur qui affiche une image déformée.', urgence:'moyenne' },
+    { lieu:'Chambre 207 — Prise antenne', desc:'Prise antenne TV arrachée du mur.', urgence:'basse' }
   ];
 
   const intervsList = intervs.map((inc, i) => {
@@ -617,7 +632,15 @@ function generateForCurrentEtab() {
       { prenom:'Stéphanie', nom:'Caron', fonction:'Secrétaire médico-sociale', username:'scaron' },
       { prenom:'Grégory', nom:'Moulin', fonction:'Agent de maintien', username:'gmoulin' },
       { prenom:'Audrey', nom:'Renard', fonction:'Référente ASE', username:'arenard' },
-      { prenom:'Florian',nom:'Marchand', fonction:'Stagiaire éducateur', username:'fmarchand' }
+      { prenom:'Florian',nom:'Marchand', fonction:'Stagiaire éducateur', username:'fmarchand' },
+      { prenom:'Nicolas',nom:'Baron', fonction:'Éducateur spécialisé', username:'nbaron' },
+      { prenom:'Vanessa',nom:'Peltier', fonction:'Assistante sociale', username:'vpeltier' },
+      { prenom:'Jérôme',nom:'Lefebvre', fonction:'Moniteur éducateur', username:'jlefebvre' },
+      { prenom:'Hélène',nom:'Garnier', fonction:'Psychologue clinicienne', username:'hgarnier' },
+      { prenom:'Thibault',nom:'Renaud', fonction:'Coordonnateur', username:'trenaud' },
+      { prenom:'Marianne',nom:'Lacroix', fonction:'Éducatrice jeunesse', username:'mlacroix' },
+      { prenom:'Yannick',nom:'Legros', fonction:'VEilleur de nuit', username:'ylegros' },
+      { prenom:'Sandrine',nom:'Carlier', fonction:'Infirmière', username:'scarlier' }
     ];
     profils.forEach((p, i) => users.push({
       id: i + 2, ...p, password: 'educ123', role: 'educ'
@@ -625,6 +648,67 @@ function generateForCurrentEtab() {
     DB.set(DB.keys.users, users);
     users.forEach(u => addUserToAllEtabs(u));
   }
+
+  // ── Employés ──
+  const employes = [
+    { prenom:'Sophie', nom:'Martin', poste:'Éducatrice spécialisée', tel:'06 11 22 33 01', email:'sophie.martin@ftr.fr' },
+    { prenom:'Pierre', nom:'Dubois', poste:'Éducateur jeunesse', tel:'06 11 22 33 02', email:'pierre.dubois@ftr.fr' },
+    { prenom:'Camille', nom:'Legrand', poste:'Psychologue', tel:'06 11 22 33 03', email:'camille.legrand@ftr.fr' },
+    { prenom:'Julien', nom:'Fontaine', poste:'Moniteur éducateur', tel:'06 11 22 33 04', email:'julien.fontaine@ftr.fr' },
+    { prenom:'Nathalie', nom:'Petit', poste:'Chef de service', tel:'06 11 22 33 05', email:'nathalie.petit@ftr.fr' },
+    { prenom:'Antoine', nom:'Leroy', poste:'Éducateur sportif', tel:'06 11 22 33 06', email:'antoine.leroy@ftr.fr' },
+    { prenom:'Mélanie', nom:'Roux', poste:'Assistante sociale', tel:'06 11 22 33 07', email:'melanie.roux@ftr.fr' },
+    { prenom:'David', nom:'Moreau', poste:'Infirmier', tel:'06 11 22 33 08', email:'david.moreau@ftr.fr' },
+    { prenom:'Élodie', nom:'Fournier', poste:'Éducatrice jeunes enfants', tel:'06 11 22 33 09', email:'elodie.fournier@ftr.fr' },
+    { prenom:'Sébastien', nom:'Girard', poste:'VEilleur de nuit', tel:'06 11 22 33 10', email:'sebastien.girard@ftr.fr' },
+    { prenom:'Caroline', nom:'Bonnet', poste:'Psychomotricienne', tel:'06 11 22 33 11', email:'caroline.bonnet@ftr.fr' },
+    { prenom:'Alexandre', nom:'Dupont', poste:'Médiateur social', tel:'06 11 22 33 12', email:'alexandre.dupont@ftr.fr' },
+    { prenom:'Virginie', nom:'Lambert', poste:'CESF', tel:'06 11 22 33 13', email:'virginie.lambert@ftr.fr' },
+    { prenom:'Romain', nom:'Chevallier', poste:'Animateur socioculturel', tel:'06 11 22 33 14', email:'romain.chevallier@ftr.fr' },
+    { prenom:'Isabelle', nom:'Perrin', poste:'Coordinatrice de parcours', tel:'06 11 22 33 15', email:'isabelle.perrin@ftr.fr' },
+    { prenom:'Laurent', nom:'Gauthier', poste:'Éducateur technique', tel:'06 11 22 33 16', email:'laurent.gauthier@ftr.fr' },
+    { prenom:'Stéphanie', nom:'Caron', poste:'Secrétaire médico-sociale', tel:'06 11 22 33 17', email:'stephanie.caron@ftr.fr' },
+    { prenom:'Grégory', nom:'Moulin', poste:'Agent de maintien', tel:'06 11 22 33 18', email:'gregory.moulin@ftr.fr' },
+    { prenom:'Audrey', nom:'Renard', poste:'Référente ASE', tel:'06 11 22 33 19', email:'audrey.renard@ftr.fr' },
+    { prenom:'Florian', nom:'Marchand', poste:'Stagiaire éducateur', tel:'06 11 22 33 20', email:'florian.marchand@ftr.fr' },
+    { prenom:'Nicolas', nom:'Baron', poste:'Éducateur spécialisé', tel:'06 11 22 33 21', email:'nicolas.baron@ftr.fr' },
+    { prenom:'Vanessa', nom:'Peltier', poste:'Assistante sociale', tel:'06 11 22 33 22', email:'vanessa.peltier@ftr.fr' },
+    { prenom:'Jérôme', nom:'Lefebvre', poste:'Moniteur éducateur', tel:'06 11 22 33 23', email:'jerome.lefebvre@ftr.fr' },
+    { prenom:'Hélène', nom:'Garnier', poste:'Psychologue clinicienne', tel:'06 11 22 33 24', email:'helene.garnier@ftr.fr' },
+    { prenom:'Thibault', nom:'Renaud', poste:'Coordonnateur', tel:'06 11 22 33 25', email:'thibault.renaud@ftr.fr' },
+    { prenom:'Marianne', nom:'Lacroix', poste:'Éducatrice jeunesse', tel:'06 11 22 33 26', email:'marianne.lacroix@ftr.fr' },
+    { prenom:'Yannick', nom:'Legros', poste:'VEilleur de nuit', tel:'06 11 22 33 27', email:'yannick.legros@ftr.fr' },
+    { prenom:'Sandrine', nom:'Carlier', poste:'Infirmière', tel:'06 11 22 33 28', email:'sandrine.carlier@ftr.fr' },
+    { prenom:'Michaël', nom:'André', poste:'Éducateur spécialisé', tel:'06 11 22 33 29', email:'michael.andre@ftr.fr' },
+    { prenom:'Céline', nom:'Bourgeois', poste:'Psychologue', tel:'06 11 22 33 30', email:'celine.bourgeois@ftr.fr' },
+    { prenom:'Loïc', nom:'Rivière', poste:'Moniteur éducateur', tel:'06 11 22 33 31', email:'loic.riviere@ftr.fr' },
+    { prenom:'Stéphane', nom:'Olivier', poste:'Animateur', tel:'06 11 22 33 32', email:'stephane.olivier@ftr.fr' },
+    { prenom:'Corine', nom:'Gilles', poste:'Assistante sociale', tel:'06 11 22 33 33', email:'corine.gilles@ftr.fr' },
+    { prenom:'Benoît', nom:'Noël', poste:'Éducateur technique', tel:'06 11 22 33 34', email:'benoit.noel@ftr.fr' },
+    { prenom:'Valérie', nom:'Blin', poste:'Infirmière', tel:'06 11 22 33 35', email:'valerie.blin@ftr.fr' },
+    { prenom:'Fabrice', nom:'Guyot', poste:'CESF', tel:'06 11 22 33 36', email:'fabrice.guyot@ftr.fr' },
+    { prenom:'Sylvie', nom:'Martineau', poste:'Coordinatrice', tel:'06 11 22 33 37', email:'sylvie.martineau@ftr.fr' },
+    { prenom:'Raphaël', nom:'Besson', poste:'Éducateur jeunesse', tel:'06 11 22 33 38', email:'raphael.besson@ftr.fr' },
+    { prenom:'Nadia', nom:'Gibert', poste:'Psychomotricienne', tel:'06 11 22 33 39', email:'nadia.gibert@ftr.fr' },
+    { prenom:'Gilles', nom:'Lemoine', poste:'Agent de maintenance', tel:'06 11 22 33 40', email:'gilles.lemoine@ftr.fr' },
+    { prenom:'Aurélie', nom:'Becker', poste:'Éducatrice jeunes enfants', tel:'06 11 22 33 41', email:'aurelie.becker@ftr.fr' },
+    { prenom:'Pascal', nom:'Marchal', poste:'VEilleur de nuit', tel:'06 11 22 33 42', email:'pascal.marchal@ftr.fr' },
+    { prenom:'Martine', nom:'Guérin', poste:'Secrétaire', tel:'06 11 22 33 43', email:'martine.guerin@ftr.fr' },
+    { prenom:'Alain', nom:'Boucher', poste:'Médiateur social', tel:'06 11 22 33 44', email:'alain.boucher@ftr.fr' },
+    { prenom:'Brigitte', nom:'Colin', poste:'Référente ASE', tel:'06 11 22 33 45', email:'brigitte.colin@ftr.fr' },
+    { prenom:'Didier', nom:'Barbier', poste:'Chef de service', tel:'06 11 22 33 46', email:'didier.barbier@ftr.fr' },
+    { prenom:'Lydie', nom:'Renault', poste:'Psychologue', tel:'06 11 22 33 47', email:'lydie.renault@ftr.fr' },
+    { prenom:'Hervé', nom:'Rolland', poste:'Éducateur sportif', tel:'06 11 22 33 48', email:'herve.rolland@ftr.fr' },
+    { prenom:'Danièle', nom:'Leclerc', poste:'Assistante sociale', tel:'06 11 22 33 49', email:'daniele.leclerc@ftr.fr' },
+    { prenom:'Patrick', nom:'Mathieu', poste:'Animateur socioculturel', tel:'06 11 22 33 50', email:'patrick.mathieu@ftr.fr' }
+  ].map((e, i) => ({
+    id: 'de-' + (i + 1),
+    prenom: e.prenom, nom: e.nom, poste: e.poste, telephone: e.tel, email: e.email,
+    dateEmbauche: new Date(now.getTime() - rand(60, 1800) * 86400000).toISOString().slice(0,10),
+    statut: Math.random() < .9 ? 'actif' : 'conge',
+    photo: '', notes: '', createdAt: now.toISOString()
+  }));
+  localStorage.setItem('ftr_employes', JSON.stringify(employes));
 
   const conversations = {};
   const allMsgs = [];
@@ -666,7 +750,21 @@ function generateForCurrentEtab() {
     { organisme:'Service Solideo', nom:'Mme Fatou Ba', tel:'06 12 34 56 13', email:'f.ba@solideo.org', fonction:'Travailleuse sociale', adresse:'18 Rue des Martyrs, 75009 Paris', notes:'' },
     { organisme:'Lycée Hôtelier Guillaume Tirel', nom:'M. Jean-Claude Roux', tel:'01 44 14 77 77', email:'jc.roux@ac-paris.fr', fonction:'Chef des travaux', adresse:'18 Rue Guillaume Tirel, 75014 Paris', notes:'' },
     { organisme:'CMP Enfants-Ados Paris 13e', nom:'Dr Catherine Lefèvre', tel:'01 45 85 45 85', email:'catherine.lefevre@gh-paris.fr', fonction:'Pédopsychiatre', adresse:'43 Rue de la Santé, 75013 Paris', notes:'' },
-    { organisme:'GRETA Paris', nom:'Mme Sylvie Mercier', tel:'01 44 62 36 00', email:'s.mercier@greta-paris.fr', fonction:'Coordinatrice', adresse:'164 Rue de Rivoli, 75001 Paris', notes:'' }
+    { organisme:'GRETA Paris', nom:'Mme Sylvie Mercier', tel:'01 44 62 36 00', email:'s.mercier@greta-paris.fr', fonction:'Coordinatrice', adresse:'164 Rue de Rivoli, 75001 Paris', notes:'' },
+    { organisme:'SPIP Paris', nom:'M. Franck Leblanc', tel:'01 45 67 89 60', email:'franck.leblanc@justice.fr', fonction:'Conseiller d insertion', adresse:'12 Rue de la Santé, 75014 Paris', notes:'' },
+    { organisme:'PMI Paris 11e', nom:'Mme Claire Fontaine', tel:'01 45 67 89 70', email:'claire.fontaine@paris.fr', fonction:'Puéricultrice', adresse:'8 Rue de la Vacquerie, 75011 Paris', notes:'' },
+    { organisme:'ATELIER CUISINE', nom:'M. Philippe Cheval', tel:'06 11 22 33 99', email:'p.cheval@atelier-cuisine.fr', fonction:'Chef cuisinier formateur', adresse:'15 Rue des Saveurs, 75012 Paris', notes:'' },
+    { organisme:'FOYER JEUNES', nom:'Mme Sylviane Roussel', tel:'01 45 67 89 80', email:'sylviane.roussel@foyerjeunes.org', fonction:'Directrice', adresse:'20 Rue des Lilas, 75020 Paris', notes:'Partenariat ateliers Insertion.' },
+    { organisme:'Hopital Cochin', nom:'Dr Martine Vergne', tel:'01 45 67 89 90', email:'martine.vergne@aphp.fr', fonction:'Pédiatre', adresse:'27 Rue du Faubourg Saint-Jacques, 75014 Paris', notes:'' },
+    { organisme:'PROTECTION CIVILE', nom:'M. Emmanuel Dupuis', tel:'06 11 22 34 00', email:'e.dupuis@protection-civile.org', fonction:'Formateur secourisme', adresse:'5 Rue du Secours, 75012 Paris', notes:'' },
+    { organisme:'CLUB SPORTIF', nom:'Mme Karine Bello', tel:'06 11 22 34 01', email:'karine.bello@clubsportif.org', fonction:'Coach sportive', adresse:'Stade Municipal, 75012 Paris', notes:'' },
+    { organisme:'SERVICE INTÉGRATION', nom:'M. Ali Hamdi', tel:'01 45 67 90 01', email:'ali.hamdi@integration.org', fonction:'Référent parcours', adresse:'10 Rue de l Insertion, 75018 Paris', notes:'' },
+    { organisme:'ASSOCIATION ESPOIR', nom:'Mme Nadia Cherfi', tel:'06 11 22 34 02', email:'n.cherfi@espoir-asso.fr', fonction:'Travailleuse sociale', adresse:'7 Rue de l Espoir, 75013 Paris', notes:'' },
+    { organisme:'CAP EMPLOI', nom:'M. Denis Cornet', tel:'01 45 67 90 10', email:'denis.cornet@capemploi.fr', fonction:'Conseiller', adresse:'32 Rue de l Emploi, 75015 Paris', notes:'' },
+    { organisme:'CROUS Paris', nom:'Mme Sylvie Albert', tel:'01 40 32 40 00', email:'s.albert@crous-paris.fr', fonction:'Gestionnaire logement', adresse:'15 Rue de Santeuil, 75005 Paris', notes:'' },
+    { organisme:'CENTRE DE LOISIRS', nom:'M. Luc Perret', tel:'06 11 22 34 03', email:'l.perret@centreloisirs.fr', fonction:'Animateur', adresse:'Place des Loisirs, 75011 Paris', notes:'' },
+    { organisme:'BAF - Bureau Aide Famille', nom:'Mme Anne-Claire Weiss', tel:'01 45 67 90 20', email:'ac.weiss@baf-paris.fr', fonction:'Assistante familiale', adresse:'5 Rue des Familles, 75010 Paris', notes:'' },
+    { organisme:'SERVICE LOGEMENT', nom:'M. Jean-Baptiste Rey', tel:'01 45 67 90 30', email:'jb.rey@logement-paris.fr', fonction:'Chargé de location', adresse:'22 Rue du Logement, 75019 Paris', notes:'' }
   ].map(c => ({ id:'dc-'+rand(100000,999999).toString(36), updatedAt:new Date(now.getTime()-rand(0,60)*86400000).toISOString(), ...c }));
   DB.set(DB.keys.repertoire, contacts);
 
@@ -688,7 +786,7 @@ function generateForCurrentEtab() {
   ];
   DB.set(DB.keys.documents, docs);
 
-  return { residents: resList.length, journal: journal.length, planning: planning.length, ppe: avenants.length, incidents: incList.length, interventions: intervsList.length, messages: allMsgs.length, contacts: contacts.length, users: users.length, documents: Object.values(docs).flat().length };
+  return { residents: resList.length, journal: journal.length, planning: planning.length, ppe: avenants.length, incidents: incList.length, interventions: intervsList.length, messages: allMsgs.length, contacts: contacts.length, users: users.length, employes: employes.length, documents: Object.values(docs).flat().length };
 }
 initDefaults();
 populateEtabSelector();
