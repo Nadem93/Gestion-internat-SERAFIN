@@ -15,7 +15,7 @@ function getPpe() { return JSON.parse(localStorage.getItem(PPE_KEY) || '[]'); }
 function savePpe(list) { localStorage.setItem(PPE_KEY, JSON.stringify(list)); }
 
 function emptySection() {
-  return { bilan:'', objectifs:[], expression:'' };
+  return { bilan:'', objectifs:[{ objectif:'', moyens:'', echeance:'', evaluation:'' }], expression:'' };
 }
 
 function initPpe() {
@@ -182,20 +182,14 @@ function renderSectionCard(p, domaine) {
         </div>
         <button class="btn btn-ghost btn-sm" style="margin-top:1.2rem" onclick="addSectionObj('${p.id}','${domaine.id}')">+ Objectif</button>
       </div>
-      ${s.objectifs.length ? `<div style="margin-top:.25rem">
+      <div style="margin-top:.25rem">
         <div style="display:grid;grid-template-columns:1fr 1fr 120px 1fr;gap:.5rem;font-size:.7rem;color:var(--muted);font-weight:600;padding:0 .5rem">
           <div>Objectif</div><div>Moyens / Actions</div><div>Échéance</div><div>Évaluation</div>
         </div>
-        ${s.objectifs.map((o, oi) => `<div class="obj-row">
-          <div><input class="input" value="${escHtml(o.objectif)}" onchange="updateSectionObjField('${p.id}','${domaine.id}',${oi},'objectif',this.value)"/></div>
-          <div><input class="input" value="${escHtml(o.moyens||'')}" onchange="updateSectionObjField('${p.id}','${domaine.id}',${oi},'moyens',this.value)"/></div>
-          <div><input class="input" type="date" value="${o.echeance||''}" onchange="updateSectionObjField('${p.id}','${domaine.id}',${oi},'echeance',this.value)"/></div>
-          <div style="display:flex;gap:.3rem;align-items:center">
-            <input class="input" value="${escHtml(o.evaluation||'')}" onchange="updateSectionObjField('${p.id}','${domaine.id}',${oi},'evaluation',this.value)"/>
-            <button class="btn btn-ghost btn-sm" style="flex-shrink:0;color:#dc2626;font-size:.7rem;padding:2px 6px" onclick="removeSectionObj('${p.id}','${domaine.id}',${oi})">✕</button>
-          </div>
-        </div>`).join('')}
-      </div>` : ''}
+        <div id="objGrid_${p.id}_${domaine.id}">
+          ${s.objectifs.map((o, oi) => objRowHtml(p.id, domaine.id, oi, o)).join('')}
+        </div>
+      </div>
       <button class="btn btn-ghost btn-sm" style="align-self:flex-start" onclick="addSectionObj('${p.id}','${domaine.id}')">+ Ajouter une ligne</button>
       <div style="margin-top:.25rem">
         <label style="font-size:.7rem;color:var(--muted);font-weight:600">Expression et souhaits du résident</label>
@@ -315,6 +309,18 @@ async function aiAssist(ppeId, domId, field, action) {
     if (bodyEl) bodyEl.style.display = '';
     toast('✓ ' + labels[action] + ' (mode local)', 'success');
   }
+}
+
+function objRowHtml(ppeId, domId, oi, o) {
+  return `<div class="obj-row">
+    <div><input class="input" value="${escHtml(o.objectif)}" onchange="updateSectionObjField('${ppeId}','${domId}',${oi},'objectif',this.value)"/></div>
+    <div><input class="input" value="${escHtml(o.moyens||'')}" onchange="updateSectionObjField('${ppeId}','${domId}',${oi},'moyens',this.value)"/></div>
+    <div><input class="input" type="date" value="${o.echeance||''}" onchange="updateSectionObjField('${ppeId}','${domId}',${oi},'echeance',this.value)"/></div>
+    <div style="display:flex;gap:.3rem;align-items:center">
+      <input class="input" value="${escHtml(o.evaluation||'')}" onchange="updateSectionObjField('${ppeId}','${domId}',${oi},'evaluation',this.value)"/>
+      <button class="btn btn-ghost btn-sm" style="flex-shrink:0;color:#dc2626;font-size:.7rem;padding:2px 6px" onclick="removeSectionObj('${ppeId}','${domId}',${oi})">✕</button>
+    </div>
+  </div>`;
 }
 
 function addSectionObj(ppeId, domId) {
@@ -749,9 +755,10 @@ function futureDate(minMonths, maxMonths) {
 function ensureSectionsComplete(sections) {
   DOMAINES.forEach(d => {
     const sec = sections[d.id];
-    if (!sec) sections[d.id] = { bilan: '', objectifs: [], expression: '' };
+    if (!sec) sections[d.id] = { bilan: '', objectifs: [{ objectif: '', moyens: '', echeance: '', evaluation: '' }], expression: '' };
     else {
       if (!sec.objectifs) sec.objectifs = [];
+      if (sec.objectifs.length === 0) sec.objectifs.push({ objectif: '', moyens: '', echeance: '', evaluation: '' });
       if (sec.bilan === undefined) sec.bilan = '';
       if (sec.expression === undefined) sec.expression = '';
       sec.objectifs.forEach(o => {
