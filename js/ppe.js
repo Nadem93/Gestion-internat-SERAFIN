@@ -116,6 +116,7 @@ function renderAvenantFull(p) {
   div.innerHTML = `<div style="max-width:800px;margin:0 auto">
     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem">
       <button class="btn btn-outline btn-sm" onclick="backToList()">← Retour à la liste</button>
+      <button class="btn btn-accent btn-sm" onclick="regenerateAvenantFromJournal('${p.id}')" style="gap:.35rem"><span>🤖</span> Générer depuis le journal</button>
       <div style="display:flex;gap:.5rem">
         <button class="btn btn-outline btn-sm" onclick="editAvenant('${p.id}')">Modifier infos</button>
         <button class="btn btn-outline btn-sm" onclick="changeAvenantStatut('${p.id}')">${p.statut==='brouillon'?'Activer':p.statut==='actif'?'Terminer':'—'}</button>
@@ -562,6 +563,139 @@ function resetAvenantModal() {
   document.getElementById('fAvEmployeur').value = '';
   document.getElementById('fAvAtelier').value = '';
   document.getElementById('fAvEntreeEsat').value = '';
+}
+
+async function genererAvenantFromJournal(existingId) {
+  let residentId, resident;
+  if (existingId) {
+    const list = getPpe();
+    const p = list.find(x => x.id === existingId);
+    if (!p) { toast('Avenant introuvable', 'error'); return; }
+    residentId = p.residentId;
+    const residents = DB.get(DB.keys.residents) || [];
+    resident = residents.find(r => r.id === residentId);
+  } else {
+    residentId = document.getElementById('fAvResident').value;
+    if (!residentId) { toast('Veuillez d\'abord choisir un résident', 'error'); return; }
+    const residents = DB.get(DB.keys.residents) || [];
+    resident = residents.find(r => r.id === residentId);
+  }
+  if (!resident) { toast('Résident introuvable', 'error'); return; }
+
+  const journal = DB.get(DB.keys.journal) || [];
+  const entries = journal.filter(e => e.residentId === residentId);
+  if (entries.length === 0) { toast('Aucune entrée de journal pour ce résident', 'error'); return; }
+
+  toast('🤖 Génération depuis le journal…', 'info');
+
+  const result = await aiAvenantFromJournal(resident, entries);
+
+  if (existingId) {
+    const list = getPpe();
+    const p = list.find(x => x.id === existingId);
+    if (!p) return;
+    p.sections = result.sections || {};
+    p.conclusion = result.conclusion || '';
+    ensureSectionsComplete(p.sections);
+    savePpe(list);
+    toast('✅ Avenant régénéré depuis le journal', 'success');
+    renderAvenantFull(p);
+  } else {
+    const residentInfo = `${resident.prenom || ''} ${resident.nom || ''}`.trim();
+    const list = getPpe();
+    const now = new Date().toISOString();
+    const avenant = {
+      id: genId(), residentId, residentName: residentInfo,
+      dateRedaction: now.slice(0, 10), dateRevision: '', referent: '',
+      protection: '', employeur: '', atelier: '', entreeEsat: '',
+      statut: 'brouillon',
+      sections: result.sections || {},
+      conclusion: result.conclusion || '',
+      signatures: { resident: null, referent: null, direction: null, date: null },
+      createdBy: (() => { const s = Auth.getSession(); return s ? `${s.prenom||''} ${s.nom||''}`.trim() || s.username : '?'; })(),
+      createdAt: now
+    };
+    ensureSectionsComplete(avenant.sections);
+    list.unshift(avenant);
+    savePpe(list);
+    closeModal('modalAvenant');
+    toast('✅ Avenant généré depuis le journal', 'success');
+    renderAvenant();
+    setTimeout(() => openAvenant(avenant.id), 400);
+  }
+}
+
+async function aiAvenantFromJournal(resident, entries) {
+  const residentInfo = `${resident.prenom || ''} ${resident.nom || ''}`.trim();
+  const journalText = entries.slice(-30).reverse().map(e =>
+    `[${e.date || '?'} ${e.heure || ''}] (${e.categorie || 'général'}) ${e.contenu || ''}`
+  ).join('\n\n');
+
+  const key = getAiKey();
+  const systemPrompt = getAiPrompt('ppe', 'avenant') || 'Tu es un rédacteur de PPE. Retourne UNIQUEMENT un objet JSON valide.';
+
+  let result = null;
+  if (key) {
+    try {
+      const res = await fetch('https://api.mistral.ai/v1/chat/completions', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + key },
+        body: JSON.stringify({
+          model: 'mistral-small-latest',
+          messages: [
+            { role: 'system', content: systemPrompt },
+            { role: 'user', content: `Rédige un avenant de PPE pour ${residentInfo} (${entries.length} entrées journal) :\n\n${journalText}` }
+          ],
+          temperature: 0.7,
+          max_tokens: 3000
+        })
+      });
+      if (res.ok) {
+        const data = await res.json();
+        const raw = data.choices?.[0]?.message?.content?.trim() || null;
+        if (raw) {
+          try { result = JSON.parse(raw.replace(/```json|```/g, '').trim()); }
+          catch (_) { result = null; }
+        }
+      }
+    } catch (_) {}
+  }
+
+  if (!result) {
+    const sections = {};
+    DOMAINES.forEach(d => {
+      const relevant = entries.filter(e =>
+        (e.contenu || '').toLowerCase().includes(d.id.toLowerCase()) ||
+        (e.categorie || '').toLowerCase().includes(d.id.toLowerCase()) ||
+        (e.contenu || '').toLowerCase().includes(d.label.toLowerCase().slice(0, 5))
+      );
+      sections[d.id] = {
+        bilan: relevant.length > 0
+          ? relevant.slice(0, 3).map(e => `Observation du ${e.date || '?'} : ${(e.contenu || '').slice(0, 200)}`).join(' ')
+          : `Aucune observation dans ce domaine.`,
+        objectifs: [],
+        expression: `Le résident exprime son point de vue sur ce domaine.`
+      };
+    });
+    result = { sections, conclusion: 'Avenant généré depuis le journal (mode local).' };
+  }
+  return result;
+}
+
+function ensureSectionsComplete(sections) {
+  DOMAINES.forEach(d => {
+    const sec = sections[d.id];
+    if (!sec) sections[d.id] = { bilan: '', objectifs: [], expression: '' };
+    else {
+      if (!sec.objectifs) sec.objectifs = [];
+      if (sec.bilan === undefined) sec.bilan = '';
+      if (sec.expression === undefined) sec.expression = '';
+    }
+  });
+}
+
+function regenerateAvenantFromJournal(id) {
+  genererAvenantFromJournal(id);
 }
 
 function initPpePage() {
