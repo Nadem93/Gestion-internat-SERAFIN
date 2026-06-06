@@ -825,6 +825,14 @@ async function callMistral(prompt, system) {
 }
 
 // ── INIT ──
+// ── SERVICE WORKER CLEANUP ──
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.getRegistrations().then(regs => {
+    regs.forEach(r => r.unregister());
+  });
+  navigator.serviceWorker.register('./sw.js').catch(() => {});
+}
+
 document.addEventListener('DOMContentLoaded', () => {
   initDefaults();
   applyBranding();
