@@ -296,70 +296,85 @@ function generateForCurrentEtab() {
     { id: 12, name: 'Caroline Bonnet' }, { id: 13, name: 'Alexandre Dupont' }
   ];
 
-  const journalTemplates = [
-    'Entretien individuel. Exprime le souhait de suivre une formation professionnelle.',
-    'RDV à Pôle Emploi. CV mis à jour. Préparation aux entretiens en cours.',
-    'Conseil de classe : résultats satisfaisants. RDV professeur principal programmé.',
-    'Consultation médicale mensuelle. Traitement bien suivi.',
-    'Appel téléphonique avec la famille. Situation tendue mais stable.',
-    'Signature du contrat d apprentissage. Félicitations !',
-    'Dossier administratif complété et envoyé.',
-    'Premier RDV psychologique. Bilan positif. Prochain RDV dans 15 jours.',
-    'Bonne intégration scolaire. Progrès notés par l enseignante.',
-    'Validation du semestre avec mention. Très bonne nouvelle !',
-    'Point téléphonique avec la famille. Réintégration se passe bien.',
-    'RDV mensuel au CMP. Bonne adaptation au traitement.',
-    'Sortie culturelle organisée. Bonne ambiance et participation.',
-    'Dossier de demande de logement social mis à jour.',
-    'Atelier "Gestion du budget" animé. Participation active.',
-    'Point mensuel sur le projet professionnel. Intérêt pour la petite enfance.',
-    'Examen de langue réussi avec succès.',
-    'Médiation familiale programmée pour le week-end prochain.',
-    'Entretien de préparation à la sortie. Recherche de logement en cours.',
-    'Sortie au musée. Très apprécié par les participants.',
-    'Point dossier administratif. Titre de séjour à renouveler.',
-    'Exclu temporairement du collège. Réunion d équipe éducative programmée.',
-    'Début de formation. Très motivé, premiers retours positifs.',
-    'Appel avec la famille. Visite prévue ce week-end.',
-    'RDV de suivi médical. Tout va bien. Rappel vaccination à prévoir.',
-    'Participation à l atelier théâtre. Premier pas vers l expression.',
-    'Bilan de sortie : logement trouvé, CDI confirmé. Accompagnement externalisé.',
-    'Première séance avec la psychologue. Difficultés à verbaliser.',
-    'Animation d un atelier d orientation pour les nouveaux arrivants.',
-    'Participation à l atelier menuiserie. Très habile de ses mains.',
-    'Point de sortie à +6 mois. Bilan très positif.',
-    'Sortie bowling. Très bonne cohésion de groupe.',
-    'Entretien individuel. Projet de formation professionnelle identifié.',
-    'Situation familiale conflictuelle. Médiation proposée.',
-    'RDV CMP. Ajustement du traitement. Nouveau RDV dans 15 jours.',
-    'Rédaction d une lettre de motivation. Très fier du résultat.',
-    'Entretien d accueil. Présentation du règlement intérieur.',
-    'Entretien PMI pour suivi bébé. Mode de garde à organiser.',
-    'Accompagnement à l école. Difficultés de concentration notées.',
-    'RDV psychiatrique. Maintien du traitement. Signes d amélioration.',
-    'Tournoi de foot inter-foyers. L équipe a gagné !',
-    'Point mensuel projet sortie. Visite de logement cette semaine.',
-    'Suivi TDAH. Adaptation du traitement. Bilan positif.',
-    'Crise de colère suite à annulation visite familiale. Apaisé.',
-    'Bonnes nouvelles de la semaine. Sourit plus souvent.',
-    'Récitation de poésie devant la classe. Fierté générale.',
-    'Progrès significatifs en séance de dessin thérapeutique.',
-    'Incident au collège. Réunion avec le CPE programmée.',
-    'Sortie au parc zoologique. Très intéressé par les animaux.'
-  ];
+  const journalParCategorie = {
+    1: [ // Accompagnement
+      'Entretien individuel approfondi aujourd hui avec le résident. Il a exprimé le souhait clair de suivre une formation professionnelle dans le domaine de la restauration. Nous avons commencé à échanger sur les différentes options disponibles et je l ai encouragé à participer à l atelier CV prévu la semaine prochaine. Son projet semble mûrement réfléchi et il montre une motivation que je n avais pas observée depuis plusieurs mois.',
+      'Point mensuel sur le projet personnalisé du résident. Plusieurs objectifs fixés lors du dernier bilan ont été atteints : il a renoué le contact avec sa référente ASE et a entamé des démarches pour obtenir un logement autonome. Nous avons réajusté les échéances pour les objectifs restants et convenu d un point intermédiaire dans quinze jours.',
+      'Accompagnement à la sortie : le résident prépare activement son autonomie avec le service logement. Il a visité deux appartements cette semaine et le dossier de demande de logement social a été envoyé. Un point sera fait après la commission d attribution prévue dans trois semaines.',
+      'Suivi renforcé mis en place suite aux difficultés du résident à respecter le cadre. Après plusieurs absences non justifiées aux ateliers, j ai organisé un entretien avec le résident et sa référente ASE pour recadrer les attentes et trouver des solutions adaptées à ses besoins.',
+      'Première rencontre avec le nouveau résident arrivé ce matin. L accueil s est bien déroulé, nous avons visité les locaux et je lui ai présenté le règlement intérieur. Le résident semble fatigué mais coopérant. RDV programmé avec le médecin traitant pour la visite médicale d entrée.',
+      'Atelier d orientation professionnelle animé. Quatre résidents ont participé et montré un intérêt marqué pour la filière sanitaire et sociale. Des conventions de stage vont être préparées et envoyées aux structures partenaires. Le bilan de l atelier est très positif.'
+    ],
+    2: [ // Médical
+      'Consultation médicale mensuelle chez le Dr Moreau. Le traitement actuel est bien toléré et les analyses de contrôle sont revenues dans les normes. Un nouveau rendez-vous a été fixé dans trois mois, avec un bilan sanguin à réaliser entre temps. Le résistant se dit en bonne forme générale.',
+      'RDV au CMP pour le suivi psychiatrique habituel. Ajustement du traitement : augmentation légère de la posologie de l antidépresseur pour mieux gérer l anxiété matinale. Prochain rendez-vous dans quatre semaines. Le résident a bien accepté les changements et semble soulagé.',
+      'Visite médicale d entrée réalisée pour le nouveau résident. Poids, taille, bilan sanguin, examen clinique : RAS. Vaccinations à jour. Sensibilisation aux règles d hygiène et aux conduites à risque. Un suivi dentaire sera programmé dans le mois.',
+      'Suivi TDAH : consultation trimestrielle chez le pédopsychiatre. Le méthylphénidate reste efficace et bien toléré. Quelques troubles du sommeil signalés, sans retentissement sur la journée. Le médecin recommande de maintenir le traitement sans changement.',
+      'Malaise du résident ce matin au réveil. Pris en charge par l infirmier, la tension était basse (9/6). Après repos et collation, les signes se sont normalisés. Surveillance rapprochée dans la journée. Pas d hospitalisation nécessaire.',
+      'Consultation dentaire : extraction d une dent de sagesse programmée. Le résident est inquiet, nous avons pris le temps de le rassurer et d expliquer le déroulement de l intervention. Accompagnement prévu le jour J par un éducateur.'
+    ],
+    3: [ // Éducatif
+      'Entretien avec le professeur principal du résident à l occasion du conseil de classe. Les résultats sont en nette amélioration, notamment en mathématiques et en français. Le comportement en classe reste toutefois irrégulier avec quelques épisodes d agitation signalés par les enseignants.',
+      'Déception aujourd hui : le résident a été exclu temporairement du collège pour trois jours suite à une altercation avec un camarade. Une réunion d équipe éducative avec le CPE est programmée pour la semaine prochaine. Le résident semble regretter son geste.',
+      'Bilan de formation très encourageant pour le résident. Son tuteur de stage a salué sa ponctualité et son sérieux. Le contrat d apprentissage sera signé vendredi en présence du chef d établissement. Une belle réussite qui mérite d être valorisée.',
+      'Résultats du premier trimestre : le résident obtient une moyenne de 13/20 avec une mention aux appréciations. Il est passé de la 3e Prépa Métiers en CAP cuisine avec un bon retour de l équipe pédagogique. Progrès notables en expression écrite.',
+      'Atelier de soutien scolaire animé. Travail sur les fractions et les pourcentages avec trois résidents en difficulté. Exercices pratiques, chacun a pu progresser à son rythme. Un nouveau créneau sera proposé la semaine prochaine pour consolider les acquis.',
+      'Le résident a réussi son examen de langue DELF avec une note de 72/100. Il était très fier et a remercié l équipe pour le soutien. C est une étape importante dans son parcours d intégration et une belle reconnaissance de ses efforts.'
+    ],
+    4: [ // Administratif
+      'Dossier administratif du résident complété et envoyé à la MDPH. Certificat médical, bilan psychologique et projet personnalisé joints. Délai d instruction estimé à 4 à 6 semaines. Une copie a été remise au résident pour son information.',
+      'Renouvellement du titre de séjour du résident : dossier déposé à la préfecture ce matin. Tous les justificatifs étaient complets et conformes. Récépissé obtenu valable 3 mois. Nouveau rendez-vous de suivi administratif programmé dans un mois.',
+      'Point sur les droits CAF : révision du dossier de la résidente suite à son changement de situation. Le RSA jeune est maintenu mais la prime d activité sera recalculée. Le dossier a été mis à jour dans les délais impartis pour éviter toute interruption de versement.',
+      'Constitution du dossier d aide au logement pour le jeune majeur accompagné. Déclaration de ressources, contrat de location et justificatif d identité. Aide personnalisée au logement estimée à 180 EUR par mois. Suivi de la demande auprès de la CAF.',
+      'Préparation du dossier de renouvellement du contrat jeune majeur. Bilan du parcours, projet d autonomie actualisé et budget prévisionnel transmis à l ASE. Le dossier sera présenté en commission le 15 du mois prochain.'
+    ],
+    5: [ // Familial
+      'Appel téléphonique avec la mère du résident. Situation reste tendue mais la mère accepte le principe d une médiation familiale. Un rendez-vous va être pris avec le service de médiation du CIDFF pour organiser une première rencontre exploratoire.',
+      'Visite médiatisée au point rencontre : le résident a retrouvé sa mère dans le cadre habituel. L échange s est bien passé, dans un climat apaisé. La mère a apporté des photos de famille. Prochaine visite programmée dans quinze jours avec une éducatrice.',
+      'Entretien téléphonique avec le père qui souhaite reprendre contact avec son fils. Situation complexe car le droit de visite est suspendu depuis six mois. Nous allons organiser une rencontre avec le juge des affaires familiales pour faire le point.',
+      'Nouvelle importante : la sœur du résident a eu un bébé. Il est très ému et souhaiterait la rencontrer. Nous allons organiser un appel vidéo dans un premier temps, puis envisager une visite si la situation familiale le permet.',
+      'Médiation familiale : première séance aujourd hui en présence de la référente ASE. La communication entre le résident et sa famille est difficile mais les deux parties montrent une volonté de dialogue. Un prochain rendez-vous est fixé dans trois semaines.'
+    ],
+    6: [ // Loisirs
+      'Sortie culturelle au Musée d Orsay organisée pour six résidents. Très belle réaction de l ensemble du groupe qui a apprécié la collection impressionniste. Moment de partage et d échange autour des oeuvres. Pique-nique au bord de la Seine pour conclure la journée.',
+      'Tournoi de football inter-foyers : notre équipe termine à la deuxième place sur huit participants. Belle performance collective et fair-play exemplaire de nos résidents qui ont su gérer la pression et la défaite en demi-finale.',
+      'Atelier menuiserie animé par Laurent Gauthier. Les résidents ont fabriqué des étagères pour leurs chambres. Ambiance studieuse et conviviale. Deux résidents se sont découverts une vraie passion pour le travail du bois.',
+      'Après-midi bowling organisé pour les résidents. Très bonne cohésion du groupe, les équipes étaient mixtes et l ambiance était détendue. Moment convivial apprécié de tous, y compris des nouveaux arrivants qui ont pu créer des liens.',
+      'Sortie au parc zoologique de Vincennes. Les résidents ont particulièrement apprécié le vivarium et la grande volière. Atelier pédagogique sur la biodiversité animé par un soigneur. Retour au foyer vers 17h, tout le monde fatigué mais ravi.',
+      'Atelier théâtre : séance sur l improvisation et l expression corporelle. Des progrès notables chez les participants, notamment chez un résident habituellement très réservé qui a réussi à jouer une scène seul devant le groupe.'
+    ],
+    7: [ // Incident
+      'Incident ce soir au réfectoire : une altercation verbale a dégénéré entre deux résidents suite à une dispute pour une place à table. Intervention rapide de l éducateur de permanence. Les deux jeunes ont été séparés et un entretien individuel est prévu demain matin.',
+      'Fugue signalée ce jour : le résident n est pas rentré de son rendez-vous à la Mission Locale. Téléphone injoignable. La famille et la police ont été prévenues. L équipe de nuit est en alerte. Le résident a été retrouvé vers 23h au domicile d un ami.',
+      'Violence entre résidents dans la cour cet après-midi. Un résident en a bousculé un autre violemment après une provocation. Pas de blessure grave mais une entorse au poignet pour la victime qui a été examinée par l infirmier. Médiation éducative en cours.',
+      'Dégât matériel signalé dans la salle de bain collective : la robinetterie du lavabo a été forcée et une fuite d eau importante s est déclarée. Le plombier a été appelé en urgence. Les résidents concernés seront reçus individuellement pour faire le point.',
+      'Crise de colère du résident en fin de journée suite à l annulation de la visite de sa mère. Il a crié, donné des coups de pied dans le mobilier puis s est enfermé dans sa chambre. Après une heure d apaisement, il a accepté de parler avec l éducateur de nuit.',
+      'Agressivité verbale du résident envers un éducateur lors de l atelier. Propos déplacés et menaces. L atelier a été interrompu. Le résident a été isolé pour un temps de réflexion puis un entretien a eu lieu avec le chef de service en fin de journée.'
+    ],
+    8: [ // Psychologique
+      'Première séance avec la psychologue clinicienne. Le résident était anxieux en début de séance mais a réussi à verbaliser ses difficultés. Sentiments d abandon, angoisse de l avenir, difficultés à faire confiance. Un suivi hebdomadaire a été proposé et accepté.',
+      'Séance de suivi psychologique : le résident aborde plus facilement ses émotions aujourd hui. Il a parlé de son enfance et des événements traumatisants qu il a vécus. La psychologue note une amélioration de la confiance en soi. Exercice de relaxation en fin de séance.',
+      'Bilan psychologique réalisé dans le cadre du projet personnalisé. Tests projectifs et entretien clinique. Résultats montrant une anxiété sociale modérée à sévère mais de bonnes capacités d introspection. Des séances de thérapie cognitivo-comportementale sont recommandées.',
+      'Séance de psychomotricité avec Caroline Bonnet. Travail sur le schéma corporel et la régulation tonico-émotionnelle. Le résident a participé avec intérêt aux exercices de relaxation et de respiration. Progression constatée par rapport à la séance précédente.',
+      'Entretien psychologique en urgence suite à la crise de la semaine dernière. Le résident va mieux, le traitement anxiolytique semble faire effet. Il a accepté de participer au groupe de parole hebdomadaire à partir de la semaine prochaine.',
+      'Séance de groupe sur la gestion des émotions animée par la psychologue et l éducatrice. Six résidents participants. Thème du jour : identifier et nommer ses émotions. Exercices pratiques autour de situations du quotidien. Échanges riches et respectueux.'
+    ]
+  };
 
   for (let i = 0; i < cfgJournal; i++) {
     const res = resList[i % resList.length];
     const cat = cats[i % cats.length];
     const d = new Date(now.getTime() - rand(0, 365) * 86400000);
     const author = pick(journalAuthors);
+    const catTemplates = journalParCategorie[cat.id];
     const usedSet = new Set();
     const lignes = [];
-    while (lignes.length < Math.min(5, 2 + rand(0,3))) {
-      const t = pick(journalTemplates);
+    const nb = rand(1, 2);
+    while (lignes.length < nb) {
+      const t = pick(catTemplates);
       if (!usedSet.has(t)) { usedSet.add(t); lignes.push(t); }
     }
-    const contenu = lignes.join('\n');
+    const contenu = lignes.join('\n\n');
     const visibilite = Math.random() < .1 ? 'confidentiel' : Math.random() < .2 ? 'tous' : 'equipe';
     journal.push({
       id: 'dj-' + (i + 1),
