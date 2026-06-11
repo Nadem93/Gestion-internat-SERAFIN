@@ -42,6 +42,7 @@ function openDemandeConge(data) {
   const div = document.createElement('div');
   div.innerHTML = html;
   document.body.appendChild(div);
+  requestAnimationFrame(() => document.getElementById('modalConge')?.classList.add('open'));
 }
 
 function saveConge(id) {

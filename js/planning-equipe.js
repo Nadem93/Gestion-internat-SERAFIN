@@ -49,6 +49,7 @@ function openImportPlanning() {
   const div = document.createElement('div');
   div.innerHTML = html;
   document.body.appendChild(div);
+  requestAnimationFrame(() => document.getElementById('modalImportPe')?.classList.add('open'));
 }
 
 function handlePeImport(e) {
@@ -163,7 +164,7 @@ function renderPlanningEquipe() {
         + `<td style="padding:.6rem .75rem;font-weight:600;font-size:.78rem;white-space:nowrap">${escHtml(emp.nom)}</td>`
         + weekDays.map(d => {
           const s = dayMap[d];
-          return `<td style="padding:.4rem .35rem;text-align:center;vertical-align:middle;font-size:.7rem">${s ? s.map(x => `<span style="display:inline-block;padding:2px 6px;background:#0891b218;color:#0891b2;border-radius:4px;font-weight:600;white-space:nowrap">${x.debut}-${x.fin}</span>`).join(' ') : '<span style="color:var(--g300))">—</span>'}</td>`;
+          return `<td style="padding:.4rem .35rem;text-align:center;vertical-align:middle;font-size:.7rem">${s ? s.map(x => `<span style="display:inline-block;padding:2px 6px;background:#0891b218;color:#0891b2;border-radius:4px;font-weight:600;white-space:nowrap">${x.debut}-${x.fin}</span>`).join(' ') : '<span style="color:var(--g300)">—</span>'}</td>`;
         }).join('')
         + '</tr>';
     }).join('')

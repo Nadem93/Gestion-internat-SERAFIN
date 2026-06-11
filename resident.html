@@ -598,6 +598,7 @@ function openSerafinphModal() {
   const div = document.createElement('div');
   div.innerHTML = html;
   document.body.appendChild(div);
+  requestAnimationFrame(() => document.getElementById('modalSerafinph')?.classList.add('open'));
 }
 
 function saveSerafinph() {

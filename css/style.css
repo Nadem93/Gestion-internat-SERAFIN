@@ -761,19 +761,19 @@ tbody tr:hover .table-actions{opacity:1}
 ══════════════════════════════════════════ */
 
 /* ── 1024px: Tablet ── */
-@media(max-width:1024px){
+@media (max-width:1024px){
   .grid-4{grid-template-columns:repeat(2,1fr)}
   .grid-3{grid-template-columns:repeat(2,1fr)}
   .content{padding:1.5rem}
 }
 
 /* ── 900px ── */
-@media(max-width:900px){
+@media (max-width:900px){
   .res-card-photo{width:68px;height:68px;border-radius:10px}
 }
 
 /* ── 768px: Small tablet / large phone ── */
-@media(max-width:768px){
+@media (max-width:768px){
   :root{--header-h:60px}
 
   /* Layout */
@@ -851,7 +851,7 @@ tbody tr:hover .table-actions{opacity:1}
 }
 
 /* ── 640px: Phone ── */
-@media(max-width:640px){
+@media (max-width:640px){
   /* Header — titre de page masqué, boutons compactés */
   .header-title{display:none}
   .header-right .btn{padding:.28rem .55rem;font-size:.75rem;min-height:32px;gap:4px}
@@ -932,7 +932,7 @@ tbody tr:hover .table-actions{opacity:1}
 }
 
 /* ── 480px: Small phone ── */
-@media(max-width:480px){
+@media (max-width:480px){
   /* INTERNALIS masqué — trop étroit pour coexister avec titre + boutons */
   #headerBrand{display:none!important}
 
@@ -1234,13 +1234,13 @@ body.etab-dark-bg .modal,
 .am-icon{width:42px;height:42px;border-radius:var(--r-sm);display:flex;align-items:center;justify-content:center;flex-shrink:0}
 .am-icon svg{width:20px;height:20px;color:inherit}
 
-@media(max-width:600px){
+@media (max-width:600px){
   .am-grid{grid-template-columns:repeat(3,1fr);gap:.625rem}
   .am-card{padding:.75rem .2rem;font-size:.65rem}
   .am-icon{width:36px;height:36px}
   .am-icon svg{width:18px;height:18px}
 }
-@media(max-width:400px){
+@media (max-width:400px){
   .am-grid{grid-template-columns:repeat(2,1fr);gap:.5rem}
 }
 

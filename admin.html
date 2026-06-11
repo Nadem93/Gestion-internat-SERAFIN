@@ -256,6 +256,18 @@
     <div style="font-size:.7rem;color:var(--muted)" id="c4sub">non traités</div>
     <span class="stat-circ-badge scb-red" id="c4badge">—</span>
   </div>
+  <div class="stat-circ-card">
+    <div class="circ-wrap">
+      <svg class="circ-svg" viewBox="0 0 88 88">
+        <circle class="circ-track" cx="44" cy="44" r="36"/>
+        <circle class="circ-bar" id="c5bar" cx="44" cy="44" r="36" stroke="#8b5cf6" stroke-dasharray="226" stroke-dashoffset="226"/>
+      </svg>
+      <div class="circ-label" style="font-size:.9rem"><span id="c5val">0</span></div>
+    </div>
+    <div class="stat-circ-name">SERAFIN-PH</div>
+    <div style="font-size:.7rem;color:var(--muted)" id="c5sub">résidents évalués</div>
+    <span class="stat-circ-badge scb-violet" id="c5badge">—</span>
+  </div>
 </div>
 
 <!-- ══════════ DETAIL STATS ══════════ -->
@@ -294,6 +306,16 @@
       <div class="qstat-row"><span class="qstat-label">Véhicules réservés</span><span class="qstat-value" id="qVehi">—</span></div>
       <div class="qstat-row"><span class="qstat-label">Messages non lus</span><span class="qstat-value" id="qMessages">—</span></div>
       <div class="qstat-row"><span class="qstat-label">Documents stockés</span><span class="qstat-value" id="qDocs">—</span></div>
+    </div>
+  </div>
+  <div class="sdcard">
+    <div class="sdcard-head"><span class="sdcard-title">🧬 SERAFIN-PH</span></div>
+    <div class="sdcard-body">
+      <div class="qstat-row"><span class="qstat-label">Résidents évalués</span><span class="qstat-value" id="spEvalues" style="color:var(--accent)">—</span></div>
+      <div class="qstat-row"><span class="qstat-label">GMPS moyen</span><span class="qstat-value" id="spGmps" style="color:var(--primary)">—</span></div>
+      <div class="qstat-row"><span class="qstat-label">Score total cumulé</span><span class="qstat-value" id="spScore" style="color:var(--primary)">—</span></div>
+      <div id="spBars" style="margin-top:.75rem"></div>
+      <div id="spNiveau" style="margin-top:.5rem"></div>
     </div>
   </div>
 </div>
@@ -902,6 +924,7 @@ function refreshAllStats() {
   renderKeyStats(residents, presences, incidents);
   renderPpeBars();
   renderDocBars();
+  renderSerafinphStats();
 }
 
 function renderKeyStats(residents, presences, incidents) {
@@ -1381,6 +1404,52 @@ function renderDocBars() {
   const data = {}, colorMap = {};
   Object.entries(counts).forEach(([cat, c]) => { const lbl = catLabels[cat] || cat; data[lbl] = c; colorMap[lbl] = catColors[cat] || '#94a3b8'; });
   el.innerHTML = svgHBar(data, '#3b82f6', false, colorMap);
+}
+
+function renderSerafinphStats() {
+  const residents = DB.get(DB.keys.residents) || [];
+  const actifs = residents.filter(r => r.statut !== 'sorti');
+  const spPrestations = ['pd_soins','pd_accomp_educatif','pd_accomp_social','pd_orientation','pd_education','pd_scolarite','pi_coordination','pi_communication','pi_gestion','pi_logistique','pi_administration','pi_services_generaux'];
+  const spLabels = { pd_soins:'Soins', pd_accomp_educatif:'Accomp. éducatif', pd_accomp_social:'Accomp. social', pd_orientation:'Orientation', pd_education:'Éducation', pd_scolarite:'Scolarité', pi_coordination:'Coordination', pi_communication:'Communication', pi_gestion:'Gestion', pi_logistique:'Logistique', pi_administration:'Administration', pi_services_generaux:'Services généraux' };
+  const withSp = actifs.filter(r => r.serafinph && Object.values(r.serafinph.prestations||{}).some(p => p.niveau > 0));
+  const allScores = withSp.map(r => {
+    const prestations = {};
+    spPrestations.forEach(k => { prestations[k] = (r.serafinph?.prestations?.[k]?.niveau) || 0; });
+    return { total: Object.values(prestations).reduce((a, n) => a + n, 0), prestations };
+  });
+  const gmps = allScores.length ? (allScores.reduce((a, s) => a + s.total / spPrestations.length, 0) / allScores.length).toFixed(1) : null;
+  const totalScore = allScores.reduce((a, s) => a + s.total, 0);
+  document.getElementById('spEvalues').textContent = withSp.length > 0 ? `${withSp.length} / ${actifs.length}` : '—';
+  document.getElementById('spGmps').textContent = gmps != null ? gmps : '—';
+  document.getElementById('spScore').textContent = totalScore > 0 ? totalScore : '—';
+  document.getElementById('c5val').textContent = withSp.length;
+  document.getElementById('c5sub').textContent = `${withSp.length} / ${actifs.length}`;
+  const pct = actifs.length > 0 ? Math.round((withSp.length / actifs.length) * 100) : 0;
+  setCirc('c5bar', pct);
+  const c5b = document.getElementById('c5badge');
+  if (pct >= 80) { c5b.textContent = 'Optimal'; c5b.className = 'stat-circ-badge scb-violet'; }
+  else if (pct >= 40) { c5b.textContent = 'Partiel'; c5b.className = 'stat-circ-badge scb-yellow'; }
+  else { c5b.textContent = 'À évaluer'; c5b.className = 'stat-circ-badge scb-red'; }
+  const spByPrest = {};
+  spPrestations.forEach(k => {
+    const niveaux = allScores.map(s => s.prestations[k]);
+    const moy = niveaux.length ? (niveaux.reduce((a, n) => a + n, 0) / niveaux.length) : 0;
+    spByPrest[spLabels[k]] = Math.round(moy * 10) / 10;
+  });
+  const barsEl = document.getElementById('spBars');
+  if (barsEl) barsEl.innerHTML = svgHBar(spByPrest, '#8b5cf6', true);
+  const spNivRepart = [0, 0, 0, 0, 0];
+  allScores.forEach(s => Object.values(s.prestations).forEach(n => spNivRepart[n]++));
+  const niveauxEl = document.getElementById('spNiveau');
+  if (niveauxEl && spNivRepart.some(v => v > 0)) {
+    niveauxEl.innerHTML = svgDonut([
+      { label: 'Niveau 0 (Nul)', value: spNivRepart[0], color: '#d1d5db' },
+      { label: 'Niveau 1 (Faible)', value: spNivRepart[1], color: '#22c55e' },
+      { label: 'Niveau 2 (Modéré)', value: spNivRepart[2], color: '#eab308' },
+      { label: 'Niveau 3 (Important)', value: spNivRepart[3], color: '#f97316' },
+      { label: 'Niveau 4 (Très important)', value: spNivRepart[4], color: '#ef4444' }
+    ], 'niveaux');
+  }
 }
 
 function renderPresenceChart(residents, presences, freq) {

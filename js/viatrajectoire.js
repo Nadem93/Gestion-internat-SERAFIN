@@ -143,6 +143,7 @@ function openVTDemande(data) {
   const div = document.createElement('div');
   div.innerHTML = html;
   document.body.appendChild(div);
+  requestAnimationFrame(() => document.getElementById('modalVTDemande')?.classList.add('open'));
   } catch(e) { console.error('openVTDemande error:', e); toast('Erreur : ' + e.message, 'error'); }
 }
 
