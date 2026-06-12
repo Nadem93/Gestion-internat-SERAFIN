@@ -4,6 +4,18 @@
   <title>Planning équipe — FTR</title>
   <link rel="stylesheet" href="css/style.css"/>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet"/>
+  <style>
+    @media print {
+      body{background:#fff;font-size:10px}
+      .header,.btn,.modal-overlay,#peStats,.accueil-fab-stack,#toast-container,[onclick]{display:none!important}
+      .card{border:none!important;box-shadow:none!important}
+      table{font-size:8px!important}
+      th,td{padding:3px!important}
+      .app-layout{display:block!important}
+      .main{max-width:100%!important}
+      .content{padding:0!important;max-width:100%!important}
+    }
+  </style>
 </head>
 <body>
 <div class="app-layout"><div class="main">
@@ -36,6 +48,11 @@
         <div id="peHint" style="font-size:.78rem;color:var(--muted)"></div>
       </div>
     </div>
+    <div id="peStats" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:.5rem;margin-bottom:.75rem"></div>
+    <div style="display:flex;justify-content:flex-end;gap:.5rem;margin-bottom:.5rem">
+      <button class="btn btn-ghost btn-sm" onclick="peDuplicateWeek()" title="Dupliquer cette semaine" style="font-size:.72rem">📋 Dupliquer la semaine</button>
+      <button class="btn btn-ghost btn-sm" onclick="peExportPDF()" title="Exporter en PDF" style="font-size:.72rem">🖨️ PDF</button>
+    </div>
     <div id="peGrid" class="card"><div class="card-body" style="padding:0;overflow-x:auto">
       <div class="empty" style="padding:3rem;text-align:center">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="width:40px;height:40px;margin:0 auto .75rem;color:var(--g300)"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
@@ -61,7 +78,21 @@
         <div class="form-group"><label>Début</label><input type="time" id="psDebut"/></div>
         <div class="form-group"><label>Fin</label><input type="time" id="psFin"/></div>
       </div>
-      <div id="psRecurrenceWrap" style="display:none;margin-top:.5rem;padding:.75rem;background:var(--g50);border-radius:var(--r-sm)">
+      <div class="form-group" style="margin-top:.35rem">
+        <label>Service</label>
+        <select id="psService" class="form-input">
+          <option value="">—</option>
+          <option value="Matin">Matin</option>
+          <option value="Apres-midi">Après-midi</option>
+          <option value="Nuit">Nuit</option>
+          <option value="Journee">Journée</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Commentaire</label>
+        <textarea id="psNotes" class="form-input" rows="2" placeholder="Optionnel…"></textarea>
+      </div>
+      <div id="psRecurrenceWrap" style="margin-top:.5rem;padding:.75rem;background:var(--g50);border-radius:var(--r-sm)">
         <div style="font-size:.78rem;font-weight:600;margin-bottom:.5rem">🔁 Récurrence hebdomadaire</div>
         <div style="display:flex;align-items:center;gap:.75rem;flex-wrap:wrap">
           <label style="display:flex;align-items:center;gap:.35rem;font-size:.78rem;cursor:pointer">
@@ -70,7 +101,7 @@
           </label>
           <div style="display:flex;align-items:center;gap:.35rem">
             <span style="font-size:.72rem;color:var(--muted)">Pendant</span>
-            <input type="number" id="psRecurrenceWeeks" class="form-input" style="width:60px;text-align:center" value="4" min="1" max="52" disabled/>
+            <input type="number" id="psRecurrenceWeeks" class="form-input" style="width:60px;text-align:center" value="4" min="1" max="52"/>
             <span style="font-size:.72rem;color:var(--muted)">semaines</span>
           </div>
         </div>

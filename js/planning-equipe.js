@@ -1,6 +1,9 @@
+const PE_SERVICE_LABELS = { Matin:'Matin', 'Apres-midi':'Après-midi', Nuit:'Nuit', Journee:'Journée' };
+const PE_SERVICE_COLORS = { Matin:'#f59e0b', 'Apres-midi':'#3b82f6', Nuit:'#312e81', Journee:'#10b981' };
+
 let peWeekStart = peGetMonday(new Date());
 let _peCtx = null;
-let peViewMode = 'week'; // 'week' | 'month'
+let peViewMode = 'week';
 
 function initPlanningEquipe() {
   const _s = Auth.requireAuth();
@@ -10,7 +13,6 @@ function initPlanningEquipe() {
   renderPlanningEquipe();
 }
 
-// ── HELPERS DATE ──
 function peGetMonday(d) {
   const date = new Date(d);
   const day = date.getDay();
@@ -51,15 +53,15 @@ function peFormatSigned(mins) {
   return sign + peFormatDuration(Math.abs(mins));
 }
 
-// ── NAVIGATION SEMAINE / MOIS ──
+// ── NAVIGATION ──
 function pePrevWeek() {
   if (peViewMode === 'week') peWeekStart.setDate(peWeekStart.getDate()-7);
-  else { peWeekStart.setMonth(peWeekStart.getMonth()-1); }
+  else peWeekStart.setMonth(peWeekStart.getMonth()-1);
   renderPlanningEquipe();
 }
 function peNextWeek() {
   if (peViewMode === 'week') peWeekStart.setDate(peWeekStart.getDate()+7);
-  else { peWeekStart.setMonth(peWeekStart.getMonth()+1); }
+  else peWeekStart.setMonth(peWeekStart.getMonth()+1);
   renderPlanningEquipe();
 }
 function peToday() {
@@ -69,9 +71,7 @@ function peToday() {
 }
 function peSetViewMode(mode) {
   peViewMode = mode;
-  if (mode === 'month') {
-    peWeekStart = new Date(peWeekStart.getFullYear(), peWeekStart.getMonth(), 1);
-  }
+  if (mode === 'month') peWeekStart = new Date(peWeekStart.getFullYear(), peWeekStart.getMonth(), 1);
   document.getElementById('peViewWeekBtn').style.color = mode === 'week' ? 'var(--primary)' : '';
   document.getElementById('peViewWeekBtn').style.fontWeight = mode === 'week' ? '700' : '';
   document.getElementById('peViewMonthBtn').style.color = mode === 'month' ? 'var(--primary)' : '';
@@ -80,17 +80,17 @@ function peSetViewMode(mode) {
 }
 
 // ── DONNÉES ──
-function getPeShifts() {
-  return DB.get(DB.keys.planningEquipe) || [];
-}
-
-function setPeShifts(shifts) {
-  DB.set(DB.keys.planningEquipe, shifts);
-}
-
+function getPeShifts() { return DB.get(DB.keys.planningEquipe) || []; }
+function setPeShifts(shifts) { DB.set(DB.keys.planningEquipe, shifts); }
 function peCanEditPlanning() {
   const _s = Auth.getSession();
   return !!(_s && (Auth.isAdmin() || hasPermission(_s.userId, 'edit_planning_equipe')));
+}
+function getPeConges() {
+  const conges = DB.get(DB.keys.conges) || [];
+  const now = new Date();
+  const debutMois = new Date(now.getFullYear(), now.getMonth(), 1);
+  return conges.filter(c => c.statut === 'accepte' && new Date(c.dateFin || c.dateDebut) >= debutMois);
 }
 
 // ── IMPORT CSV ──
@@ -144,22 +144,13 @@ function handlePeImport(e) {
     const employes = DB.get(DB.keys.employes) || [];
     for (let i = 1; i < lines.length; i++) {
       const cols = lines[i].split(/[;,]/).map(c => c.trim().replace(/['"]/g,''));
-      const nom = cols[empIdx];
-      const date = cols[dateIdx];
-      const debut = cols[debutIdx];
-      const fin = cols[finIdx];
+      const nom = cols[empIdx], date = cols[dateIdx], debut = cols[debutIdx], fin = cols[finIdx];
       if (!nom || !date || !debut || !fin) continue;
       const emp = employes.find(e => (e.prenom+' '+e.nom).toLowerCase() === nom.toLowerCase() || e.nom.toLowerCase() === nom.toLowerCase());
-      imported.push({
-        id: 'pe-' + genId(),
-        employeId: emp ? emp.id : null,
-        employeNom: emp ? emp.prenom+' '+emp.nom : nom,
-        date, debut, fin
-      });
+      imported.push({ id:'pe-'+genId(), employeId:emp?emp.id:null, employeNom:emp?emp.prenom+' '+emp.nom:nom, date, debut, fin });
     }
     if (!imported.length) { toast('Aucune ligne valide trouvée', 'error'); return; }
-    const shifts = getPeShifts().concat(imported);
-    setPeShifts(shifts);
+    setPeShifts(getPeShifts().concat(imported));
     if (typeof auditLog === 'function') auditLog('import', 'Planning équipe — ' + imported.length + ' lignes depuis ' + file.name);
     closeModal('modalImportPe');
     toast('Planning importé : ' + imported.length + ' lignes ✓', 'success');
@@ -192,6 +183,8 @@ function openPeShiftModal(employeId, date, shiftId) {
   document.getElementById('psDate').textContent = peFormatLong(new Date(finalDate + 'T00:00:00'));
   document.getElementById('psDebut').value = shift ? shift.debut : '08:00';
   document.getElementById('psFin').value = shift ? shift.fin : '16:00';
+  document.getElementById('psService').value = shift ? (shift.service || '') : '';
+  document.getElementById('psNotes').value = shift ? (shift.notes || '') : '';
   document.getElementById('psDeleteBtn').style.display = shift ? '' : 'none';
   document.getElementById('psRecurrenceWrap').style.display = shift ? 'none' : '';
   document.getElementById('psRecurrenceEnabled').checked = false;
@@ -204,25 +197,27 @@ function savePeShift() {
   const debut = document.getElementById('psDebut').value;
   const fin = document.getElementById('psFin').value;
   if (!debut || !fin) { toast('Veuillez renseigner les heures de début et de fin', 'error'); return; }
+  const service = document.getElementById('psService').value;
+  const notes = document.getElementById('psNotes').value.trim();
   const shifts = getPeShifts();
   if (_peCtx.shiftId) {
     const s = shifts.find(x => x.id === _peCtx.shiftId);
-    if (s) { s.debut = debut; s.fin = fin; }
-    auditLog('modification', `Planning équipe — créneau ${_peCtx.employeNom} le ${_peCtx.date} (${debut}-${fin})`);
+    if (s) { s.debut = debut; s.fin = fin; s.service = service; s.notes = notes; }
+    auditLog('modification', `Planning équipe — créneau ${_peCtx.employeNom} le ${_peCtx.date}`);
   } else {
     const recEnabled = document.getElementById('psRecurrenceEnabled').checked;
     const recWeeks = parseInt(document.getElementById('psRecurrenceWeeks').value) || 1;
+    const base = { employeId: _peCtx.employeId, employeNom: _peCtx.employeNom, debut, fin, service, notes };
     if (recEnabled && recWeeks > 1) {
       for (let w = 0; w < recWeeks; w++) {
         const d = new Date(_peCtx.date + 'T00:00:00');
         d.setDate(d.getDate() + w * 7);
-        const dateStr = peISO(d);
-        shifts.push({ id: 'pe-'+genId(), employeId: _peCtx.employeId, employeNom: _peCtx.employeNom, date: dateStr, debut, fin });
+        shifts.push({ id:'pe-'+genId(), ...base, date: peISO(d) });
       }
     } else {
-      shifts.push({ id: 'pe-'+genId(), employeId: _peCtx.employeId, employeNom: _peCtx.employeNom, date: _peCtx.date, debut, fin });
+      shifts.push({ id:'pe-'+genId(), ...base, date: _peCtx.date });
     }
-    auditLog('création', `Planning équipe — créneau ${_peCtx.employeNom} le ${_peCtx.date} (${debut}-${fin})` + (recEnabled&&recWeeks>1?` récurrence ${recWeeks} sem`:''));
+    auditLog('création', `Planning équipe — créneau ${_peCtx.employeNom} le ${_peCtx.date}`);
   }
   setPeShifts(shifts);
   closeModal('modalPeShift');
@@ -233,12 +228,47 @@ function savePeShift() {
 function deletePeShift() {
   if (!_peCtx || !_peCtx.shiftId) return;
   if (!confirm('Supprimer ce créneau ?')) return;
-  const shifts = getPeShifts().filter(s => s.id !== _peCtx.shiftId);
-  setPeShifts(shifts);
+  setPeShifts(getPeShifts().filter(s => s.id !== _peCtx.shiftId));
   auditLog('suppression', `Planning équipe — créneau ${_peCtx.employeNom} le ${_peCtx.date} supprimé`);
   closeModal('modalPeShift');
   toast('Créneau supprimé', 'success');
   renderPlanningEquipe();
+}
+
+// ── DUPLIQUER UNE SEMAINE ──
+function peDuplicateWeek() {
+  const weekDays = [];
+  for (let i = 0; i < 7; i++) { const d = new Date(peWeekStart); d.setDate(d.getDate() + i); weekDays.push(d); }
+  const weekDayStrs = weekDays.map(peISO);
+  const shifts = getPeShifts();
+  const weekShifts = shifts.filter(s => weekDayStrs.includes(s.date));
+  if (!weekShifts.length) { toast('Aucun créneau cette semaine à dupliquer', 'error'); return; }
+  const target = prompt('Dupliquer vers la semaine du (JJ/MM/AAAA) :', peFormatShort(new Date(peWeekStart.getTime() + 7*86400000)));
+  if (!target) return;
+  const parts = target.split('/');
+  if (parts.length !== 3) { toast('Format invalide. Utilisez JJ/MM/AAAA', 'error'); return; }
+  const targetDate = new Date(parseInt(parts[2]), parseInt(parts[1])-1, parseInt(parts[0]));
+  if (isNaN(targetDate.getTime())) { toast('Date invalide', 'error'); return; }
+  const targetMonday = peGetMonday(targetDate);
+  const existingStrs = [];
+  for (let i = 0; i < 7; i++) { const d = new Date(targetMonday); d.setDate(d.getDate() + i); existingStrs.push(peISO(d)); }
+  const existing = shifts.filter(s => existingStrs.includes(s.date));
+  if (existing.length && !confirm(existing.length + ' créneaux existent déjà sur la semaine cible. Ajouter quand même ?')) return;
+  weekShifts.forEach(s => {
+    const oldDate = new Date(s.date + 'T00:00:00');
+    const dayOffset = Math.round((oldDate - peWeekStart) / 86400000);
+    const newDate = new Date(targetMonday);
+    newDate.setDate(newDate.getDate() + dayOffset);
+    shifts.push({ ...s, id: 'pe-'+genId(), date: peISO(newDate) });
+  });
+  setPeShifts(shifts);
+  toast('Semaine dupliquée : ' + weekShifts.length + ' créneaux copiés ✓', 'success');
+  auditLog('duplication', `Planning équipe — semaine du ${peFormatShort(weekDays[0])} dupliquée vers ${peFormatShort(targetMonday)}`);
+}
+
+// ── EXPORT PDF ──
+function peExportPDF() {
+  window.print();
 }
 
 // ── RENDU GRILLE ──
@@ -249,21 +279,14 @@ function renderPlanningEquipe() {
 
   if (peViewMode === 'week') {
     weekDays = [];
-    for (let i = 0; i < 7; i++) {
-      const d = new Date(peWeekStart);
-      d.setDate(d.getDate() + i);
-      weekDays.push(d);
-    }
+    for (let i = 0; i < 7; i++) { const d = new Date(peWeekStart); d.setDate(d.getDate() + i); weekDays.push(d); }
     weekDayStrs = weekDays.map(peISO);
     displayLabel = `Semaine du ${peFormatShort(weekDays[0])} au ${peFormatShort(weekDays[6])}/${weekDays[6].getFullYear()}`;
   } else {
-    // Vue mois : générer tous les jours du mois
     const y = peWeekStart.getFullYear(), m = peWeekStart.getMonth();
     const daysInMonth = new Date(y, m + 1, 0).getDate();
     weekDays = [];
-    for (let d = 1; d <= daysInMonth; d++) {
-      weekDays.push(new Date(y, m, d));
-    }
+    for (let d = 1; d <= daysInMonth; d++) weekDays.push(new Date(y, m, d));
     weekDayStrs = weekDays.map(peISO);
     displayLabel = `${MONTHS[m]} ${y}`;
   }
@@ -277,6 +300,19 @@ function renderPlanningEquipe() {
   const employes = (DB.get(DB.keys.employes) || []).filter(e => e.statut !== 'inactif');
   const shifts = getPeShifts();
   const shiftsFilt = shifts.filter(s => weekDayStrs.includes(s.date));
+  const conges = getPeConges();
+
+  // Stats
+  const totalMinsAll = shiftsFilt.reduce((sum,s) => sum + peDuration(s.debut, s.fin), 0);
+  const empPlanifies = new Set(shiftsFilt.map(s => s.employeId)).size;
+  const nbJoursAvec = weekDayStrs.filter(d => shiftsFilt.some(s => s.date === d)).length;
+  const pctCouverture = weekDays.length > 0 ? Math.round((nbJoursAvec / weekDays.length) * 100) : 0;
+  document.getElementById('peStats').innerHTML = `
+    <div class="stat-mini" style="text-align:center;padding:.5rem;background:var(--g50);border-radius:var(--r-sm)"><div style="font-size:1.1rem;font-weight:800">${peFormatDuration(totalMinsAll)}</div><div style="font-size:.65rem;color:var(--muted)">Total heures</div></div>
+    <div class="stat-mini" style="text-align:center;padding:.5rem;background:var(--g50);border-radius:var(--r-sm)"><div style="font-size:1.1rem;font-weight:800">${empPlanifies}</div><div style="font-size:.65rem;color:var(--muted)">Employés planifiés</div></div>
+    <div class="stat-mini" style="text-align:center;padding:.5rem;background:var(--g50);border-radius:var(--r-sm)"><div style="font-size:1.1rem;font-weight:800">${nbJoursAvec}/${weekDays.length}</div><div style="font-size:.65rem;color:var(--muted)">Jours couverts</div></div>
+    <div class="stat-mini" style="text-align:center;padding:.5rem;background:var(--g50);border-radius:var(--r-sm)"><div style="font-size:1.1rem;font-weight:800;color:${pctCouverture >= 80 ? 'var(--green)' : pctCouverture >= 50 ? 'var(--amber)' : 'var(--red)'}">${pctCouverture}%</div><div style="font-size:.65rem;color:var(--muted)">Couverture</div></div>
+  `;
 
   const byEmp = {};
   shiftsFilt.forEach(s => {
@@ -284,25 +320,22 @@ function renderPlanningEquipe() {
     (byEmp[key] = byEmp[key] || []).push(s);
   });
 
-  const el = document.getElementById('peGrid');
-  const body = el.querySelector('.card-body');
+  const body = document.getElementById('peGrid').querySelector('.card-body');
 
   if (!employes.length) {
-    body.innerHTML = '<div class="empty" style="padding:3rem;text-align:center"><p>Aucun employé enregistré. Ajoutez des employés pour gérer le planning.</p></div>';
+    body.innerHTML = '<div class="empty" style="padding:3rem;text-align:center"><p>Aucun employé enregistré.</p></div>';
     return;
   }
 
   const dayHeader = weekDays.map((d,i) => {
     const isToday = weekDayStrs[i] === todayStr;
-    const numStyle = isToday
-      ? 'display:inline-block;width:22px;height:22px;line-height:22px;border-radius:50%;background:var(--primary);color:#fff;font-weight:700;margin-top:2px'
-      : 'display:inline-block;margin-top:2px;font-weight:400';
+    const numStyle = isToday ? 'display:inline-block;width:22px;height:22px;line-height:22px;border-radius:50%;background:var(--primary);color:#fff;font-weight:700;margin-top:2px' : 'display:inline-block;margin-top:2px;font-weight:400';
     const dayLabel = peViewMode === 'week' ? DAYS[i] : DAYS[new Date(d).getDay()];
     return `<th style="padding:.6rem .35rem;text-align:center;font-size:.67rem;font-weight:700;color:var(--muted);text-transform:uppercase;min-width:${peViewMode==='week'?'90':'72'}px">${dayLabel}<br/><span style="${numStyle}">${d.getDate()}</span></th>`;
   }).join('');
 
   const naShifts = byEmp['NA'] || [];
-  const naRow = `<tr style="border-top:1px solid var(--border);background:var(--g50)">
+  const naRow = naShifts.length ? `<tr style="border-top:1px solid var(--border);background:var(--g50)">
     <td style="padding:.5rem .75rem;white-space:nowrap">
       <div style="display:flex;align-items:center;gap:.5rem">
         <div style="width:32px;height:32px;border-radius:50%;background:var(--g200);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:.65rem;color:var(--muted);flex-shrink:0">NA</div>
@@ -312,11 +345,11 @@ function renderPlanningEquipe() {
     ${weekDays.map(d => {
       const dateStr = peISO(d);
       const dayShifts = naShifts.filter(s => s.date === dateStr);
-      const content = dayShifts.map(s => `<div onclick="openPeShiftModal(null,'${dateStr}','${s.id}')" style="cursor:pointer;background:var(--g100);border:1px solid var(--border);border-radius:6px;padding:.3rem .4rem;margin-bottom:2px;font-size:.68rem;font-weight:600;color:var(--muted)">${escHtml(s.employeNom||'?')}<br/>${s.debut} - ${s.fin}</div>`).join('');
+      const content = dayShifts.map(s => peShiftBlock(null, dateStr, s, true)).join('');
       return `<td style="padding:.35rem;vertical-align:top">${content || '<span style="color:var(--g300)">—</span>'}</td>`;
     }).join('')}
     <td></td>
-  </tr>`;
+  </tr>` : '';
 
   const empRows = employes.map(emp => {
     const empShifts = byEmp[emp.id] || [];
@@ -325,15 +358,26 @@ function renderPlanningEquipe() {
     const nbJours = weekDays.filter(d => empShifts.some(s => s.date === peISO(d))).length;
     const contractLabel = peViewMode === 'week' ? `${emp.heuresContrat ?? 35}h/sem` : `${nbJours}j présents`;
 
+    // Congés de l'employé
+    const empConges = conges.filter(c => {
+      if (String(c.employeId) !== String(emp.id)) return false;
+      const dDebut = new Date(c.dateDebut + 'T00:00:00');
+      const dFin = new Date((c.dateFin || c.dateDebut) + 'T00:00:00');
+      return weekDays.some(wd => wd >= dDebut && wd <= dFin);
+    });
+
     const cells = weekDays.map(d => {
       const dateStr = peISO(d);
       const dayShifts = empShifts.filter(s => s.date === dateStr);
-      const blocks = dayShifts.map(s => `<div onclick="event.stopPropagation();openPeShiftModal('${emp.id}','${dateStr}','${s.id}')" style="cursor:pointer;background:${color}20;border:1px solid ${color}55;border-radius:6px;padding:.3rem .4rem;margin-bottom:2px">
-          <div style="font-size:.7rem;font-weight:700;color:${color}">${s.debut} - ${s.fin}</div>
-          <div style="font-size:.62rem;font-weight:500;color:${color};opacity:.85">${peFormatDuration(peDuration(s.debut,s.fin))}</div>
-        </div>`).join('');
-      const addBtn = (canEdit && !dayShifts.length) ? '<div style="text-align:center;color:var(--g300);font-size:.9rem;line-height:1.4">+</div>' : '';
-      return `<td style="padding:.35rem;vertical-align:top"${canEdit ? ` onclick="openPeShiftModal('${emp.id}','${dateStr}')" style="cursor:pointer"` : ''}>${blocks}${addBtn}</td>`;
+      const blocks = dayShifts.map(s => peShiftBlock(emp.id, dateStr, s)).join('');
+      const congeDuJour = empConges.filter(c => {
+        const dDebut = new Date(c.dateDebut + 'T00:00:00');
+        const dFin = new Date((c.dateFin || c.dateDebut) + 'T00:00:00');
+        return d >= dDebut && d <= dFin;
+      });
+      const congeBadge = congeDuJour.length ? `<div style="font-size:.6rem;padding:1px 4px;background:#f59e0b20;color:#f59e0b;border-radius:4px;text-align:center;margin-top:2px">🔶 ${congeDuJour[0].type === 'cp' ? 'Congé' : congeDuJour[0].type || 'Absent'}</div>` : '';
+      const addBtn = (canEdit && !dayShifts.length && !congeDuJour.length) ? '<div style="text-align:center;color:var(--g300);font-size:.9rem;line-height:1.4">+</div>' : '';
+      return `<td style="padding:.35rem;vertical-align:top"${canEdit ? ` onclick="openPeShiftModal('${emp.id}','${dateStr}')" style="cursor:pointer"` : ''}>${blocks}${congeBadge}${addBtn}</td>`;
     }).join('');
 
     return `<tr style="border-top:1px solid var(--border)">
@@ -380,6 +424,39 @@ function renderPlanningEquipe() {
       </tr>
     </tbody>
   </table>`;
+}
+
+function peShiftBlock(empId, dateStr, s, isNa) {
+  const serviceColor = s.service ? (PE_SERVICE_COLORS[s.service] || '') : '';
+  const bgColor = isNa ? 'var(--g100)' : (serviceColor || s.color || 'var(--primary)');
+  const txtColor = isNa ? 'var(--muted)' : (serviceColor || s.color || 'var(--primary)');
+  const borderColor = isNa ? 'var(--border)' : (serviceColor ? serviceColor + '55' : (s.color || 'var(--primary)') + '55');
+  const label = s.service ? PE_SERVICE_LABELS[s.service] || s.service : (s.debut + '-' + s.fin);
+  return `<div draggable="true" ondragstart="peDragStart(event,'${s.id}')" ondrop="peDrop(event,'${s.id}')" ondragover="event.preventDefault()"
+    onclick="event.stopPropagation();${empId ? `openPeShiftModal('${empId}','${dateStr}','${s.id}')` : `openPeShiftModal(null,'${dateStr}','${s.id}')`}"
+    style="cursor:pointer;background:${bgColor}20;border:1px solid ${borderColor};border-radius:6px;padding:.3rem .4rem;margin-bottom:2px" title="${escHtml(s.notes||'')}">
+    <div style="font-size:.7rem;font-weight:700;color:${txtColor}">${escHtml(label)}${s.service ? `<span style="font-weight:400;margin-left:.2rem">${s.debut}-${s.fin}</span>` : ''}</div>
+    <div style="font-size:.62rem;font-weight:500;color:${txtColor};opacity:.85">${peFormatDuration(peDuration(s.debut,s.fin))}</div>
+    ${s.notes ? `<div style="font-size:.6rem;color:${txtColor};opacity:.7;margin-top:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${escHtml(s.notes)}</div>` : ''}
+  </div>`;
+}
+
+// ── DRAG & DROP ──
+let _peDragId = null;
+function peDragStart(e, id) { _peDragId = id; e.dataTransfer.effectAllowed = 'move'; }
+function peDrop(e, targetId) {
+  e.preventDefault();
+  if (!_peDragId || _peDragId === targetId) return;
+  const shifts = getPeShifts();
+  const srcIdx = shifts.findIndex(s => s.id === _peDragId);
+  const tgtIdx = shifts.findIndex(s => s.id === targetId);
+  if (srcIdx === -1 || tgtIdx === -1) return;
+  const temp = shifts[srcIdx];
+  shifts[srcIdx] = { ...shifts[tgtIdx], id: shifts[srcIdx].id };
+  shifts[tgtIdx] = { ...temp, id: shifts[tgtIdx].id };
+  setPeShifts(shifts);
+  _peDragId = null;
+  renderPlanningEquipe();
 }
 
 document.addEventListener('DOMContentLoaded', initPlanningEquipe);
