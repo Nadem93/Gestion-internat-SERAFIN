@@ -61,6 +61,20 @@
         <div class="form-group"><label>Début</label><input type="time" id="psDebut"/></div>
         <div class="form-group"><label>Fin</label><input type="time" id="psFin"/></div>
       </div>
+      <div id="psRecurrenceWrap" style="display:none;margin-top:.5rem;padding:.75rem;background:var(--g50);border-radius:var(--r-sm)">
+        <div style="font-size:.78rem;font-weight:600;margin-bottom:.5rem">🔁 Récurrence hebdomadaire</div>
+        <div style="display:flex;align-items:center;gap:.75rem;flex-wrap:wrap">
+          <label style="display:flex;align-items:center;gap:.35rem;font-size:.78rem;cursor:pointer">
+            <input type="checkbox" id="psRecurrenceEnabled" onchange="document.getElementById('psRecurrenceWeeks').disabled=!this.checked"/>
+            Répéter chaque semaine
+          </label>
+          <div style="display:flex;align-items:center;gap:.35rem">
+            <span style="font-size:.72rem;color:var(--muted)">Pendant</span>
+            <input type="number" id="psRecurrenceWeeks" class="form-input" style="width:60px;text-align:center" value="4" min="1" max="52" disabled/>
+            <span style="font-size:.72rem;color:var(--muted)">semaines</span>
+          </div>
+        </div>
+      </div>
     </div>
     <div class="modal-footer">
       <button class="btn btn-ghost" id="psDeleteBtn" onclick="deletePeShift()" style="display:none;color:var(--red);margin-right:auto">🗑 Supprimer</button>

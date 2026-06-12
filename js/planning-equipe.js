@@ -193,6 +193,10 @@ function openPeShiftModal(employeId, date, shiftId) {
   document.getElementById('psDebut').value = shift ? shift.debut : '08:00';
   document.getElementById('psFin').value = shift ? shift.fin : '16:00';
   document.getElementById('psDeleteBtn').style.display = shift ? '' : 'none';
+  document.getElementById('psRecurrenceWrap').style.display = shift ? 'none' : '';
+  document.getElementById('psRecurrenceEnabled').checked = false;
+  document.getElementById('psRecurrenceWeeks').disabled = true;
+  document.getElementById('psRecurrenceWeeks').value = 4;
   openModal('modalPeShift');
 }
 
@@ -204,11 +208,23 @@ function savePeShift() {
   if (_peCtx.shiftId) {
     const s = shifts.find(x => x.id === _peCtx.shiftId);
     if (s) { s.debut = debut; s.fin = fin; }
+    auditLog('modification', `Planning équipe — créneau ${_peCtx.employeNom} le ${_peCtx.date} (${debut}-${fin})`);
   } else {
-    shifts.push({ id: 'pe-'+genId(), employeId: _peCtx.employeId, employeNom: _peCtx.employeNom, date: _peCtx.date, debut, fin });
+    const recEnabled = document.getElementById('psRecurrenceEnabled').checked;
+    const recWeeks = parseInt(document.getElementById('psRecurrenceWeeks').value) || 1;
+    if (recEnabled && recWeeks > 1) {
+      for (let w = 0; w < recWeeks; w++) {
+        const d = new Date(_peCtx.date + 'T00:00:00');
+        d.setDate(d.getDate() + w * 7);
+        const dateStr = peISO(d);
+        shifts.push({ id: 'pe-'+genId(), employeId: _peCtx.employeId, employeNom: _peCtx.employeNom, date: dateStr, debut, fin });
+      }
+    } else {
+      shifts.push({ id: 'pe-'+genId(), employeId: _peCtx.employeId, employeNom: _peCtx.employeNom, date: _peCtx.date, debut, fin });
+    }
+    auditLog('création', `Planning équipe — créneau ${_peCtx.employeNom} le ${_peCtx.date} (${debut}-${fin})` + (recEnabled&&recWeeks>1?` récurrence ${recWeeks} sem`:''));
   }
   setPeShifts(shifts);
-  auditLog('modification', `Planning équipe — créneau ${_peCtx.employeNom} le ${_peCtx.date} (${debut}-${fin})`);
   closeModal('modalPeShift');
   toast('Créneau enregistré ✓');
   renderPlanningEquipe();
