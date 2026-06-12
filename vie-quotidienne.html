@@ -4,6 +4,19 @@
   <title>Vie quotidienne — FTR</title>
   <link rel="stylesheet" href="css/style.css"/>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet"/>
+  <style>
+    .vq-grid{grid-auto-rows:1fr}
+    .vq-card{position:relative;isolation:isolate}
+    .vq-card::before{
+      content:'';position:absolute;inset:0;border-radius:inherit;z-index:0;
+      background:radial-gradient(circle 150px at var(--mx,50%) var(--my,50%),
+        color-mix(in srgb, var(--c,#4f46e5) 38%, transparent) 0%, transparent 68%);
+      opacity:0;transition:opacity .35s ease;pointer-events:none;
+      filter:blur(8px);
+    }
+    .vq-card:hover::before{opacity:1}
+    .vq-icon,.vq-label{position:relative;z-index:1}
+  </style>
 </head>
 <body>
 <div class="app-layout"><div class="main">
@@ -18,27 +31,27 @@
   </header>
   <main class="content">
     <div style="max-width:620px;margin:0 auto;padding:2rem 0">
-      <div class="am-grid">
-        <a href="presences.html" class="am-card" data-perm="access_presences" style="background:linear-gradient(135deg,#16a34a25,#4ade8015)">
-          <span class="am-icon" style="background:#16a34a20;color:#16a34a"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg></span> Présences
+      <div class="accueil-home-grid vq-grid">
+        <a href="presences.html" class="accueil-home-card vq-card" data-perm="access_presences" style="--c:#16a34a;background:linear-gradient(135deg,#16a34a25,#4ade8015)">
+          <span class="accueil-home-icon vq-icon" style="background:#16a34a20;color:#16a34a"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg></span><span class="accueil-home-label vq-label">Présences</span>
         </a>
-        <a href="chambres.html" class="am-card" data-perm="view_residents" style="background:linear-gradient(135deg,#be185d25,#f472b615)">
-          <span class="am-icon" style="background:#be185d20;color:#be185d"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 4v16"/><path d="M2 8h18a2 2 0 0 1 2 2v10"/><path d="M2 17h20"/><path d="M6 8v9"/></svg></span> Chambres
+        <a href="chambres.html" class="accueil-home-card vq-card" data-perm="view_residents" style="--c:#be185d;background:linear-gradient(135deg,#be185d25,#f472b615)">
+          <span class="accueil-home-icon vq-icon" style="background:#be185d20;color:#be185d"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 4v16"/><path d="M2 8h18a2 2 0 0 1 2 2v10"/><path d="M2 17h20"/><path d="M6 8v9"/></svg></span><span class="accueil-home-label vq-label">Chambres</span>
         </a>
-        <a href="repas.html" class="am-card" data-perm="view_residents" style="background:linear-gradient(135deg,#ea580c25,#fdba7415)">
-          <span class="am-icon" style="background:#ea580c20;color:#ea580c"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 2v7c0 1.1.9 2 2 2h4a2 2 0 0 0 2-2V2"/><path d="M7 2v20"/><path d="M21 15V2a5 5 0 0 0-5 5v6c0 1.1.9 2 2 2h3zm0 0v7"/></svg></span> Repas & régimes
+        <a href="repas.html" class="accueil-home-card vq-card" data-perm="view_residents" style="--c:#ea580c;background:linear-gradient(135deg,#ea580c25,#fdba7415)">
+          <span class="accueil-home-icon vq-icon" style="background:#ea580c20;color:#ea580c"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 2v7c0 1.1.9 2 2 2h4a2 2 0 0 0 2-2V2"/><path d="M7 2v20"/><path d="M21 15V2a5 5 0 0 0-5 5v6c0 1.1.9 2 2 2h3zm0 0v7"/></svg></span><span class="accueil-home-label vq-label">Repas & régimes</span>
         </a>
-        <a href="visites.html" class="am-card" data-perm="view_residents" style="background:linear-gradient(135deg,#65a30d25,#bef26415)">
-          <span class="am-icon" style="background:#65a30d20;color:#65a30d"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M19 8v6"/><path d="M22 11h-6"/></svg></span> Visites & famille
+        <a href="visites.html" class="accueil-home-card vq-card" data-perm="view_residents" style="--c:#65a30d;background:linear-gradient(135deg,#65a30d25,#bef26415)">
+          <span class="accueil-home-icon vq-icon" style="background:#65a30d20;color:#65a30d"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M19 8v6"/><path d="M22 11h-6"/></svg></span><span class="accueil-home-label vq-label">Visites & famille</span>
         </a>
-        <a href="nuit.html" class="am-card" data-perm="access_journal" style="background:linear-gradient(135deg,#312e8125,#818cf815)">
-          <span class="am-icon" style="background:#312e8120;color:#312e81"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg></span> Cahier de nuit
+        <a href="nuit.html" class="accueil-home-card vq-card" data-perm="access_journal" style="--c:#312e81;background:linear-gradient(135deg,#312e8125,#818cf815)">
+          <span class="accueil-home-icon vq-icon" style="background:#312e8120;color:#312e81"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg></span><span class="accueil-home-label vq-label">Cahier de nuit</span>
         </a>
-        <a href="activites.html" class="am-card" data-perm="access_activites" style="background:linear-gradient(135deg,#6366f125,#a5b4fc15)">
-          <span class="am-icon" style="background:#6366f120;color:#6366f1"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="13.5" cy="6.5" r=".5"/><circle cx="17.5" cy="10.5" r=".5"/><circle cx="8.5" cy="7.5" r=".5"/><circle cx="6.5" cy="12.5" r=".5"/><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10c.926 0 1.648-.746 1.648-1.688 0-.437-.18-.835-.437-1.125-.29-.289-.438-.652-.438-1.125a1.64 1.64 0 0 1 1.668-1.668h1.996c3.051 0 5.555-2.503 5.555-5.554C21.965 6.012 17.461 2 12 2z"/></svg></span> Activités éducatives
+        <a href="activites.html" class="accueil-home-card vq-card" data-perm="access_activites" style="--c:#6366f1;background:linear-gradient(135deg,#6366f125,#a5b4fc15)">
+          <span class="accueil-home-icon vq-icon" style="background:#6366f120;color:#6366f1"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="13.5" cy="6.5" r=".5"/><circle cx="17.5" cy="10.5" r=".5"/><circle cx="8.5" cy="7.5" r=".5"/><circle cx="6.5" cy="12.5" r=".5"/><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10c.926 0 1.648-.746 1.648-1.688 0-.437-.18-.835-.437-1.125-.29-.289-.438-.652-.438-1.125a1.64 1.64 0 0 1 1.668-1.668h1.996c3.051 0 5.555-2.503 5.555-5.554C21.965 6.012 17.461 2 12 2z"/></svg></span><span class="accueil-home-label vq-label">Activités éducatives</span>
         </a>
-        <a href="medicaments.html" class="am-card" data-perm="access_medicaments" style="background:linear-gradient(135deg,#dc262625,#fca5a515)">
-          <span class="am-icon" style="background:#dc262620;color:#dc2626"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.5 20.5 21 10a4.95 4.95 0 1 0-7-7L3.5 13.5a4.95 4.95 0 1 0 7 7z"/><path d="m8.5 8.5 7 7"/></svg></span> Distribution des médicaments
+        <a href="medicaments.html" class="accueil-home-card vq-card" data-perm="access_medicaments" style="--c:#dc2626;background:linear-gradient(135deg,#dc262625,#fca5a515)">
+          <span class="accueil-home-icon vq-icon" style="background:#dc262620;color:#dc2626"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.5 20.5 21 10a4.95 4.95 0 1 0-7-7L3.5 13.5a4.95 4.95 0 1 0 7 7z"/><path d="m8.5 8.5 7 7"/></svg></span><span class="accueil-home-label vq-label">Distribution des médicaments</span>
         </a>
       </div>
     </div>
@@ -52,6 +65,13 @@
     const _s = Auth.getSession();
     const ok = _s && (_s.role === 'admin' || _s.role === 'superadmin' || hasPermission(_s.userId, el.dataset.perm));
     if (!ok) el.style.display = 'none';
+  });
+  document.querySelectorAll('.vq-card').forEach(card => {
+    card.addEventListener('mousemove', e => {
+      const r = card.getBoundingClientRect();
+      card.style.setProperty('--mx', (e.clientX - r.left) + 'px');
+      card.style.setProperty('--my', (e.clientY - r.top) + 'px');
+    });
   });
 </script>
 </body></html>
