@@ -1,5 +1,6 @@
 let peWeekStart = peGetMonday(new Date());
 let _peCtx = null;
+let peViewMode = 'week'; // 'week' | 'month'
 
 function initPlanningEquipe() {
   const _s = Auth.requireAuth();
@@ -50,10 +51,33 @@ function peFormatSigned(mins) {
   return sign + peFormatDuration(Math.abs(mins));
 }
 
-// ── NAVIGATION SEMAINE ──
-function pePrevWeek() { peWeekStart.setDate(peWeekStart.getDate()-7); renderPlanningEquipe(); }
-function peNextWeek() { peWeekStart.setDate(peWeekStart.getDate()+7); renderPlanningEquipe(); }
-function peToday() { peWeekStart = peGetMonday(new Date()); renderPlanningEquipe(); }
+// ── NAVIGATION SEMAINE / MOIS ──
+function pePrevWeek() {
+  if (peViewMode === 'week') peWeekStart.setDate(peWeekStart.getDate()-7);
+  else { peWeekStart.setMonth(peWeekStart.getMonth()-1); }
+  renderPlanningEquipe();
+}
+function peNextWeek() {
+  if (peViewMode === 'week') peWeekStart.setDate(peWeekStart.getDate()+7);
+  else { peWeekStart.setMonth(peWeekStart.getMonth()+1); }
+  renderPlanningEquipe();
+}
+function peToday() {
+  const now = new Date();
+  peWeekStart = peViewMode === 'week' ? peGetMonday(now) : new Date(now.getFullYear(), now.getMonth(), 1);
+  renderPlanningEquipe();
+}
+function peSetViewMode(mode) {
+  peViewMode = mode;
+  if (mode === 'month') {
+    peWeekStart = new Date(peWeekStart.getFullYear(), peWeekStart.getMonth(), 1);
+  }
+  document.getElementById('peViewWeekBtn').style.color = mode === 'week' ? 'var(--primary)' : '';
+  document.getElementById('peViewWeekBtn').style.fontWeight = mode === 'week' ? '700' : '';
+  document.getElementById('peViewMonthBtn').style.color = mode === 'month' ? 'var(--primary)' : '';
+  document.getElementById('peViewMonthBtn').style.fontWeight = mode === 'month' ? '700' : '';
+  renderPlanningEquipe();
+}
 
 // ── DONNÉES ──
 function getPeShifts() {
@@ -204,26 +228,42 @@ function deletePeShift() {
 // ── RENDU GRILLE ──
 function renderPlanningEquipe() {
   const DAYS = ['Lun','Mar','Mer','Jeu','Ven','Sam','Dim'];
-  const weekDays = [];
-  for (let i = 0; i < 7; i++) {
-    const d = new Date(peWeekStart);
-    d.setDate(d.getDate() + i);
-    weekDays.push(d);
+  const MONTHS = ['Janvier','Février','Mars','Avril','Mai','Juin','Juillet','Août','Septembre','Octobre','Novembre','Décembre'];
+  let weekDays, weekDayStrs, displayLabel;
+
+  if (peViewMode === 'week') {
+    weekDays = [];
+    for (let i = 0; i < 7; i++) {
+      const d = new Date(peWeekStart);
+      d.setDate(d.getDate() + i);
+      weekDays.push(d);
+    }
+    weekDayStrs = weekDays.map(peISO);
+    displayLabel = `Semaine du ${peFormatShort(weekDays[0])} au ${peFormatShort(weekDays[6])}/${weekDays[6].getFullYear()}`;
+  } else {
+    // Vue mois : générer tous les jours du mois
+    const y = peWeekStart.getFullYear(), m = peWeekStart.getMonth();
+    const daysInMonth = new Date(y, m + 1, 0).getDate();
+    weekDays = [];
+    for (let d = 1; d <= daysInMonth; d++) {
+      weekDays.push(new Date(y, m, d));
+    }
+    weekDayStrs = weekDays.map(peISO);
+    displayLabel = `${MONTHS[m]} ${y}`;
   }
-  const weekDayStrs = weekDays.map(peISO);
+
   const todayStr = today();
   const canEdit = peCanEditPlanning();
 
-  document.getElementById('peWeekLabel').textContent =
-    `Semaine du ${peFormatShort(weekDays[0])} au ${peFormatShort(weekDays[6])}/${weekDays[6].getFullYear()}`;
+  document.getElementById('peWeekLabel').textContent = displayLabel;
   document.getElementById('peHint').textContent = canEdit ? 'Cliquez sur une case pour ajouter ou modifier un créneau' : '';
 
   const employes = (DB.get(DB.keys.employes) || []).filter(e => e.statut !== 'inactif');
   const shifts = getPeShifts();
-  const shiftsWeek = shifts.filter(s => weekDayStrs.includes(s.date));
+  const shiftsFilt = shifts.filter(s => weekDayStrs.includes(s.date));
 
   const byEmp = {};
-  shiftsWeek.forEach(s => {
+  shiftsFilt.forEach(s => {
     const key = s.employeId || 'NA';
     (byEmp[key] = byEmp[key] || []).push(s);
   });
@@ -241,7 +281,8 @@ function renderPlanningEquipe() {
     const numStyle = isToday
       ? 'display:inline-block;width:22px;height:22px;line-height:22px;border-radius:50%;background:var(--primary);color:#fff;font-weight:700;margin-top:2px'
       : 'display:inline-block;margin-top:2px;font-weight:400';
-    return `<th style="padding:.6rem .35rem;text-align:center;font-size:.67rem;font-weight:700;color:var(--muted);text-transform:uppercase;min-width:90px">${DAYS[i]}<br/><span style="${numStyle}">${d.getDate()}</span></th>`;
+    const dayLabel = peViewMode === 'week' ? DAYS[i] : DAYS[new Date(d).getDay()];
+    return `<th style="padding:.6rem .35rem;text-align:center;font-size:.67rem;font-weight:700;color:var(--muted);text-transform:uppercase;min-width:${peViewMode==='week'?'90':'72'}px">${dayLabel}<br/><span style="${numStyle}">${d.getDate()}</span></th>`;
   }).join('');
 
   const naShifts = byEmp['NA'] || [];
@@ -265,9 +306,8 @@ function renderPlanningEquipe() {
     const empShifts = byEmp[emp.id] || [];
     const color = emp.color || 'var(--primary)';
     const totalMins = empShifts.reduce((sum,s) => sum + peDuration(s.debut, s.fin), 0);
-    const contractH = emp.heuresContrat ?? 35;
-    const deltaMins = totalMins - contractH * 60;
-    const deltaColor = deltaMins >= 0 ? 'var(--green)' : 'var(--red)';
+    const nbJours = weekDays.filter(d => empShifts.some(s => s.date === peISO(d))).length;
+    const contractLabel = peViewMode === 'week' ? `${emp.heuresContrat ?? 35}h/sem` : `${nbJours}j présents`;
 
     const cells = weekDays.map(d => {
       const dateStr = peISO(d);
@@ -286,14 +326,14 @@ function renderPlanningEquipe() {
           ${residentPhoto(emp, 32)}
           <div>
             <div style="font-weight:600;font-size:.8rem">${escHtml((emp.prenom||'')+' '+(emp.nom||''))}</div>
-            <div style="font-size:.68rem;color:var(--muted)">${contractH}h/sem</div>
+            <div style="font-size:.68rem;color:var(--muted)">${contractLabel}</div>
           </div>
         </div>
       </td>
       ${cells}
       <td style="padding:.5rem .75rem;text-align:center;white-space:nowrap">
         <div style="font-weight:700;font-size:.78rem">${peFormatDuration(totalMins)}</div>
-        <div style="font-size:.68rem;font-weight:600;color:${deltaColor}">${peFormatSigned(deltaMins)}</div>
+        ${peViewMode === 'week' ? `<div style="font-size:.68rem;font-weight:600;color:${totalMins >= (emp.heuresContrat??35)*60 ? 'var(--green)' : 'var(--red)'}">${peFormatSigned(totalMins - (emp.heuresContrat??35)*60)}</div>` : ''}
       </td>
     </tr>`;
   }).join('');
@@ -301,7 +341,7 @@ function renderPlanningEquipe() {
   let grandTotal = 0;
   const footerCells = weekDays.map(d => {
     const dateStr = peISO(d);
-    const dayTotal = shiftsWeek.filter(s => s.date === dateStr).reduce((sum,s) => sum + peDuration(s.debut,s.fin), 0);
+    const dayTotal = shiftsFilt.filter(s => s.date === dateStr).reduce((sum,s) => sum + peDuration(s.debut,s.fin), 0);
     grandTotal += dayTotal;
     return `<td style="padding:.5rem .35rem;text-align:center;font-weight:700;font-size:.78rem">${peFormatDuration(dayTotal)}</td>`;
   }).join('');
