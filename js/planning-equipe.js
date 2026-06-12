@@ -428,13 +428,15 @@ function renderPlanningEquipe() {
 
 function peShiftBlock(empId, dateStr, s, isNa) {
   const serviceColor = s.service ? (PE_SERVICE_COLORS[s.service] || '') : '';
-  const bgColor = isNa ? 'var(--g100)' : (serviceColor || s.color || 'var(--primary)');
-  const txtColor = isNa ? 'var(--muted)' : (serviceColor || s.color || 'var(--primary)');
-  const borderColor = isNa ? 'var(--border)' : (serviceColor ? serviceColor + '55' : (s.color || 'var(--primary)') + '55');
+  const baseColor = serviceColor || s.color || 'var(--primary)';
+  const txtColor = isNa ? 'var(--muted)' : baseColor;
+  const bgAlpha = serviceColor ? '20' : '12';
+  const borderColor = isNa ? 'var(--border)' : (serviceColor ? serviceColor + '55' : (s.color || 'var(--primary)') + '30');
   const label = s.service ? PE_SERVICE_LABELS[s.service] || s.service : (s.debut + '-' + s.fin);
+  const bgStyle = isNa ? 'var(--g100)' : (serviceColor ? serviceColor + bgAlpha : `color-mix(in srgb, ${baseColor} 8%, transparent)`);
   return `<div draggable="true" ondragstart="peDragStart(event,'${s.id}')" ondrop="peDrop(event,'${s.id}')" ondragover="event.preventDefault()"
     onclick="event.stopPropagation();${empId ? `openPeShiftModal('${empId}','${dateStr}','${s.id}')` : `openPeShiftModal(null,'${dateStr}','${s.id}')`}"
-    style="cursor:pointer;background:${bgColor}20;border:1px solid ${borderColor};border-radius:6px;padding:.3rem .4rem;margin-bottom:2px" title="${escHtml(s.notes||'')}">
+    style="cursor:pointer;background:${bgStyle};border:1px solid ${borderColor};border-radius:6px;padding:.3rem .4rem;margin-bottom:2px" title="${escHtml(s.notes||'')}">
     <div style="font-size:.7rem;font-weight:700;color:${txtColor}">${escHtml(label)}${s.service ? `<span style="font-weight:400;margin-left:.2rem">${s.debut}-${s.fin}</span>` : ''}</div>
     <div style="font-size:.62rem;font-weight:500;color:${txtColor};opacity:.85">${peFormatDuration(peDuration(s.debut,s.fin))}</div>
     ${s.notes ? `<div style="font-size:.6rem;color:${txtColor};opacity:.7;margin-top:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${escHtml(s.notes)}</div>` : ''}

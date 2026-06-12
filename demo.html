@@ -1042,13 +1042,17 @@ function generateForCurrentEtab() {
       d.setDate(d.getDate() - rand(0, 60));
       const debut = new Date(d); debut.setHours(rand(6, 10), 0, 0, 0);
       const fin = new Date(debut); fin.setHours(debut.getHours() + rand(4, 10));
+      const hD = debut.getHours();
+      const dureeH = (fin.getHours() - debut.getHours()) + (fin.getMinutes() - debut.getMinutes()) / 60;
+      const svc = (dureeH >= 11) ? 'Journee' : (hD < 7) ? 'Nuit' : (hD < 12) ? 'Matin' : 'Apres-midi';
       pe.push({
         id: 'pe-' + genId(),
         employeId: emp.id,
         employeNom: (emp.prenom||'') + ' ' + (emp.nom||''),
         date: d.toISOString().slice(0,10),
         debut: debut.toTimeString().slice(0,5),
-        fin: fin.toTimeString().slice(0,5)
+        fin: fin.toTimeString().slice(0,5),
+        service: svc
       });
     }
     // Générer des créneaux pour la semaine courante
@@ -1070,13 +1074,49 @@ function generateForCurrentEtab() {
         const duree = pick([4, 6, 7, 8, 9, 10, 12]);
         const debut = new Date(d); debut.setHours(hDebut, 0, 0, 0);
         const fin = new Date(debut); fin.setHours(debut.getHours() + duree);
+      const hD = debut.getHours();
+      const dureeH = (fin.getHours() - debut.getHours()) + (fin.getMinutes() - debut.getMinutes()) / 60;
+      const svc = (dureeH >= 11) ? 'Journee' : (hD < 7) ? 'Nuit' : (hD < 12) ? 'Matin' : 'Apres-midi';
+      pe.push({
+        id: 'pe-' + genId(),
+        employeId: emp.id,
+        employeNom: (emp.prenom||'') + ' ' + (emp.nom||''),
+        date: d.toISOString().slice(0,10),
+        debut: debut.toTimeString().slice(0,5),
+        fin: fin.toTimeString().slice(0,5),
+        service: svc
+      });
+    }
+    // Générer des créneaux pour la semaine courante
+    function peGetMonday(d) {
+      const date = new Date(d);
+      const day = date.getDay();
+      date.setDate(date.getDate() - (day === 0 ? 6 : day - 1));
+      date.setHours(0,0,0,0);
+      return date;
+    }
+    const monday = peGetMonday(now);
+    for (let i = 0; i < 7; i++) {
+      const d = new Date(monday);
+      d.setDate(d.getDate() + i);
+      const dateStr = d.toISOString().slice(0,10);
+      const quels = employesList.filter(() => Math.random() < 0.5);
+      quels.forEach(emp => {
+        const hDebut = rand(6, 14);
+        const duree = pick([4, 6, 7, 8, 9, 10, 12]);
+        const debut = new Date(d); debut.setHours(hDebut, 0, 0, 0);
+        const fin = new Date(debut); fin.setHours(debut.getHours() + duree);
+        const hD = debut.getHours();
+        const dureeH = (fin.getHours() - debut.getHours()) + (fin.getMinutes() - debut.getMinutes()) / 60;
+        const svc = (dureeH >= 11) ? 'Journee' : (hD < 7) ? 'Nuit' : (hD < 12) ? 'Matin' : 'Apres-midi';
         pe.push({
           id: 'pe-' + genId(),
           employeId: emp.id,
           employeNom: (emp.prenom||'') + ' ' + (emp.nom||''),
           date: dateStr,
           debut: debut.toTimeString().slice(0,5),
-          fin: fin.toTimeString().slice(0,5)
+          fin: fin.toTimeString().slice(0,5),
+          service: svc
         });
       });
     }
